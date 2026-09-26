@@ -288,7 +288,8 @@ with updated as (
 select isnt((select accepted_at from updated), null, 'Carla accepts Bob''s request and accepted_at is set');
 
 select is(
-  (select count(*)::integer from public.score_categories),
+  (select count(*)::integer from public.score_categories
+   where game_id = 'a0000000-0000-0000-0000-000000000001'),
   1,
   'signed-in users can read the game catalog'
 );
