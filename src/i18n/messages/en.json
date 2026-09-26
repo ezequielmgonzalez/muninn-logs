@@ -1,0 +1,14 @@
+{
+  "Metadata": {
+    "description": "The memory of your game table."
+  },
+  "HomePage": {
+    "tagline": "The memory of your game table.",
+    "logGame": "Log a game"
+  },
+  "LocaleSwitcher": {
+    "label": "Language",
+    "es": "Español",
+    "en": "English"
+  }
+}

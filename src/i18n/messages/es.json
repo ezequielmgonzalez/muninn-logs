@@ -1,0 +1,14 @@
+{
+  "Metadata": {
+    "description": "La memoria de tu mesa de juego."
+  },
+  "HomePage": {
+    "tagline": "La memoria de tu mesa de juego.",
+    "logGame": "Cargar partida"
+  },
+  "LocaleSwitcher": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "English"
+  }
+}
