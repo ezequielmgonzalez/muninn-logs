@@ -12,3 +12,13 @@ pnpm supabase start        # local Postgres + Auth; prints the URL and publishab
 cp .env.example .env.local # paste those values in
 pnpm dev
 ```
+
+## Testing
+
+```bash
+pnpm test        # unit tests (Vitest), next to the code as *.test.ts(x)
+pnpm test:watch  # unit tests in watch mode
+pnpm test:e2e    # end-to-end tests (Playwright) in e2e/, desktop + mobile
+```
+
+The first time, install the browser with `pnpm exec playwright install chromium`. `pnpm test:e2e` starts `pnpm dev` on port 3100, or reuses it if it's already running.
