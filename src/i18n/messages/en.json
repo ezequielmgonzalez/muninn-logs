@@ -4,7 +4,44 @@
   },
   "HomePage": {
     "tagline": "The memory of your game table.",
-    "logGame": "Log a game"
+    "logGame": "Log a game",
+    "signIn": "Sign in",
+    "greeting": "Hi, {name}"
+  },
+  "Auth": {
+    "title": "Sign in",
+    "description": "We'll email you a code. If it's your first time, we'll create your account.",
+    "emailLabel": "Email",
+    "sendCode": "Send code",
+    "codeSentTo": "Enter the 6-digit code we sent to {email}.",
+    "codeLabel": "Code",
+    "verify": "Sign in",
+    "useDifferentEmail": "Use a different email",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "signOut": "Sign out",
+    "errors": {
+      "invalidEmail": "Enter a valid email.",
+      "invalidCode": "That code is wrong or expired. Request a new one if needed.",
+      "rateLimited": "Too many codes requested. Wait a moment and try again.",
+      "oauth": "We couldn't sign you in with Google. Try again.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "Onboarding": {
+    "title": "Choose your username",
+    "description": "Friends will find you by this name to add you.",
+    "usernameLabel": "Username",
+    "usernameHint": "3 to 20 characters: lowercase letters, numbers or _",
+    "displayNameLabel": "Name",
+    "displayNameHint": "This is how others see you in games.",
+    "submit": "Continue",
+    "errors": {
+      "invalidUsername": "Use 3 to 20 characters: lowercase letters, numbers or _.",
+      "invalidDisplayName": "Your name must be 1 to 50 characters.",
+      "usernameTaken": "That username is already taken.",
+      "generic": "Something went wrong. Try again."
+    }
   },
   "LocaleSwitcher": {
     "label": "Language",

@@ -4,7 +4,44 @@
   },
   "HomePage": {
     "tagline": "La memoria de tu mesa de juego.",
-    "logGame": "Cargar partida"
+    "logGame": "Cargar partida",
+    "signIn": "Iniciar sesión",
+    "greeting": "Hola, {name}"
+  },
+  "Auth": {
+    "title": "Iniciar sesión",
+    "description": "Te mandamos un código a tu email. Si es tu primera vez, se crea tu cuenta.",
+    "emailLabel": "Email",
+    "sendCode": "Enviar código",
+    "codeSentTo": "Ingresá el código de 6 dígitos que mandamos a {email}.",
+    "codeLabel": "Código",
+    "verify": "Entrar",
+    "useDifferentEmail": "Usar otro email",
+    "or": "o",
+    "continueWithGoogle": "Continuar con Google",
+    "signOut": "Cerrar sesión",
+    "errors": {
+      "invalidEmail": "Ingresá un email válido.",
+      "invalidCode": "El código es incorrecto o venció. Pedí uno nuevo si hace falta.",
+      "rateLimited": "Pediste demasiados códigos. Esperá un momento y probá de nuevo.",
+      "oauth": "No pudimos iniciar sesión con Google. Probá de nuevo.",
+      "generic": "Algo salió mal. Probá de nuevo."
+    }
+  },
+  "Onboarding": {
+    "title": "Elegí tu nombre de usuario",
+    "description": "Tus amigos te van a encontrar por este nombre para agregarte.",
+    "usernameLabel": "Nombre de usuario",
+    "usernameHint": "3 a 20 caracteres: minúsculas, números o _",
+    "displayNameLabel": "Nombre",
+    "displayNameHint": "Así te ven los demás en las partidas.",
+    "submit": "Continuar",
+    "errors": {
+      "invalidUsername": "Usá de 3 a 20 caracteres: minúsculas, números o _.",
+      "invalidDisplayName": "El nombre tiene que tener entre 1 y 50 caracteres.",
+      "usernameTaken": "Ese nombre de usuario ya está en uso.",
+      "generic": "Algo salió mal. Probá de nuevo."
+    }
   },
   "LocaleSwitcher": {
     "label": "Idioma",

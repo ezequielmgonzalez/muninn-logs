@@ -11,8 +11,10 @@ import { getSupabaseEnv } from "./env";
  * Create a new one per request; never share it across requests.
  */
 export async function createClient() {
-  const { url, publishableKey } = getSupabaseEnv();
+  // cookies() first: it marks the page as dynamic, so the build never tries to
+  // prerender it and doesn't need the env vars, which are only read at request time.
   const cookieStore = await cookies();
+  const { url, publishableKey } = getSupabaseEnv();
 
   return createServerClient<Database>(url, publishableKey, {
     cookies: {

@@ -37,10 +37,6 @@ jobs:
   e2e:
     name: End-to-end tests
     runs-on: ubuntu-latest
-    env:
-      # Placeholders: the proxy requires these, but no test signs in yet.
-      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder
     steps:
       - uses: actions/checkout@v7
 
@@ -53,6 +49,21 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+
+      # Postgres, Auth, the REST API and Mailpit (sign-in codes) are all the
+      # tests need; skip the rest to start faster.
+      - run: >
+          pnpm supabase start
+          -x realtime,storage-api,imgproxy,studio,edge-runtime,logflare,vector,supavisor,postgres-meta
+
+      # NEXT_PUBLIC_* values are inlined at build time, so set them before building.
+      - name: Point the app at the local Supabase
+        run: |
+          eval "$(pnpm -s supabase status -o env)"
+          echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+          echo "MAILPIT_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
+
       - run: pnpm build
       - run: pnpm test:e2e
 

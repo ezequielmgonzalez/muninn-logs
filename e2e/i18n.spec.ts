@@ -5,7 +5,7 @@ test("redirects / to the Spanish home page by default", async ({ page }) => {
 
   await expect(page).toHaveURL("/es");
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
-  await expect(page.getByRole("button", { name: "Cargar partida" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Iniciar sesión" })).toBeVisible();
 });
 
 test.describe("with an English browser", () => {
@@ -15,7 +15,7 @@ test.describe("with an English browser", () => {
     await page.goto("/");
 
     await expect(page).toHaveURL("/en");
-    await expect(page.getByRole("button", { name: "Log a game" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
   });
 });
 
@@ -24,7 +24,7 @@ test("switches language and remembers the choice", async ({ page }) => {
 
   await page.getByRole("link", { name: "English" }).click();
   await expect(page).toHaveURL("/en");
-  await expect(page.getByRole("button", { name: "Log a game" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
 
   // next-intl stores the choice in a cookie, so / now goes to English.
   await page.goto("/");
