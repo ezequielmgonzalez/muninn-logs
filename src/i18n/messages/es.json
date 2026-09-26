@@ -10,5 +10,28 @@
     "label": "Idioma",
     "es": "Español",
     "en": "English"
+  },
+  "Games": {
+    "arnak": {
+      "name": "Las Ruinas Perdidas de Arnak",
+      "leaders": {
+        "captain": "Capitán",
+        "falconer": "Cetrera",
+        "baroness": "Baronesa",
+        "professor": "Profesor",
+        "explorer": "Exploradora",
+        "mystic": "Místico",
+        "mechanic": "Mecánica",
+        "journalist": "Periodista"
+      },
+      "scoreCategories": {
+        "research": "Investigación",
+        "temple": "Templo",
+        "idols": "Ídolos",
+        "guardians": "Guardianes",
+        "cards": "Cartas",
+        "fear": "Miedo"
+      }
+    }
   }
 }

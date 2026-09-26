@@ -10,5 +10,28 @@
     "label": "Language",
     "es": "Español",
     "en": "English"
+  },
+  "Games": {
+    "arnak": {
+      "name": "Lost Ruins of Arnak",
+      "leaders": {
+        "captain": "Captain",
+        "falconer": "Falconer",
+        "baroness": "Baroness",
+        "professor": "Professor",
+        "explorer": "Explorer",
+        "mystic": "Mystic",
+        "mechanic": "Mechanic",
+        "journalist": "Journalist"
+      },
+      "scoreCategories": {
+        "research": "Research",
+        "temple": "Temple",
+        "idols": "Idols",
+        "guardians": "Guardians",
+        "cards": "Cards",
+        "fear": "Fear"
+      }
+    }
   }
 }
