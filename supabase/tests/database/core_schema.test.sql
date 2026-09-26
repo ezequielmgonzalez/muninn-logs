@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(23);
+select plan(24);
 
 -- Deferred unique constraints only fire at commit, and this transaction rolls back.
 set constraints all immediate;
@@ -14,7 +14,8 @@ set constraints all immediate;
 
 insert into auth.users (id, email, raw_user_meta_data) values
   ('11111111-1111-1111-1111-111111111111', 'ana@example.com', '{"full_name": "Ana"}'),
-  ('22222222-2222-2222-2222-222222222222', 'bob@example.com', '{}');
+  ('22222222-2222-2222-2222-222222222222', 'bob@example.com', '{}'),
+  ('33333333-3333-3333-3333-333333333333', 'carla@example.com', '{}');
 
 insert into public.games (id, slug, min_players, max_players) values
   ('a0000000-0000-0000-0000-000000000001', 'test-game', 2, 4),
@@ -100,10 +101,17 @@ select throws_ok(
 );
 
 select throws_ok(
-  $$ update public.friendships set status = 'accepted'
-     where requester_id = '11111111-1111-1111-1111-111111111111' $$,
+  $$ insert into public.friendships (requester_id, addressee_id, status)
+     values ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 'accepted') $$,
   '23514', null, 'an accepted friendship needs accepted_at'
 );
+
+with accepted as (
+  update public.friendships set status = 'accepted'
+  where requester_id = '11111111-1111-1111-1111-111111111111'
+  returning accepted_at
+)
+select isnt((select accepted_at from accepted), null, 'accepting a request sets accepted_at');
 
 -- ---------------------------------------------------------------------------
 -- Matches

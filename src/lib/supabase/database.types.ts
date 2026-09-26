@@ -231,7 +231,11 @@ isOneToOne: false
                 }
           }
           Functions: {
-            [_ in never]: never
+            "find_profile_by_username":
+{ Args: { "search_username": string }; Returns: {
+              "display_name": string,"id": string,"username": string
+            }[]
+                           }
           }
           Enums: {
             "friendship_status": "pending"|"accepted"
