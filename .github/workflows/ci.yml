@@ -64,6 +64,31 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  db:
+    name: Database tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Starts only Postgres and applies every migration in supabase/migrations.
+      - run: pnpm supabase db start
+      - run: pnpm test:db
+
+      - name: Check generated types are up to date
+        run: |
+          pnpm db:types
+          git diff --exit-code src/lib/supabase/database.types.ts \
+            || (echo "::error::database.types.ts is stale. Run 'pnpm db:types' and commit it." && exit 1)
+
   commitlint:
     name: Commit messages
     if: github.event_name == 'pull_request'
