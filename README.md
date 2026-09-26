@@ -26,6 +26,16 @@ pnpm test:db                        # pgTAP tests in supabase/tests/
 
 Commit the regenerated types with the migration; CI fails if they're stale.
 
+### Environments
+
+| | Supabase project | App |
+| --- | --- | --- |
+| Local | `pnpm supabase start` | `pnpm dev` |
+| Staging | `muninn-logs-staging` | Vercel preview deployments |
+| Production | `muninn-logs-prod` | https://muninn-logs.vercel.app |
+
+Merging a migration to `main` runs **Deploy database** (`.github/workflows/deploy-db.yml`): it applies pending migrations to staging, then to production if staging succeeded. It needs the `SUPABASE_ACCESS_TOKEN` repository secret and, in the `db-staging` and `db-production` GitHub environments, the `SUPABASE_PROJECT_REF` variable and `SUPABASE_DB_PASSWORD` secret.
+
 ## Testing
 
 ```bash

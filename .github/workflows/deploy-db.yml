@@ -1,0 +1,32 @@
+name: Deploy database
+
+# Migrations reach staging first; production only runs if staging succeeded.
+on:
+  push:
+    branches: [main]
+    paths:
+      - supabase/migrations/**
+  # Run by hand, e.g. to bring a new project up to date.
+  workflow_dispatch:
+
+# Queue deploys instead of cancelling one halfway through a migration.
+concurrency:
+  group: deploy-db
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  staging:
+    uses: ./.github/workflows/db-push.yml
+    with:
+      environment: db-staging
+    secrets: inherit
+
+  production:
+    needs: staging
+    uses: ./.github/workflows/db-push.yml
+    with:
+      environment: db-production
+    secrets: inherit
