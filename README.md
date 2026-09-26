@@ -13,6 +13,19 @@ cp .env.example .env.local # paste those values in
 pnpm dev
 ```
 
+## Database
+
+Schema changes are versioned SQL migrations in `supabase/migrations/`. See [docs/data-model.md](docs/data-model.md) for the model.
+
+```bash
+pnpm supabase migration new <name>  # create a migration file
+pnpm supabase db reset              # rebuild the local database from all migrations
+pnpm db:types                       # regenerate src/lib/supabase/database.types.ts
+pnpm test:db                        # pgTAP tests in supabase/tests/
+```
+
+Commit the regenerated types with the migration; CI fails if they're stale.
+
 ## Testing
 
 ```bash

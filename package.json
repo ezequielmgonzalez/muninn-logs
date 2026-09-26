@@ -11,6 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "db:types": "supabase gen types --lang typescript --local --schema public > src/lib/supabase/database.types.ts",
+    "test:db": "supabase test db",
     "prepare": "husky"
   },
   "dependencies": {
