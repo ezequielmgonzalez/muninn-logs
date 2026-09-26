@@ -46,8 +46,8 @@ Cada usuario ve dos vistas de sus estadísticas: contra todos los rivales que en
 
 |                                      | Usuario con cuenta | Invitado sin cuenta                                                                      |
 | ------------------------------------ | ------------------ | ---------------------------------------------------------------------------------------- |
-| Quién lo puede agregar a una partida | Solo amigos        | Quien lo creó                                                                            |
-| Quién lo puede ver y comparar        | Solo amigos        | Cualquiera que jugó con él en alguna partida, aunque el registro sea de otro organizador |
+| Quién lo puede agregar a una partida | Solo amigos        | Quien lo creó, o cualquiera que ya jugó con él                                           |
+| Quién lo puede ver y comparar        | Solo amigos (en una partida compartida, cualquiera ve su nombre) | Cualquiera que jugó con él en alguna partida, aunque el registro sea de otro organizador |
 | Dónde vive el registro               | Global (la cuenta) | Privado, en el roster de quien lo cargó                                                  |
 | Continuidad de estadísticas          | Automática         | Automática si se reusa el mismo registro                                                 |
 | Puede volverse el otro tipo          | —                  | Sí, reclamando el registro al crear cuenta                                               |
@@ -89,7 +89,6 @@ El juego base es simétrico: la asimetría la agrega la expansión _Los Líderes
 | ------------------ | ------------------ | ------------------------------------- |
 | Fecha              | Fecha              | Obligatorio                           |
 | Lado del tablero   | Pájaro / Serpiente | Opcional, permite comparar dificultad |
-| Expansiones usadas | Lista              | Vacía = juego base                    |
 | Duración           | Minutos            | Opcional                              |
 
 **Datos por jugador en la partida**
@@ -98,7 +97,7 @@ El juego base es simétrico: la asimetría la agrega la expansión _Los Líderes
 | -------------- | ---------------- | ----------------------------- |
 | Jugador        | Referencia       | Con o sin cuenta              |
 | Orden de turno | Número           | 1 a 4                         |
-| Líder          | Opción           | Solo si se usó la expansión   |
+| Líder          | Opción           | Opcional (vacío = sin la expansión). Único por partida |
 | Investigación  | Puntos           | Track de investigación        |
 | Templo         | Puntos           | Losetas de templo             |
 | Ídolos         | Puntos           |                               |
@@ -109,7 +108,7 @@ El juego base es simétrico: la asimetría la agrega la expansión _Los Líderes
 
 Conviene verificar estas categorías contra la hoja de puntuación oficial antes de programar el formulario.
 
-**Desempate:** en caso de empate en puntos totales, gana quien llevó la lupa más lejos en el track de exploración. Lo indica manualmente quien carga la partida; conviene agregar un campo "posición en el track" por jugador para eso.
+**Desempate:** en caso de empate en puntos totales, gana quien llevó la lupa más lejos en el track de exploración. Solo si hay empate en el primer puesto, el formulario pregunta quién ganó el desempate; no se guarda la posición en el track. El ganador se calcula a partir de los puntos, no se guarda (ver [data-model.md](data-model.md)).
 
 ## Métricas de éxito del MVP
 

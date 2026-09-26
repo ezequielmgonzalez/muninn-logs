@@ -1,0 +1,157 @@
+# Data model
+
+How Muninn Logs stores people, games and matches, and who can see or change what. Product context lives in [vision.md](vision.md); this document is the technical contract the migrations and RLS policies implement.
+
+## Principles
+
+- **Generic inside, game-specific outside.** Tables work for any game. Each game is catalog data (rows identified by slugs) plus a Zod schema and translated labels in the app.
+- **Store facts, derive results.** Scores are stored; totals, ranks and winners are computed. Editing a score can never leave a stale winner behind.
+- **Private by default.** A match is visible only to the users who played it and the user who logged it.
+
+## Tables
+
+### People
+
+**`profiles`**: one per account, created automatically when a user signs up.
+
+| Column         | Type        | Notes                                      |
+| -------------- | ----------- | ------------------------------------------ |
+| `id`           | uuid, PK    | = `auth.users.id`                          |
+| `username`     | text        | Unique, lowercase. Used to find friends    |
+| `display_name` | text        |                                            |
+| `created_at`   | timestamptz |                                            |
+
+**`friendships`**: one row per pair of users.
+
+| Column         | Type        | Notes                             |
+| -------------- | ----------- | --------------------------------- |
+| `requester_id` | uuid        | → `profiles`                      |
+| `addressee_id` | uuid        | → `profiles`                      |
+| `status`       | enum        | `pending` \| `accepted`           |
+| `created_at`   | timestamptz |                                   |
+| `accepted_at`  | timestamptz | Null while pending                |
+
+- `requester_id <> addressee_id`.
+- Unique on the unordered pair (`least(a, b)`, `greatest(a, b)`), so A→B and B→A can't both exist.
+- Declining or unfriending deletes the row.
+
+**`players`**: anyone who can appear in a match. Users and guests share this table.
+
+| Column       | Type        | Notes                                              |
+| ------------ | ----------- | -------------------------------------------------- |
+| `id`         | uuid, PK    |                                                    |
+| `user_id`    | uuid        | Unique → `profiles`. Null for guests               |
+| `owner_id`   | uuid        | → `profiles`, the guest's creator. Null for users  |
+| `name`       | text        | Guests only. Users show their profile's name       |
+| `created_at` | timestamptz |                                                    |
+
+- Check: a row is either a user (`user_id` set, `owner_id` and `name` null) or a guest (`user_id` null, `owner_id` and `name` set).
+- Every profile gets its player row automatically on sign-up.
+- **Why one table:** match rows reference a single `player_id`, and stats queries are identical for users and guests. Claiming a guest (phase 2) means moving the guest's `match_players` rows to the user's player and deleting the guest.
+
+### Game catalog
+
+Catalog rows are inserted by migrations/seeds, never by users. They store slugs only; display names live in the translation files (`es.json`: `research` → "Investigación").
+
+**`games`**: `id`, `slug` (unique, e.g. `arnak`), `min_players`, `max_players`.
+
+**`game_characters`**: `id`, `game_id`, `slug`. Unique (`game_id`, `slug`). For Arnak, the leaders (`falconeer`, …).
+
+**`score_categories`**: `id`, `game_id`, `slug`, `sort_order`. Unique (`game_id`, `slug`). For Arnak: `research`, `temple`, `idols`, `guardians`, `cards`, `fear`, to be checked against the official score sheet before seeding.
+
+### Matches
+
+**`matches`**
+
+| Column             | Type        | Notes                                                 |
+| ------------------ | ----------- | ----------------------------------------------------- |
+| `id`               | uuid, PK    |                                                       |
+| `game_id`          | uuid        | → `games`                                             |
+| `created_by`       | uuid        | → `profiles`. Doesn't have to be a participant        |
+| `played_on`        | date        | Required                                              |
+| `duration_minutes` | integer     | Optional, > 0                                         |
+| `setup`            | jsonb       | Game-specific setup, validated by the game's Zod schema. Arnak: `{"board_side": "bird" \| "snake"}` (optional) |
+| `created_at`       | timestamptz |                                                       |
+| `updated_at`       | timestamptz |                                                       |
+
+**`match_players`**
+
+| Column         | Type     | Notes                                                        |
+| -------------- | -------- | ------------------------------------------------------------ |
+| `match_id`     | uuid     | → `matches`, cascade delete. PK with `player_id`             |
+| `player_id`    | uuid     | → `players`                                                  |
+| `turn_order`   | smallint | 1..N. Unique per match                                       |
+| `character_id` | uuid     | → `game_characters`. **Optional**: null = played without the leaders expansion |
+| `won_tiebreak` | boolean  | Default false. See [Winner](#winner)                         |
+
+- Unique (`match_id`, `character_id`): a leader can be played by only one player per match. Nulls don't collide, so any number of players can have no leader.
+- At most one `won_tiebreak = true` per match (partial unique index).
+- The character must belong to the match's game (enforced in the database).
+
+**`match_player_scores`**: one row per player per category.
+
+| Column        | Type    | Notes                                              |
+| ------------- | ------- | -------------------------------------------------- |
+| `match_id`    | uuid    | PK with `player_id`, `category_id`. → `match_players` |
+| `player_id`   | uuid    |                                                    |
+| `category_id` | uuid    | → `score_categories`, of the match's game          |
+| `points`      | integer | Signed: fear is stored negative, so total = sum    |
+
+**Why rows instead of a jsonb column:** "average per category" and comparisons are plain `GROUP BY`s, and foreign keys guarantee every category exists.
+
+### Winner
+
+Totals and the winner are never stored. A view computes them per player per match:
+
+```sql
+total  = sum(points)
+rank   = rank() over (partition by match_id order by total desc, won_tiebreak desc)
+winner = rank = 1
+```
+
+- Highest total wins.
+- If several players tie for first, the form asks who won the tiebreak (for Arnak: furthest on the research track) and sets `won_tiebreak` on that player.
+- If a first-place tie is left unresolved, every tied player has rank 1: a shared win.
+- `won_tiebreak` only matters among players tied for first; on anyone else it has no effect on the ranking.
+
+The view must be created with `security_invoker = true`, so it applies the RLS of the person querying it instead of bypassing it.
+
+## Who can see what
+
+Enforced with Row Level Security. "Shared a match" means both players appear in `match_players` of the same match.
+
+| Data                     | Visible to                                                                                     |
+| ------------------------ | ---------------------------------------------------------------------------------------------- |
+| A match and its players and scores | Its creator and every participant with an account                                     |
+| A user's name            | Themselves, their friends, and anyone who shared a match with them                            |
+| A user's stats           | Themselves and their accepted friends, as **aggregates only** (see below)                     |
+| A guest and their stats  | Its owner and anyone who shared a match with that guest; stats count only those shared matches |
+| Friendships              | The two users involved                                                                        |
+
+**Friends' stats without exposing their matches.** Matches stay private even from friends, but comparing yourself with a friend needs their overall numbers. Stats for a user are served by a database function (`security definer`) that returns aggregates only (games, wins, win rate, averages per category), and only when the caller is that user or an accepted friend. Match rows themselves stay behind RLS.
+
+**Finding people.** There is no public user list. A friend request starts from an exact username lookup (a function that returns at most one profile).
+
+## Who can change what
+
+| Action                                   | Allowed for                                                                                   |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Create, edit, delete a match (and its players/scores) | Only its creator                                                                  |
+| Add a user to a match                    | The match creator, if the user is themselves or an accepted friend                             |
+| Add a guest to a match                   | The match creator, if they own the guest or have shared a match with it                        |
+| Create, rename a guest                   | Only its owner                                                                                |
+| Delete a guest                           | Only its owner, and only if the guest isn't in any match                                      |
+| Send a friend request                    | Any user, to someone found by username                                                        |
+| Accept a friend request                  | The addressee                                                                                 |
+| Decline, cancel, unfriend                | Either user (deletes the row). Existing matches are unaffected                               |
+
+## Decided, to implement later
+
+- **Saving a match atomically.** A match, its players and their scores are several inserts. They should run in one transaction, likely a Postgres function called from the form, so a failure never leaves a half-saved match. Decide when building the form.
+- **Player count** (`min_players`..`max_players`) spans many rows, so it's validated by the Zod schema and by that function, not by a table constraint.
+
+## Out of scope for now
+
+- Claiming a guest when they sign up (phase 2).
+- What happens to matches when a user deletes their account.
+- Letting a participant dispute or leave a match someone else logged. Requiring friendship to add a user is the MVP safeguard.
