@@ -34,4 +34,10 @@ pnpm test:watch  # unit tests in watch mode
 pnpm test:e2e    # end-to-end tests (Playwright) in e2e/, desktop + mobile
 ```
 
-The first time, install the browser with `pnpm exec playwright install chromium`. `pnpm test:e2e` starts `pnpm dev` on port 3100, or reuses it if it's already running.
+The first time, install the browser with `pnpm exec playwright install chromium`. `pnpm test:e2e` starts `pnpm dev` on port 3100, or reuses it if it's already running. It needs the local Supabase stack running (`pnpm supabase start`): the sign-in tests read their codes from Mailpit at http://127.0.0.1:54324.
+
+## Authentication
+
+Users sign in with a 6-digit code sent by email (templates in `supabase/templates/`), then choose a username. Locally, every email lands in Mailpit (http://127.0.0.1:54324) instead of a real inbox.
+
+Google sign-in is built but off until a Google Cloud OAuth client exists: enable `[auth.external.google]` in `supabase/config.toml` and set `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED=true`.
