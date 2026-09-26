@@ -1,0 +1,32 @@
+import { expect, test } from "@playwright/test";
+
+test("redirects / to the Spanish home page by default", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page).toHaveURL("/es");
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
+  await expect(page.getByRole("button", { name: "Cargar partida" })).toBeVisible();
+});
+
+test.describe("with an English browser", () => {
+  test.use({ locale: "en-US" });
+
+  test("redirects / to the English home page", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(page).toHaveURL("/en");
+    await expect(page.getByRole("button", { name: "Log a game" })).toBeVisible();
+  });
+});
+
+test("switches language and remembers the choice", async ({ page }) => {
+  await page.goto("/es");
+
+  await page.getByRole("link", { name: "English" }).click();
+  await expect(page).toHaveURL("/en");
+  await expect(page.getByRole("button", { name: "Log a game" })).toBeVisible();
+
+  // next-intl stores the choice in a cookie, so / now goes to English.
+  await page.goto("/");
+  await expect(page).toHaveURL("/en");
+});

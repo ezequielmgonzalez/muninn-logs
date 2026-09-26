@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   checks:
-    name: Lint, typecheck and build
+    name: Lint, typecheck, unit tests and build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -31,7 +31,38 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm test
       - run: pnpm build
+
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    env:
+      # Placeholders: the proxy requires these, but no test signs in yet.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - run: pnpm test:e2e
+
+      # Traces and screenshots of failed tests, downloadable from the run page.
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
 
   commitlint:
     name: Commit messages
