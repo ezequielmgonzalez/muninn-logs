@@ -59,6 +59,7 @@ function LoginSteps({
         <div className="flex flex-col gap-2">
           <Label htmlFor="code">{t("codeLabel")}</Label>
           <Input
+            className="h-11"
             id="code"
             name="code"
             inputMode="numeric"
@@ -74,7 +75,7 @@ function LoginSteps({
             {t(`errors.${verifyState.error}`)}
           </p>
         )}
-        <Button type="submit" disabled={verifying}>
+        <Button type="submit" className="h-11 text-base" disabled={verifying}>
           {t("verify")}
         </Button>
         <Button type="button" variant="ghost" onClick={onReset}>
@@ -92,6 +93,7 @@ function LoginSteps({
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">{t("emailLabel")}</Label>
           <Input
+            className="h-11"
             id="email"
             name="email"
             type="email"
@@ -105,14 +107,14 @@ function LoginSteps({
             {t(`errors.${error}`)}
           </p>
         )}
-        <Button type="submit" disabled={sending}>
+        <Button type="submit" className="h-11 text-base" disabled={sending}>
           {t("sendCode")}
         </Button>
       </form>
       {googleEnabled && (
         <>
           <p className="text-center text-sm text-muted-foreground">{t("or")}</p>
-          <Button type="button" variant="outline" onClick={signInWithGoogle}>
+          <Button type="button" variant="outline" className="h-11 text-base" onClick={signInWithGoogle}>
             {t("continueWithGoogle")}
           </Button>
         </>

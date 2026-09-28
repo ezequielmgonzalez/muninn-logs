@@ -1,0 +1,61 @@
+<!-- @dsCard group="Foundations" height=360 subtitle="La técnica de la banda pintada, en sus tres usos" -->
+<!doctype html>
+<html>
+<head>
+<style>
+  .pb-wrap { max-width: 720px; margin: 24px auto; font-family: var(--font-body); }
+  .pb-row { margin-bottom: 28px; }
+  .pb-label { font-family: var(--font-body); font-size: 12px; color: var(--ink-muted); margin-bottom: 8px; }
+  .pb-band { position: relative; }
+  .paint-bg { position: absolute; inset: -14px -30px; opacity: 0.26; filter: url(#mjRoughBlur); }
+  .paint-fg { position: absolute; inset: -3px -9px; filter: url(#mjRough); }
+  .pb-text { position: relative; z-index: 2; display: flex; align-items: center; height: 100%; padding: 0 24px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--band-text); }
+  .pb-track { position: relative; height: 24px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <filter id="mjRough" x="-15%" y="-60%" width="130%" height="220%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.014 0.11" numOctaves="2" seed="7" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="mjRoughBlur" x="-25%" y="-120%" width="150%" height="340%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.09" numOctaves="2" seed="3" result="noise2"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise2" scale="13" xChannelSelector="R" yChannelSelector="G"/>
+    <feGaussianBlur stdDeviation="3"/>
+  </filter>
+</svg>
+
+<div class="pb-wrap">
+
+  <div class="pb-row">
+    <div class="pb-label">Borde a borde — para un encabezado de página (masthead)</div>
+    <div class="pb-band" style="height: 60px;">
+      <div class="paint-bg" style="background: var(--ink);"></div>
+      <div class="paint-fg" style="background: var(--ink);"></div>
+      <div class="pb-text band-lg" style="font-size: 20px;">Diario de Ezequiel</div>
+    </div>
+  </div>
+
+  <div class="pb-row">
+    <div class="pb-label">Ancho de columna — para un título de sección</div>
+    <div class="pb-band" style="height: 42px; width: 260px;">
+      <div class="paint-bg" style="background: var(--ink);"></div>
+      <div class="paint-fg" style="background: var(--ink);"></div>
+      <div class="pb-text band-md">Por categoría</div>
+    </div>
+  </div>
+
+  <div class="pb-row">
+    <div class="pb-label">Impulsada por un valor — la misma técnica, ahora con un color categórico y un ancho = % del dato</div>
+    <div class="pb-track">
+      <div style="position: absolute; inset: 0 auto 0 0; width: 68%;">
+        <div class="paint-bg" style="background: var(--chart-6);"></div>
+        <div class="paint-fg" style="background: var(--chart-6);"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

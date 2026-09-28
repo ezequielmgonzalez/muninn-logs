@@ -23,6 +23,7 @@ export function OnboardingForm({ defaultDisplayName }: { defaultDisplayName: str
       <div className="flex flex-col gap-2">
         <Label htmlFor="username">{t("usernameLabel")}</Label>
         <Input
+          className="h-11"
           id="username"
           name="username"
           autoComplete="username"
@@ -40,6 +41,7 @@ export function OnboardingForm({ defaultDisplayName }: { defaultDisplayName: str
       <div className="flex flex-col gap-2">
         <Label htmlFor="displayName">{t("displayNameLabel")}</Label>
         <Input
+          className="h-11"
           id="displayName"
           name="displayName"
           defaultValue={submitted?.displayName ?? defaultDisplayName}
@@ -56,7 +58,7 @@ export function OnboardingForm({ defaultDisplayName }: { defaultDisplayName: str
           {t(`errors.${state.error}`)}
         </p>
       )}
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" className="h-11 text-base" disabled={pending}>
         {t("submit")}
       </Button>
     </form>
