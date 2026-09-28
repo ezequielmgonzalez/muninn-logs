@@ -6,7 +6,9 @@
     "tagline": "La memoria de tu mesa de juego.",
     "logGame": "Cargar partida",
     "signIn": "Iniciar sesión",
-    "journal": "Diario de {name}"
+    "journal": "Diario de {name}",
+    "friends": "Amigos",
+    "friendsWithRequests": "Amigos ({count})"
   },
   "Auth": {
     "title": "Iniciar sesión",
@@ -40,6 +42,34 @@
       "invalidUsername": "Usá de 3 a 20 caracteres: minúsculas, números o _.",
       "invalidDisplayName": "El nombre tiene que tener entre 1 y 50 caracteres.",
       "usernameTaken": "Ese nombre de usuario ya está en uso.",
+      "generic": "Algo salió mal. Probá de nuevo."
+    }
+  },
+  "Friends": {
+    "title": "Amigos",
+    "usernameLabel": "Nombre de usuario",
+    "usernameHint": "Pedile a tu amigo su nombre de usuario de Muninn Logs.",
+    "send": "Enviar solicitud",
+    "sent": "Le mandaste una solicitud a {name}.",
+    "accepted": "Ahora sos amigo de {name}.",
+    "incoming": "Solicitudes recibidas",
+    "outgoing": "Solicitudes enviadas",
+    "friends": "Tus amigos",
+    "empty": "Todavía no tenés amigos en Muninn Logs.",
+    "accept": "Aceptar",
+    "acceptName": "Aceptar a {name}",
+    "decline": "Rechazar",
+    "declineName": "Rechazar a {name}",
+    "cancel": "Cancelar",
+    "cancelName": "Cancelar la solicitud a {name}",
+    "remove": "Eliminar",
+    "removeName": "Eliminar a {name} de tus amigos",
+    "errors": {
+      "invalidUsername": "Ese no es un nombre de usuario válido.",
+      "notFound": "No encontramos a nadie con ese nombre de usuario.",
+      "self": "Ese sos vos.",
+      "alreadyFriends": "Ya son amigos.",
+      "alreadyRequested": "Ya le mandaste una solicitud.",
       "generic": "Algo salió mal. Probá de nuevo."
     }
   },

@@ -4,6 +4,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { PaintedBand } from "@/components/painted-band";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/features/auth/actions";
+import { countIncomingRequests } from "@/features/friends/queries";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
@@ -15,6 +16,7 @@ export default async function Home() {
     getTranslations("Auth"),
   ]);
   if (profile && !profile.username) return redirect({ href: "/onboarding", locale });
+  const incomingRequests = profile ? await countIncomingRequests(profile.id) : 0;
 
   return (
     <>
@@ -25,6 +27,13 @@ export default async function Home() {
         {profile ? (
           <>
             <Button className="h-11 w-full text-base">{t("logGame")}</Button>
+            <Button asChild variant="outline" className="h-11 w-full text-base">
+              <Link href="/friends">
+                {incomingRequests > 0
+                  ? t("friendsWithRequests", { count: incomingRequests })
+                  : t("friends")}
+              </Link>
+            </Button>
             <form action={signOut}>
               <input type="hidden" name="locale" value={locale} />
               <Button type="submit" variant="ghost">

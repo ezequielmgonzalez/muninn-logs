@@ -6,7 +6,9 @@
     "tagline": "The memory of your game table.",
     "logGame": "Log a game",
     "signIn": "Sign in",
-    "journal": "{name}'s journal"
+    "journal": "{name}'s journal",
+    "friends": "Friends",
+    "friendsWithRequests": "Friends ({count})"
   },
   "Auth": {
     "title": "Sign in",
@@ -40,6 +42,34 @@
       "invalidUsername": "Use 3 to 20 characters: lowercase letters, numbers or _.",
       "invalidDisplayName": "Your name must be 1 to 50 characters.",
       "usernameTaken": "That username is already taken.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "Friends": {
+    "title": "Friends",
+    "usernameLabel": "Username",
+    "usernameHint": "Ask your friend for their Muninn Logs username.",
+    "send": "Send request",
+    "sent": "You sent {name} a friend request.",
+    "accepted": "You and {name} are now friends.",
+    "incoming": "Requests received",
+    "outgoing": "Requests sent",
+    "friends": "Your friends",
+    "empty": "You don't have friends on Muninn Logs yet.",
+    "accept": "Accept",
+    "acceptName": "Accept {name}",
+    "decline": "Decline",
+    "declineName": "Decline {name}",
+    "cancel": "Cancel",
+    "cancelName": "Cancel the request to {name}",
+    "remove": "Remove",
+    "removeName": "Remove {name} from your friends",
+    "errors": {
+      "invalidUsername": "That isn't a valid username.",
+      "notFound": "We couldn't find anyone with that username.",
+      "self": "That's you.",
+      "alreadyFriends": "You're already friends.",
+      "alreadyRequested": "You already sent them a request.",
       "generic": "Something went wrong. Try again."
     }
   },
