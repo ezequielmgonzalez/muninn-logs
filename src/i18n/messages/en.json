@@ -6,7 +6,7 @@
     "tagline": "The memory of your game table.",
     "logGame": "Log a game",
     "signIn": "Sign in",
-    "greeting": "Hi, {name}"
+    "journal": "{name}'s journal"
   },
   "Auth": {
     "title": "Sign in",

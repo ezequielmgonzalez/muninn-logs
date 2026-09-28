@@ -33,6 +33,15 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 - Supabase: `@/lib/supabase/server` in Server Components/Actions/Route Handlers, `@/lib/supabase/client` in Client Components. Use `getClaims()` (verifies the JWT), not `getSession()`. `getCurrentProfile()` in `@/lib/auth` for the signed-in profile.
 - Next 16: middleware is `src/proxy.ts` (Supabase session refresh, then next-intl). The root layout reads the locale with `next/root-params`.
 
+## Design
+
+"Diario de expedición": aged paper, section titles painted in ink. Read `design/README.md` → `SUMMARY.md` → `brand.md` before building UI; the HTML files there are references to open in a browser. One light theme ("Pergamino"); there is no dark theme, so don't add `dark:` styles.
+
+- Colors are Tailwind classes from the brand tokens: `bg-ink`, `text-ink-body`, `text-ink-muted`, `text-band-text(-muted)`, `bronze`, `chart-1`…`chart-8` (which leader/category gets which chart color is in `design/tokens.json`). shadcn's semantic tokens map onto them (`primary` = ink, `destructive` = chart-1), so shadcn components are already on-brand.
+- Type: `type-band-lg|md|sm` (Cinzel, uppercase, only for text on a painted band), `type-stat-hero|lg`, `type-body-strong`, `type-caption`. Everything else is Spectral (`font-sans`), numbers included.
+- Section titles and page mastheads are `<PaintedBand>` (`size="section" | "page"`); value bars are `<PaintedBar value tone>`. Never hand-roll the paint layers or add `border-radius` to a band; the SVG filters they need come from `<Paper />` in the root layout.
+- One radius (4px). Design spacing `space-1…8` = Tailwind `1, 2, 3, 4, 5, 7, 11, 14`. Form controls and primary buttons are `h-11` (44px touch targets); inputs keep 16px text on phones so iOS doesn't zoom.
+
 ## Database
 
 - Every schema change is a new migration: `pnpm supabase migration new <name> < /dev/null` (without `< /dev/null` it waits for SQL on stdin). Never edit a migration that's on `main`; it's already applied to staging and production.
@@ -54,5 +63,6 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 | Production | `niltnathzxgedevqaltz` | https://muninn-logs.vercel.app |
 
 - Merging a migration to `main` runs `.github/workflows/deploy-db.yml`: staging, then production.
+- If local sign-in emails show a link instead of a 6-digit code, the local gateway lost the email templates: `pnpm supabase stop && pnpm supabase start`.
 - Auth settings on the hosted projects (Gmail SMTP, email templates with `{{ .Token }}`, OTP length 6, redirect URLs) are set by hand in each dashboard for now; change both projects together. Google sign-in is built but off (`NEXT_PUBLIC_AUTH_GOOGLE_ENABLED`).
 - Only publishable keys (`sb_publishable_…`) may be `NEXT_PUBLIC_*`. Secret keys and passwords never go in client code or chat.

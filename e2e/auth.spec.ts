@@ -22,7 +22,7 @@ test("a new user signs in with an emailed code, picks a username and signs out",
   await chooseUsername(page, uniqueUsername());
 
   await expect(page).toHaveURL("/es");
-  await expect(page.getByText("Hola, Ana")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Diario de Ana" })).toBeVisible();
 
   await page.getByRole("button", { name: "Cerrar sesión" }).click();
   await expect(page.getByRole("link", { name: "Iniciar sesión" })).toBeVisible();

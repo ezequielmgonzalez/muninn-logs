@@ -6,7 +6,7 @@
     "tagline": "La memoria de tu mesa de juego.",
     "logGame": "Cargar partida",
     "signIn": "Iniciar sesión",
-    "greeting": "Hola, {name}"
+    "journal": "Diario de {name}"
   },
   "Auth": {
     "title": "Iniciar sesión",
