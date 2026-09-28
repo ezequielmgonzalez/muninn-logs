@@ -8,7 +8,8 @@
     "signIn": "Iniciar sesión",
     "journal": "Diario de {name}",
     "friends": "Amigos",
-    "friendsWithRequests": "Amigos ({count})"
+    "friendsWithRequests": "Amigos ({count})",
+    "saved": "Partida guardada."
   },
   "Auth": {
     "title": "Iniciar sesión",
@@ -70,6 +71,45 @@
       "self": "Ese sos vos.",
       "alreadyFriends": "Ya son amigos.",
       "alreadyRequested": "Ya le mandaste una solicitud.",
+      "generic": "Algo salió mal. Probá de nuevo."
+    }
+  },
+  "LogMatch": {
+    "title": "Nueva partida",
+    "date": "Fecha",
+    "boardSide": "Lado del tablero",
+    "bird": "Pájaro",
+    "snake": "Serpiente",
+    "notRecorded": "Sin registrar",
+    "duration": "Duración en minutos (opcional)",
+    "playersSection": "Jugadores",
+    "turn": "Turno {n}",
+    "you": "vos",
+    "guest": "invitado",
+    "guestOf": "invitado de {owner}",
+    "newGuest": "invitado nuevo",
+    "leader": "Líder de {name}",
+    "noLeader": "Sin líder",
+    "moveUp": "Subir a {name}",
+    "moveDown": "Bajar a {name}",
+    "remove": "Quitar a {name}",
+    "addPlayer": "Agregar jugador",
+    "addPlayerHint": "Buscá entre tus amigos e invitados, o escribí un nombre nuevo.",
+    "createGuest": "Crear invitado “{name}”",
+    "maxPlayers": "Arnak se juega con hasta 4 jugadores.",
+    "pointsSection": "Puntos",
+    "fearCount": "Miedo (cartas)",
+    "fearHint": "Cantidad de cartas de miedo: se restan del total.",
+    "total": "Total",
+    "scoreFor": "{category} de {name}",
+    "tiebreakQuestion": "Empate en {points} puntos. ¿Quién llegó primero a la cima del track de investigación?",
+    "tiebreakNone": "Siguen empatados",
+    "save": "Guardar partida",
+    "needTwoPlayers": "Agregá al menos 2 jugadores para guardar.",
+    "errors": {
+      "invalid": "Revisá los datos de la partida.",
+      "notAllowed": "No podés agregar a uno de los jugadores. Puede que ya no sean amigos.",
+      "duplicate": "Hay un jugador o un líder repetido.",
       "generic": "Algo salió mal. Probá de nuevo."
     }
   },

@@ -8,7 +8,8 @@
     "signIn": "Sign in",
     "journal": "{name}'s journal",
     "friends": "Friends",
-    "friendsWithRequests": "Friends ({count})"
+    "friendsWithRequests": "Friends ({count})",
+    "saved": "Game saved."
   },
   "Auth": {
     "title": "Sign in",
@@ -70,6 +71,45 @@
       "self": "That's you.",
       "alreadyFriends": "You're already friends.",
       "alreadyRequested": "You already sent them a request.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "LogMatch": {
+    "title": "New game",
+    "date": "Date",
+    "boardSide": "Board side",
+    "bird": "Bird",
+    "snake": "Snake",
+    "notRecorded": "Not recorded",
+    "duration": "Duration in minutes (optional)",
+    "playersSection": "Players",
+    "turn": "Turn {n}",
+    "you": "you",
+    "guest": "guest",
+    "guestOf": "{owner}'s guest",
+    "newGuest": "new guest",
+    "leader": "{name}'s leader",
+    "noLeader": "No leader",
+    "moveUp": "Move {name} up",
+    "moveDown": "Move {name} down",
+    "remove": "Remove {name}",
+    "addPlayer": "Add player",
+    "addPlayerHint": "Search your friends and guests, or type a new name.",
+    "createGuest": "Create guest “{name}”",
+    "maxPlayers": "Arnak is played with up to 4 players.",
+    "pointsSection": "Points",
+    "fearCount": "Fear (cards)",
+    "fearHint": "Number of fear cards: subtracted from the total.",
+    "total": "Total",
+    "scoreFor": "{name}'s {category}",
+    "tiebreakQuestion": "Tied at {points} points. Who reached the top of the research track first?",
+    "tiebreakNone": "Still tied",
+    "save": "Save game",
+    "needTwoPlayers": "Add at least 2 players to save.",
+    "errors": {
+      "invalid": "Check the game's details.",
+      "notAllowed": "You can't add one of the players. Maybe you're no longer friends.",
+      "duplicate": "A player or leader appears twice.",
       "generic": "Something went wrong. Try again."
     }
   },
