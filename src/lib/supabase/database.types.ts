@@ -235,6 +235,14 @@ isOneToOne: false
 { Args: { "search_username": string }; Returns: {
               "display_name": string,"id": string,"username": string
             }[]
+                           },
+"list_addable_players":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "id": string,"is_guest": boolean,"is_me": boolean,"name": string,"owner_name": string
+            }[]
+                           },
+"log_match":
+{ Args: { "duration_minutes"?: number,"game_slug": string,"played_on": string,"players": Json,"setup"?: Json }; Returns: string
                            }
           }
           Enums: {

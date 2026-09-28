@@ -147,10 +147,16 @@ A user's **visible matches** are the ones they logged or played in. **Shared a m
 | Accept a friend request                  | The addressee                                                                                 |
 | Decline, cancel, unfriend                | Either user (deletes the row). Existing matches are unaffected                               |
 
-## Decided, to implement later
+## Saving a match
 
-- **Saving a match atomically.** A match, its players and their scores are several inserts. They should run in one transaction, likely a Postgres function called from the form, so a failure never leaves a half-saved match. Decide when building the form.
-- **Player count** (`min_players`..`max_players`) spans many rows, so it's validated by the Zod schema and by that function, not by a table constraint.
+A match, its players and their scores are saved by one database function, `log_match()`, in a single transaction: a failure never leaves a half-saved match or an orphan guest. It runs as the caller (`security invoker`), so the grants and RLS policies above still decide who may be added; the function only adds validation:
+
+- The game's player count (`min_players`..`max_players`), which spans rows and so can't be a table constraint.
+- Each player is an existing player or a new guest (created on the spot, owned by the caller), never both.
+- Leaders by slug, from the match's game.
+- A score for exactly every category of the game.
+
+`list_addable_players()` returns who the caller may add, which is narrower than who they can see: a non-friend met in a shared match is visible, but not addable.
 
 ## Out of scope for now
 
