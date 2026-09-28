@@ -40,6 +40,7 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 - Colors are Tailwind classes from the brand tokens: `bg-ink`, `text-ink-body`, `text-ink-muted`, `text-band-text(-muted)`, `bronze`, `chart-1`…`chart-8` (which leader/category gets which chart color is in `design/tokens.json`). shadcn's semantic tokens map onto them (`primary` = ink, `destructive` = chart-1), so shadcn components are already on-brand.
 - Type: `type-band-lg|md|sm` (Cinzel, uppercase, only for text on a painted band), `type-stat-hero|lg`, `type-body-strong`, `type-caption`. Everything else is Spectral (`font-sans`), numbers included.
 - Section titles and page mastheads are `<PaintedBand>` (`size="section" | "page"`); value bars are `<PaintedBar value tone>`. Never hand-roll the paint layers or add `border-radius` to a band; the SVG filters they need come from `<Paper />` in the root layout.
+- Leaders are shown by emoji plus their chart color (`ARNAK_LEADER_STYLES` in `src/games/arnak.ts`), never with the official leader art: it isn't licensed, so it must not be committed or displayed.
 - One radius (4px). Design spacing `space-1…8` = Tailwind `1, 2, 3, 4, 5, 7, 11, 14`. Form controls and primary buttons are `h-11` (44px touch targets); inputs keep 16px text on phones so iOS doesn't zoom.
 
 ## Database

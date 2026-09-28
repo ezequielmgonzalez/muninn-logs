@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import en from "@/i18n/messages/en.json";
 import es from "@/i18n/messages/es.json";
 
-import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES } from "./arnak";
+import { ARNAK_LEADER_STYLES, ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES } from "./arnak";
 
 describe.each([
   ["es", es],
@@ -19,5 +19,17 @@ describe.each([
     expect(Object.keys(arnak.scoreCategories).sort()).toEqual(
       [...ARNAK_SCORE_CATEGORIES].sort(),
     );
+  });
+});
+
+describe("Arnak leader styles", () => {
+  it("gives every leader a distinct color, so a color always means one leader", () => {
+    const tones = ARNAK_LEADERS.map((leader) => ARNAK_LEADER_STYLES[leader].tone);
+    expect(new Set(tones).size).toBe(ARNAK_LEADERS.length);
+  });
+
+  it("gives every leader a distinct emoji", () => {
+    const emojis = ARNAK_LEADERS.map((leader) => ARNAK_LEADER_STYLES[leader].emoji);
+    expect(new Set(emojis).size).toBe(ARNAK_LEADERS.length);
   });
 });
