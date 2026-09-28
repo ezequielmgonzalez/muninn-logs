@@ -1,8 +1,9 @@
-name: Push migrations
+name: Push to Supabase
 
-# Reusable: applies pending migrations in supabase/migrations to one hosted
-# project. The GitHub environment holds its project ref (variable) and
-# database password (secret).
+# Reusable: applies pending migrations and the config.toml settings (Auth,
+# email templates, SMTP...) to one hosted project. The GitHub environment
+# holds its project ref (variable) and database password (secret); the Gmail
+# app password for SMTP is a repository secret shared by both projects.
 on:
   workflow_call:
     inputs:
@@ -22,6 +23,7 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_AUTH_SMTP_PASS: ${{ secrets.SUPABASE_AUTH_SMTP_PASS }}
     steps:
       - uses: actions/checkout@v7
 
@@ -43,3 +45,12 @@ jobs:
         run: >
           pnpm supabase db push
           --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      # config.toml's [remotes.*] block for this project ref supplies its URLs,
+      # SMTP and other overrides. The diff is logged so every deploy shows
+      # exactly which settings it changed.
+      - name: Show config changes
+        run: pnpm supabase config diff --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Apply config
+        run: pnpm supabase config push --project-ref "$SUPABASE_PROJECT_REF" --yes
