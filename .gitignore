@@ -46,3 +46,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Mockup embedding the official leader art (not licensed); kept locally only.
+/design/mockups/profile.html
