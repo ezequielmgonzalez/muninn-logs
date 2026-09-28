@@ -67,3 +67,18 @@ export async function chooseUsername(page: Page, username: string) {
 export function formError(page: Page) {
   return page.locator("p[role=alert]");
 }
+
+/** Creates a signed-in user with a username, starting from a fresh page. */
+export async function signUp(
+  page: Page,
+  request: APIRequestContext,
+  name: string,
+): Promise<{ username: string }> {
+  const username = uniqueUsername();
+  await signInWithCode(page, request, uniqueEmail());
+  await expect(page).toHaveURL("/es/onboarding");
+  await page.getByLabel("Nombre", { exact: true }).fill(name);
+  await chooseUsername(page, username);
+  await expect(page).toHaveURL("/es");
+  return { username };
+}
