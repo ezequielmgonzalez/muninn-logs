@@ -63,7 +63,8 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 | Staging | `reabwxbptbzokwxnxmae` | Vercel preview deployments |
 | Production | `niltnathzxgedevqaltz` | https://muninn-logs.vercel.app |
 
-- Merging a migration to `main` runs `.github/workflows/deploy-db.yml`: staging, then production.
+- Merging a change to `supabase/migrations/`, `supabase/config.toml` or `supabase/templates/` runs `.github/workflows/deploy-db.yml`: migrations and then `supabase config push`, staging first, then production.
+- Auth settings (email templates, OTP length, SMTP, redirect URLs, rate limits) live in `supabase/config.toml`. Shared values sit at the top; each hosted project's `[remotes.<name>]` block overrides only what differs. Never change them in the Supabase dashboard: the next deploy overwrites it. Preview a change with `pnpm supabase config diff --project-ref <ref>` (needs `pnpm supabase login`).
 - If local sign-in emails show a link instead of a 6-digit code, the local gateway lost the email templates: `pnpm supabase stop && pnpm supabase start`.
-- Auth settings on the hosted projects (Gmail SMTP, email templates with `{{ .Token }}`, OTP length 6, redirect URLs) are set by hand in each dashboard for now; change both projects together. Google sign-in is built but off (`NEXT_PUBLIC_AUTH_GOOGLE_ENABLED`).
+- Google sign-in is built but off (`NEXT_PUBLIC_AUTH_GOOGLE_ENABLED`).
 - Only publishable keys (`sb_publishable_…`) may be `NEXT_PUBLIC_*`. Secret keys and passwords never go in client code or chat.

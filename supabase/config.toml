@@ -223,7 +223,8 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+# On to match the hosted projects; the sign-in code itself confirms the address.
+enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
@@ -433,3 +434,67 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# ---------------------------------------------------------------------------
+# Hosted projects. The Deploy database workflow runs `supabase config push`
+# for each one, applying everything above plus these overrides. Preview the
+# effect with: pnpm supabase config diff --project-ref <ref>
+# ---------------------------------------------------------------------------
+
+[remotes.staging]
+project_id = "reabwxbptbzokwxnxmae"
+
+[remotes.staging.auth]
+site_url = "https://muninn-logs-git-main-ezequielmgonzalezs-projects.vercel.app"
+additional_redirect_urls = ["https://muninn-logs-*-ezequielmgonzalezs-projects.vercel.app/**"]
+
+[remotes.staging.auth.email]
+# One email per user per minute (locally 1s, so tests can sign in quickly).
+max_frequency = "1m0s"
+
+[remotes.staging.auth.rate_limit]
+# Emails per hour for the whole project (locally 2, and only Mailpit sees them).
+email_sent = 30
+
+[remotes.staging.auth.email.smtp]
+enabled = true
+host = "smtp.gmail.com"
+port = 465
+user = "muninnlogs@gmail.com"
+pass = "env(SUPABASE_AUTH_SMTP_PASS)"
+admin_email = "muninnlogs@gmail.com"
+sender_name = "Muninn Logs"
+
+# Set by Supabase for the plan; pinned so a push leaves them alone.
+[remotes.staging.db.pooler]
+default_pool_size = 15
+max_client_conn = 200
+
+[remotes.production]
+project_id = "niltnathzxgedevqaltz"
+
+[remotes.production.auth]
+site_url = "https://muninn-logs.vercel.app"
+additional_redirect_urls = ["https://muninn-logs.vercel.app/**"]
+
+[remotes.production.auth.email]
+# One email per user per minute (locally 1s, so tests can sign in quickly).
+max_frequency = "1m0s"
+
+[remotes.production.auth.rate_limit]
+# Emails per hour for the whole project (locally 2, and only Mailpit sees them).
+email_sent = 30
+
+[remotes.production.auth.email.smtp]
+enabled = true
+host = "smtp.gmail.com"
+port = 465
+user = "muninnlogs@gmail.com"
+pass = "env(SUPABASE_AUTH_SMTP_PASS)"
+admin_email = "muninnlogs@gmail.com"
+sender_name = "Muninn Logs"
+
+# Set by Supabase for the plan; pinned so a push leaves them alone.
+[remotes.production.db.pooler]
+default_pool_size = 15
+max_client_conn = 200

@@ -1,11 +1,14 @@
-name: Deploy database
+name: Deploy Supabase
 
-# Migrations reach staging first; production only runs if staging succeeded.
+# Migrations and config reach staging first; production only runs if staging
+# succeeded.
 on:
   push:
     branches: [main]
     paths:
       - supabase/migrations/**
+      - supabase/config.toml
+      - supabase/templates/**
   # Run by hand, e.g. to bring a new project up to date.
   workflow_dispatch:
 
