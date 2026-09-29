@@ -175,6 +175,71 @@
       "avgPoints": "Puntos promedio"
     }
   },
+  "Legal": {
+    "updated": "Última actualización: 29 de septiembre de 2026",
+    "footer": {
+      "privacy": "Privacidad",
+      "terms": "Términos"
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "sections": [
+        {
+          "heading": "Qué es Muninn Logs",
+          "body": "Muninn Logs es un proyecto personal para registrar partidas de juegos de mesa entre amigos y ver estadísticas. No tiene publicidad y no vende ni comparte tus datos con nadie para fines comerciales."
+        },
+        {
+          "heading": "Qué datos guardamos",
+          "body": "Tu email, para que puedas entrar. Tu nombre y nombre de usuario, que elegís vos (si entrás con Google, tomamos de ahí tu nombre y tu email). Las partidas que cargás o en las que participás: fecha, jugadores, líderes y puntos. Tus amistades y solicitudes de amistad. Los invitados sin cuenta que agregás a tus partidas (solo su nombre)."
+        },
+        {
+          "heading": "Quién ve qué",
+          "body": "Una partida la ven quienes la cargaron o jugaron en ella. Tu nombre lo ven tus amigos, quienes jugaron con vos y quienes te mandaron o recibieron una solicitud. Tus estadísticas las ven solo vos y tus amigos, y siempre como totales: tus amigos no ven las partidas en las que no estuvieron. Nadie puede ver una lista de usuarios: para agregarte, alguien tiene que saber tu nombre de usuario exacto."
+        },
+        {
+          "heading": "Servicios que usamos",
+          "body": "Supabase guarda los datos y maneja el inicio de sesión. Vercel aloja la app. Gmail envía los códigos para entrar. Google interviene solo si elegís entrar con Google. Cada uno procesa los datos únicamente para prestar ese servicio."
+        },
+        {
+          "heading": "Cookies",
+          "body": "Usamos solo cookies necesarias: una para mantener tu sesión iniciada y otra para recordar tu idioma. No usamos cookies de seguimiento ni de análisis."
+        },
+        {
+          "heading": "Borrar tus datos",
+          "body": "Podés pedir que borremos tu cuenta y tus datos escribiendo a muninnlogs@gmail.com desde el email de tu cuenta. Las partidas que cargaste se borran; en las que cargó otra persona, tu lugar se elimina o queda anónimo."
+        },
+        {
+          "heading": "Contacto",
+          "body": "Por cualquier consulta sobre tus datos: muninnlogs@gmail.com."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Términos del servicio",
+      "sections": [
+        {
+          "heading": "Uso",
+          "body": "Muninn Logs es gratuito y es un proyecto personal. Lo podés usar para registrar tus partidas y compararte con tus amigos. Se ofrece tal cual, sin garantías de disponibilidad ni de que los datos se conserven para siempre."
+        },
+        {
+          "heading": "Tu cuenta",
+          "body": "Sos responsable de lo que cargás desde tu cuenta. Cargá solo partidas reales y no agregues a otras personas a partidas en las que no jugaron. Podemos suspender cuentas que se usen para molestar a otros o para abusar del servicio."
+        },
+        {
+          "heading": "Cambios",
+          "body": "Estos términos y la app pueden cambiar. Si el cambio es importante, lo vamos a avisar en la app."
+        },
+        {
+          "heading": "Marcas",
+          "body": "Las Ruinas Perdidas de Arnak y sus expansiones son marcas de Czech Games Edition. Muninn Logs no está afiliado, respaldado ni patrocinado por Czech Games Edition ni por sus distribuidores."
+        },
+        {
+          "heading": "Contacto",
+          "body": "muninnlogs@gmail.com"
+        }
+      ]
+    }
+  },
   "LocaleSwitcher": {
     "label": "Idioma",
     "es": "Español",

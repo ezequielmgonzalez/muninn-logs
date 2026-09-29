@@ -175,6 +175,71 @@
       "avgPoints": "Average points"
     }
   },
+  "Legal": {
+    "updated": "Last updated: September 29, 2026",
+    "footer": {
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "sections": [
+        {
+          "heading": "What Muninn Logs is",
+          "body": "Muninn Logs is a personal project for logging board game plays among friends and seeing stats. It has no ads and doesn't sell or share your data with anyone for commercial purposes."
+        },
+        {
+          "heading": "What we store",
+          "body": "Your email, so you can sign in. Your name and username, which you choose (if you sign in with Google, we take your name and email from there). The games you log or play in: date, players, leaders and points. Your friendships and friend requests. The guests without an account you add to your games (only their name)."
+        },
+        {
+          "heading": "Who sees what",
+          "body": "A game is visible to whoever logged it and whoever played in it. Your name is visible to your friends, to people who played with you, and to people you sent or received a friend request from. Your stats are visible only to you and your friends, and always as totals: your friends don't see games they weren't in. Nobody can see a list of users: to add you, someone has to know your exact username."
+        },
+        {
+          "heading": "Services we use",
+          "body": "Supabase stores the data and handles sign-in. Vercel hosts the app. Gmail sends the sign-in codes. Google is involved only if you choose to sign in with Google. Each processes data only to provide that service."
+        },
+        {
+          "heading": "Cookies",
+          "body": "We only use necessary cookies: one to keep you signed in and one to remember your language. We don't use tracking or analytics cookies."
+        },
+        {
+          "heading": "Deleting your data",
+          "body": "You can ask us to delete your account and data by writing to muninnlogs@gmail.com from your account's email. Games you logged are deleted; in games someone else logged, your place is removed or anonymized."
+        },
+        {
+          "heading": "Contact",
+          "body": "For any question about your data: muninnlogs@gmail.com."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of service",
+      "sections": [
+        {
+          "heading": "Use",
+          "body": "Muninn Logs is free and a personal project. You can use it to log your games and compare yourself with your friends. It's provided as is, with no guarantee of availability or that data will be kept forever."
+        },
+        {
+          "heading": "Your account",
+          "body": "You're responsible for what you log from your account. Only log real games, and don't add people to games they didn't play. We may suspend accounts used to harass others or abuse the service."
+        },
+        {
+          "heading": "Changes",
+          "body": "These terms and the app may change. If a change is significant, we'll say so in the app."
+        },
+        {
+          "heading": "Trademarks",
+          "body": "Lost Ruins of Arnak and its expansions are trademarks of Czech Games Edition. Muninn Logs is not affiliated with, endorsed or sponsored by Czech Games Edition or its distributors."
+        },
+        {
+          "heading": "Contact",
+          "body": "muninnlogs@gmail.com"
+        }
+      ]
+    }
+  },
   "LocaleSwitcher": {
     "label": "Language",
     "es": "Español",
