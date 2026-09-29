@@ -81,6 +81,7 @@ export default async function FriendsPage() {
           {friends.length > 0 ? (
             <FriendList
               people={friends}
+              linkToProfile
               actions={(person) =>
                 actionButton(removeFriendship, person.id, t("remove"), t("removeName", { name: person.display_name }), "ghost")
               }
