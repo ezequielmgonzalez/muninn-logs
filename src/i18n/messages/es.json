@@ -244,6 +244,13 @@
       ]
     }
   },
+  "EditProfile": {
+    "title": "Editar perfil",
+    "description": "Si cambiás tu nombre de usuario, tus amigos te van a encontrar por el nuevo.",
+    "submit": "Guardar cambios",
+    "saved": "Perfil actualizado.",
+    "link": "Editar perfil"
+  },
   "LocaleSwitcher": {
     "label": "Idioma",
     "es": "Español",

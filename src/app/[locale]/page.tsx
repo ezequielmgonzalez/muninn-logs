@@ -11,7 +11,7 @@ import { getPlayerStats } from "@/features/stats/queries";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
-export default async function Home() {
+export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   const [profile, locale, t] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
@@ -20,13 +20,16 @@ export default async function Home() {
   if (!profile) return <Landing />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const [tStats, tAuth, format, stats, recent, incomingRequests] = await Promise.all([
+  const [tStats, tAuth, tEdit, format, stats, recent, incomingRequests, { profileSaved }] = await Promise.all([
     getTranslations("Stats"),
     getTranslations("Auth"),
+    getTranslations("EditProfile"),
     getFormatter(),
     getPlayerStats(profile.id),
     listMatches(3),
     countIncomingRequests(profile.id),
+    // Set by "Editar perfil" after saving.
+    searchParams,
   ]);
 
   const seeMore = (href: string, label: string) => (
@@ -41,6 +44,11 @@ export default async function Home() {
         {t("journal", { name: profile.display_name })}
       </PaintedBand>
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-11 px-6 py-11">
+        {profileSaved === "1" && (
+          <p role="status" className="type-body-strong -mb-5 text-center text-ink-body">
+            {tEdit("saved")}
+          </p>
+        )}
         <Button asChild className="h-11 w-full text-base">
           <Link href="/matches/new">{t("logGame")}</Link>
         </Button>
@@ -82,12 +90,17 @@ export default async function Home() {
               {incomingRequests > 0 ? t("friendsWithRequests", { count: incomingRequests }) : t("friends")}
             </Link>
           </Button>
-          <form action={signOut}>
-            <input type="hidden" name="locale" value={locale} />
-            <Button type="submit" variant="ghost">
-              {tAuth("signOut")}
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button asChild variant="ghost">
+              <Link href="/profile/edit">{tEdit("link")}</Link>
             </Button>
-          </form>
+            <form action={signOut}>
+              <input type="hidden" name="locale" value={locale} />
+              <Button type="submit" variant="ghost">
+                {tAuth("signOut")}
+              </Button>
+            </form>
+          </div>
           <LocaleSwitcher />
         </div>
       </main>
