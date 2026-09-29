@@ -243,6 +243,9 @@ isOneToOne: false
                            },
 "log_match":
 { Args: { "duration_minutes"?: number,"game_slug": string,"played_on": string,"players": Json,"setup"?: Json }; Returns: string
+                           },
+"update_match":
+{ Args: { "duration_minutes"?: number,"match_id": string,"played_on": string,"players": Json,"setup"?: Json }; Returns: string
                            }
           }
           Enums: {

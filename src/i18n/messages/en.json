@@ -111,7 +111,8 @@
       "notAllowed": "You can't add one of the players. Maybe you're no longer friends.",
       "duplicate": "A player or leader appears twice.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "editTitle": "Edit game"
   },
   "Matches": {
     "title": "Games",
@@ -131,7 +132,8 @@
     "delete": "Delete game",
     "deleteConfirm": "Delete this game? This can't be undone.",
     "deleteYes": "Yes, delete",
-    "deleteNo": "Cancel"
+    "deleteNo": "Cancel",
+    "edit": "Edit game"
   },
   "LocaleSwitcher": {
     "label": "Language",

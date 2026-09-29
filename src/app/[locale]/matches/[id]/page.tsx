@@ -3,6 +3,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
 import { PaintedBand, PaintedBar } from "@/components/painted-band";
+import { Button } from "@/components/ui/button";
 import { DeleteMatch } from "@/features/matches/delete-match";
 import { playedOnDate } from "@/features/matches/format";
 import { getMatch } from "@/features/matches/queries";
@@ -130,7 +131,14 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
           </div>
         </section>
 
-        {match.loggedByMe && <DeleteMatch matchId={match.id} />}
+        {match.loggedByMe && (
+          <div className="flex flex-col gap-3">
+            <Button asChild variant="outline" className="h-11 text-base">
+              <Link href={`/matches/${match.id}/edit`}>{t("edit")}</Link>
+            </Button>
+            <DeleteMatch matchId={match.id} />
+          </div>
+        )}
       </main>
     </>
   );

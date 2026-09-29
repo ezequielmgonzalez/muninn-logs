@@ -16,7 +16,7 @@ import {
 } from "@/games/arnak";
 import { cn } from "@/lib/utils";
 
-import { type LogMatchState, logMatch } from "./actions";
+import { type SaveMatchState, saveMatch } from "./actions";
 import { type LogMatchInput, logMatchSchema } from "./schema";
 import { tiedForFirst, total } from "./scoring";
 
@@ -29,7 +29,7 @@ export type AddablePlayer = {
   owner_name: string | null;
 };
 
-type FormPlayer = {
+export type FormPlayer = {
   key: string;
   name: string;
   /** Set for existing players; new guests only have a name. */
@@ -42,8 +42,18 @@ type FormPlayer = {
   scores: Record<ArnakScoreCategory, string>;
 };
 
+/** An existing match to edit, already in the form's shape. */
+export type InitialMatch = {
+  matchId: string;
+  playedOn: string;
+  boardSide: "bird" | "snake" | null;
+  durationMinutes: number | null;
+  players: FormPlayer[];
+  tiebreakKey: string | null;
+};
+
 const MAX_PLAYERS = 4;
-const idle: LogMatchState = { status: "idle" };
+const idle: SaveMatchState = { status: "idle" };
 
 const emptyScores = () =>
   Object.fromEntries(ARNAK_SCORE_CATEGORIES.map((c) => [c, ""])) as FormPlayer["scores"];
@@ -74,18 +84,20 @@ function localToday() {
   return new Date(now.getTime() - offset).toISOString().slice(0, 10);
 }
 
-export function LogMatchForm({ addable }: { addable: AddablePlayer[] }) {
+export function LogMatchForm({ addable, initial }: { addable: AddablePlayer[]; initial?: InitialMatch }) {
   const t = useTranslations("LogMatch");
   const tGame = useTranslations("Games.arnak");
   const locale = useLocale();
-  const [state, action, pending] = useActionState(logMatch, idle);
+  const [state, action, pending] = useActionState(saveMatch, idle);
 
   const me = addable.find((p) => p.is_me);
-  const [players, setPlayers] = useState<FormPlayer[]>(me ? [fromAddable(me)] : []);
-  const [playedOn, setPlayedOn] = useState("");
-  const [boardSide, setBoardSide] = useState<"bird" | "snake" | null>(null);
-  const [duration, setDuration] = useState("");
-  const [tiebreakKey, setTiebreakKey] = useState<string | null>(null);
+  const [players, setPlayers] = useState<FormPlayer[]>(
+    () => initial?.players ?? (me ? [fromAddable(me)] : []),
+  );
+  const [playedOn, setPlayedOn] = useState(initial?.playedOn ?? "");
+  const [boardSide, setBoardSide] = useState<"bird" | "snake" | null>(initial?.boardSide ?? null);
+  const [duration, setDuration] = useState(initial?.durationMinutes?.toString() ?? "");
+  const [tiebreakKey, setTiebreakKey] = useState<string | null>(initial?.tiebreakKey ?? null);
 
   // Set on the client: the server doesn't know the player's time zone.
   useEffect(() => {
@@ -128,6 +140,7 @@ export function LogMatchForm({ addable }: { addable: AddablePlayer[] }) {
     <form action={action} className="flex flex-col gap-11 pb-28">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="payload" value={JSON.stringify(payload)} />
+      {initial && <input type="hidden" name="matchId" value={initial.matchId} />}
 
       {/* The match details sit directly under the page title, "Nueva partida". */}
       <section className="flex flex-col gap-5">

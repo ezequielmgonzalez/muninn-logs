@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { z } from "zod";
 
 import { usernameSchema } from "@/features/auth/schemas";
+import { logUnexpected } from "@/lib/log";
 import { createClient } from "@/lib/supabase/server";
 
 // Codes map to Friends.errors.* in the messages. Errors echo the submitted
@@ -67,7 +68,10 @@ export async function addFriend(_state: AddFriendState, formData: FormData): Pro
       .update({ status: "accepted" })
       .eq("requester_id", target.id)
       .eq("addressee_id", me);
-    if (error) return fail("generic");
+    if (error) {
+      logUnexpected("addFriend.accept", error);
+      return fail("generic");
+    }
     refresh();
     return { status: "accepted", name: target.display_name };
   }
@@ -77,7 +81,9 @@ export async function addFriend(_state: AddFriendState, formData: FormData): Pro
     .insert({ requester_id: me, addressee_id: target.id });
   if (error) {
     // 23505: a request appeared in between (e.g. sent from another tab).
-    return fail(error.code === "23505" ? "alreadyRequested" : "generic");
+    if (error.code === "23505") return fail("alreadyRequested");
+    logUnexpected("addFriend.insert", error);
+    return fail("generic");
   }
   refresh();
   return { status: "sent", name: target.display_name };
