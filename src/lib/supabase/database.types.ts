@@ -265,6 +265,9 @@ isOneToOne: false
             "accept_guest_claim":
 { Args: { "claim_id": string }; Returns: number
                            },
+"account_deletion_preview":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "admin_link_guest":
 { Args: { "guest_id": string,"user_id": string }; Returns: number
                            },
@@ -272,6 +275,9 @@ isOneToOne: false
 { Args: Record<PropertyKey, never>; Returns: {
               "id": string,"matches": number,"name": string,"owner_name": string
             }[]
+                           },
+"delete_my_account":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "find_profile_by_username":
 { Args: { "search_username": string }; Returns: {

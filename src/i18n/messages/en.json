@@ -210,7 +210,7 @@
         },
         {
           "heading": "Deleting your data",
-          "body": "You can ask us to delete your account and data by writing to muninnlogs@gmail.com from your account's email. Games you logged are deleted; in games someone else logged, your place is removed or anonymized."
+          "body": "You can delete your account at any time from Edit profile → Delete account. Your account, profile and friendships are deleted. Games you logged where only guests played are deleted; games other people with an account played pass to one of them, so they don't lose their history. In the games that remain, your place becomes “Jugador eliminado” (deleted player), without your name. You can also ask by writing to muninnlogs@gmail.com."
         },
         {
           "heading": "Contact",
@@ -296,6 +296,26 @@
       "conflict": "Not possible: that account already played a game together with this guest.",
       "notAllowed": "Your account doesn't have admin permissions.",
       "generic": "Something went wrong. Try again."
+    }
+  },
+  "DeleteAccount": {
+    "link": "Delete account",
+    "title": "Delete account",
+    "intro": "If you delete your account:",
+    "account": "Your account, profile, friendships and requests are deleted.",
+    "matchesDeleted": "{count, plural, one {# game you logged is deleted: only guests played in it.} other {# games you logged are deleted: only guests played in them.}}",
+    "matchesTransferred": "{count, plural, one {# game you logged passes to another player with an account who played, so they don't lose it.} other {# games you logged pass to other players with an account who played, so they don't lose them.}}",
+    "placesAnonymized": "In {count, plural, one {# game} other {# games}}, your place becomes “Jugador eliminado” (deleted player). The points don't change.",
+    "guestsTransferred": "{count, plural, one {# of your guests passes} other {# of your guests pass}} to whoever logged their games.",
+    "guestsDeleted": "{count, plural, one {# of your guests is deleted} other {# of your guests are deleted}}.",
+    "irreversible": "This can't be undone.",
+    "confirmLabel": "Type your username ({username}) to confirm",
+    "submit": "Delete my account",
+    "back": "Go back without deleting",
+    "deleted": "Your account was deleted.",
+    "errors": {
+      "mismatch": "The username doesn't match.",
+      "generic": "Something went wrong. Your account wasn't deleted; try again."
     }
   },
   "LocaleSwitcher": {

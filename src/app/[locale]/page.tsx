@@ -19,7 +19,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
     getLocale(),
     getTranslations("HomePage"),
   ]);
-  if (!profile) return <Landing />;
+  if (!profile) return <Landing searchParams={searchParams} />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   const [tStats, tAuth, tEdit, tGuests, tAdmin, format, stats, recent, incomingRequests, claims, admin, params] =
@@ -128,14 +128,23 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
 }
 
 /** The signed-out home: what Muninn Logs is, and a way in. */
-async function Landing() {
-  const t = await getTranslations("HomePage");
+async function Landing({ searchParams }: Pick<PageProps<"/[locale]">, "searchParams">) {
+  const [t, tDelete, { accountDeleted }] = await Promise.all([
+    getTranslations("HomePage"),
+    getTranslations("DeleteAccount"),
+    searchParams,
+  ]);
   return (
     <>
       <PaintedBand as="h1" size="page">
         Muninn Logs
       </PaintedBand>
       <main className="mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center gap-6 px-6 py-11 text-center">
+        {accountDeleted === "1" && (
+          <p role="status" className="type-body-strong text-ink-body">
+            {tDelete("deleted")}
+          </p>
+        )}
         <p className="text-lg text-ink-muted italic">{t("tagline")}</p>
         <Button asChild className="h-11 w-full text-base">
           <Link href="/login">{t("signIn")}</Link>

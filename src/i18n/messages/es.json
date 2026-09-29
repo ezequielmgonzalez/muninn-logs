@@ -210,7 +210,7 @@
         },
         {
           "heading": "Borrar tus datos",
-          "body": "Podés pedir que borremos tu cuenta y tus datos escribiendo a muninnlogs@gmail.com desde el email de tu cuenta. Las partidas que cargaste se borran; en las que cargó otra persona, tu lugar se elimina o queda anónimo."
+          "body": "Podés borrar tu cuenta cuando quieras desde Editar perfil → Eliminar cuenta. Se borran tu cuenta, tu perfil y tus amistades. Las partidas que cargaste donde solo jugaron invitados se borran; las que jugaron otras personas con cuenta pasan a una de ellas, para que no pierdan su historial. En las partidas que quedan, tu lugar pasa a ser «Jugador eliminado», sin tu nombre. También podés pedirlo escribiendo a muninnlogs@gmail.com."
         },
         {
           "heading": "Contacto",
@@ -296,6 +296,26 @@
       "conflict": "No se puede: esa cuenta ya jugó una partida junto a este invitado.",
       "notAllowed": "Tu cuenta no tiene permisos de administración.",
       "generic": "Algo salió mal. Probá de nuevo."
+    }
+  },
+  "DeleteAccount": {
+    "link": "Eliminar cuenta",
+    "title": "Eliminar cuenta",
+    "intro": "Si eliminás tu cuenta:",
+    "account": "Se borran tu cuenta, tu perfil, tus amistades y tus solicitudes.",
+    "matchesDeleted": "{count, plural, one {# partida que cargaste se borra: en ella solo jugaron invitados.} other {# partidas que cargaste se borran: en ellas solo jugaron invitados.}}",
+    "matchesTransferred": "{count, plural, one {# partida que cargaste pasa a otro jugador con cuenta que participó, para que no la pierda.} other {# partidas que cargaste pasan a otros jugadores con cuenta que participaron, para que no las pierdan.}}",
+    "placesAnonymized": "En {count, plural, one {# partida} other {# partidas}}, tu lugar queda como «Jugador eliminado». Los puntos no cambian.",
+    "guestsTransferred": "{count, plural, one {# invitado tuyo pasa} other {# invitados tuyos pasan}} a quien cargó sus partidas.",
+    "guestsDeleted": "{count, plural, one {# invitado tuyo se borra} other {# invitados tuyos se borran}}.",
+    "irreversible": "No se puede deshacer.",
+    "confirmLabel": "Escribí tu nombre de usuario ({username}) para confirmar",
+    "submit": "Eliminar mi cuenta",
+    "back": "Volver sin eliminar",
+    "deleted": "Tu cuenta se eliminó.",
+    "errors": {
+      "mismatch": "El nombre de usuario no coincide.",
+      "generic": "Algo salió mal. Tu cuenta no se eliminó; probá de nuevo."
     }
   },
   "LocaleSwitcher": {
