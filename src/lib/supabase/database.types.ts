@@ -62,6 +62,37 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"guest_claims": {
+                  Row: {
+                    "created_at": string,"guest_id": string,"id": string,"requested_by": string,"user_id": string
+                  }
+                  Insert: {
+                    "created_at"?: string,"guest_id": string,"id"?: string,"requested_by"?: string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"guest_id"?: string,"id"?: string,"requested_by"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "guest_claims_guest_id_fkey"
+      columns: ["guest_id"]
+isOneToOne: true
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "guest_claims_requested_by_fkey"
+      columns: ["requested_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "guest_claims_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"match_player_scores": {
                   Row: {
                     "category_id": string,"match_id": string,"player_id": string,"points": number
@@ -231,7 +262,18 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "find_profile_by_username":
+            "accept_guest_claim":
+{ Args: { "claim_id": string }; Returns: number
+                           },
+"admin_link_guest":
+{ Args: { "guest_id": string,"user_id": string }; Returns: number
+                           },
+"admin_list_guests":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "id": string,"matches": number,"name": string,"owner_name": string
+            }[]
+                           },
+"find_profile_by_username":
 { Args: { "search_username": string }; Returns: {
               "display_name": string,"id": string,"username": string
             }[]
@@ -242,6 +284,11 @@ isOneToOne: false
 "list_addable_players":
 { Args: Record<PropertyKey, never>; Returns: {
               "id": string,"is_guest": boolean,"is_me": boolean,"name": string,"owner_name": string
+            }[]
+                           },
+"list_received_guest_claims":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "guest_name": string,"id": string,"matches": number,"requested_by_name": string
             }[]
                            },
 "log_match":

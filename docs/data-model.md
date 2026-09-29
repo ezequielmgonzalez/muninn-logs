@@ -47,7 +47,7 @@ How Muninn Logs stores people, games and matches, and who can see or change what
 
 - Check: a row is either a user (`user_id` set, `owner_id` and `name` null) or a guest (`user_id` null, `owner_id` and `name` set).
 - Every profile gets its player row automatically on sign-up.
-- **Why one table:** match rows reference a single `player_id`, and stats queries are identical for users and guests. Claiming a guest (phase 2) means moving the guest's `match_players` rows to the user's player and deleting the guest.
+- **Why one table:** match rows reference a single `player_id`, and stats queries are identical for users and guests. Claiming a guest (see "Claiming a guest") moves the guest's `match_players` rows to the user's player and deletes the guest.
 
 ### Game catalog
 
@@ -158,8 +158,25 @@ A match, its players and their scores are saved by one database function, `log_m
 
 `list_addable_players()` returns who the caller may add, which is narrower than who they can see: a non-friend met in a shared match is visible, but not addable.
 
+## Claiming a guest
+
+When a guest turns out to be someone with an account, their record can become that account ("Jessi" becomes @jessi): the guest's match rows move to the user's player, scores and all, and the guest disappears. One-way. Two ways in:
+
+- **Between friends:** a guest's owner asks an accepted friend "are you this guest?" (`guest_claims`), and only that friend can accept (`accept_guest_claim()`) or decline. Same trust as adding someone to a match: nobody gets matches attached without saying yes.
+- **Admins** link any guest to any account directly (`admin_link_guest()`), and can list every guest (`admin_list_guests()`).
+
+A link is refused when the guest and the user already appear in the same match (the same person recorded twice), naming how many.
+
+**Admins** carry role `admin` in `auth.users.raw_app_meta_data`, which users can't edit. It's granted by hand in each project's SQL editor, never in code or migrations (the repo is public):
+
+```sql
+update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}'
+where email = '<email>';
+```
+
+It reaches the session on the next sign-in or token refresh.
+
 ## Out of scope for now
 
-- Claiming a guest when they sign up (phase 2).
 - What happens to matches when a user deletes their account.
 - Letting a participant dispute or leave a match someone else logged. Requiring friendship to add a user is the MVP safeguard.
