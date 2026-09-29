@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { localeSchema } from "@/features/auth/schemas";
 import { redirect } from "@/i18n/navigation";
+import { logUnexpected } from "@/lib/log";
 import { createClient } from "@/lib/supabase/server";
 
 import { logMatchSchema, toLogMatchArgs } from "./schema";
@@ -45,6 +46,7 @@ export async function saveMatch(_state: SaveMatchState, formData: FormData): Pro
     // isn't the user's to edit. 23505: a player
     // or leader twice. Anything else was caught by the schema already.
     const code = error.code === "42501" ? "notAllowed" : error.code === "23505" ? "duplicate" : "generic";
+    if (code === "generic") logUnexpected("saveMatch", error);
     return { status: "error", error: code };
   }
 

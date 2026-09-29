@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "@/i18n/navigation";
+import { logUnexpected } from "@/lib/log";
 import { createClient } from "@/lib/supabase/server";
 
 import {
@@ -46,6 +47,7 @@ export async function sendCode(
     options: { shouldCreateUser: true },
   });
   if (error) {
+    if (error.code !== "over_email_send_rate_limit") logUnexpected("sendCode", error);
     return {
       status: "error",
       error: error.code === "over_email_send_rate_limit" ? "rateLimited" : "generic",
@@ -75,6 +77,7 @@ export async function verifyCode(
   });
   if (error) {
     // Supabase reports wrong and expired codes the same way (otp_expired).
+    if (error.code !== "otp_expired") logUnexpected("verifyCode", error);
     return {
       status: "error",
       error: error.code === "otp_expired" ? "invalidCode" : "generic",
@@ -111,6 +114,7 @@ export async function completeOnboarding(
     .eq("id", userId);
   if (error) {
     // 23505 = unique_violation on profiles.username.
+    if (error.code !== "23505") logUnexpected("completeOnboarding", error);
     return {
       status: "error",
       error: error.code === "23505" ? "usernameTaken" : "generic",
