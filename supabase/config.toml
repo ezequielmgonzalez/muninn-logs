@@ -330,11 +330,13 @@ max_frequency = "5s"
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
-# Disabled until the Google Cloud OAuth client exists. To enable locally, set
-# the two env vars (e.g. in supabase/.env) and flip enabled to true.
+# Google OAuth client "Muninn Logs web" (Google Cloud project Muninn Logs).
+# The client id is public; the secret comes from the environment. Enabled on
+# the hosted projects (see [remotes.*]). Locally it's off: to try it, put
+# SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET in supabase/.env and set enabled = true.
 [auth.external.google]
 enabled = false
-client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+client_id = "609550453666-h84otoe0281b9d4fv9l7do77l5ftvlrh.apps.googleusercontent.com"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
 # Required for local sign in with Google.
 skip_nonce_check = true
@@ -465,6 +467,10 @@ pass = "env(SUPABASE_AUTH_SMTP_PASS)"
 admin_email = "muninnlogs@gmail.com"
 sender_name = "Muninn Logs"
 
+[remotes.staging.auth.external.google]
+enabled = true
+skip_nonce_check = false
+
 # Set by Supabase for the plan; pinned so a push leaves them alone.
 [remotes.staging.db.pooler]
 default_pool_size = 15
@@ -493,6 +499,10 @@ user = "muninnlogs@gmail.com"
 pass = "env(SUPABASE_AUTH_SMTP_PASS)"
 admin_email = "muninnlogs@gmail.com"
 sender_name = "Muninn Logs"
+
+[remotes.production.auth.external.google]
+enabled = true
+skip_nonce_check = false
 
 # Set by Supabase for the plan; pinned so a push leaves them alone.
 [remotes.production.db.pooler]

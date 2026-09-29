@@ -67,5 +67,5 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 - Never edit a migration after its pull request ran it on staging. If staging drifts from `main` (abandoned PR, rewritten migration), run the **Reset staging** workflow: it rebuilds staging from `main` and deletes its data.
 - Auth settings (email templates, OTP length, SMTP, redirect URLs, rate limits) live in `supabase/config.toml`. Shared values sit at the top; each hosted project's `[remotes.<name>]` block overrides only what differs. Never change them in the Supabase dashboard: the next deploy overwrites it. Preview a change with `pnpm supabase config diff --project-ref <ref>` (needs `pnpm supabase login`).
 - If local sign-in emails show a link instead of a 6-digit code, the local gateway lost the email templates: `pnpm supabase stop && pnpm supabase start`.
-- Google sign-in is built but off (`NEXT_PUBLIC_AUTH_GOOGLE_ENABLED`).
+- Google sign-in is on for staging and production (OAuth client in the Google Cloud project "Muninn Logs"; the secret is the `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` repo secret; Vercel's `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED=true` shows the button). It's off locally and can't be e2e-tested: check it by hand on a preview.
 - Only publishable keys (`sb_publishable_…`) may be `NEXT_PUBLIC_*`. Secret keys and passwords never go in client code or chat.

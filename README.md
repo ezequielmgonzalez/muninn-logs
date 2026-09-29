@@ -54,4 +54,4 @@ The first time, install the browser with `pnpm exec playwright install chromium`
 
 Users sign in with a 6-digit code sent by email (templates in `supabase/templates/`), then choose a username. Locally, every email lands in Mailpit (http://127.0.0.1:54324) instead of a real inbox.
 
-Google sign-in is built but off until a Google Cloud OAuth client exists: enable `[auth.external.google]` in `supabase/config.toml` and set `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED=true`.
+Google sign-in is on for staging and production: `[remotes.*.auth.external.google]` in `supabase/config.toml` (client secret from the `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` repository secret) and `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED=true` in Vercel. Locally it's off; to try it, put the secret in `supabase/.env` and enable `[auth.external.google]`.
