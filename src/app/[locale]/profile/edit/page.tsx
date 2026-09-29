@@ -6,11 +6,12 @@ import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function EditProfilePage() {
-  const [profile, locale, t, tHome] = await Promise.all([
+  const [profile, locale, t, tHome, tDelete] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("EditProfile"),
     getTranslations("HomePage"),
+    getTranslations("DeleteAccount"),
   ]);
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
@@ -31,6 +32,12 @@ export default async function EditProfilePage() {
           defaultUsername={profile.username}
           submitLabel={t("submit")}
         />
+        <Link
+          href="/account/delete"
+          className="mt-6 self-center text-sm text-destructive underline-offset-4 hover:underline"
+        >
+          {tDelete("link")}
+        </Link>
       </main>
     </>
   );
