@@ -42,7 +42,8 @@ export async function requestGuestLink(_state: RequestLinkState, formData: FormD
 export async function removeGuestLinkRequest(formData: FormData) {
   const claimId = idSchema.parse(formData.get("claimId"));
   const supabase = await createClient();
-  await supabase.from("guest_claims").delete().eq("id", claimId);
+  const { error } = await supabase.from("guest_claims").delete().eq("id", claimId);
+  if (error) logUnexpected("removeGuestLinkRequest", error);
   refresh();
 }
 

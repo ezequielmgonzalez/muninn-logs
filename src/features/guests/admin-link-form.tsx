@@ -14,15 +14,20 @@ type Guest = { id: string; name: string; owner_name: string; matches: number };
 
 /** Find the account by username, then confirm what moves before linking. */
 export function AdminLinkForm({ guest }: { guest: Guest }) {
+  // "Cancelar" remounts the steps, which resets the action's state back to
+  // the search. (A key on the <form> alone wouldn't: the state lives here.)
+  const [attempt, setAttempt] = useState(0);
+  return <AdminLinkSteps key={attempt} guest={guest} onCancel={() => setAttempt((n) => n + 1)} />;
+}
+
+function AdminLinkSteps({ guest, onCancel }: { guest: Guest; onCancel: () => void }) {
   const t = useTranslations("AdminGuests");
   const locale = useLocale();
   const [state, action, pending] = useActionState(adminLinkGuest, idle);
-  // Remounting the form after "Cancelar" returns it to the search step.
-  const [attempt, setAttempt] = useState(0);
   const inputId = `admin-link-${guest.id}`;
 
   return (
-    <form key={attempt} action={action} className="flex flex-col gap-2">
+    <form action={action} className="flex flex-col gap-2">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="guestId" value={guest.id} />
       {state.status === "confirm" ? (
@@ -42,7 +47,7 @@ export function AdminLinkForm({ guest }: { guest: Guest }) {
             <Button type="submit" className="h-10 flex-1" disabled={pending}>
               {t("confirmYes")}
             </Button>
-            <Button type="button" variant="outline" className="h-10 flex-1" onClick={() => setAttempt((n) => n + 1)}>
+            <Button type="button" variant="outline" className="h-10 flex-1" onClick={onCancel}>
               {t("cancel")}
             </Button>
           </div>

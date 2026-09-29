@@ -48,13 +48,24 @@ test("a guest's owner asks a friend, who accepts and gets the guest's games", as
   await beto.page.close();
 });
 
-test("declining leaves the guest as it was", async ({ page, request, browser }) => {
+test("the owner can cancel, and declining leaves the guest as it was", async ({ page, request, browser }) => {
   await signUp(page, request, "Ana");
   await logGameWithGuest(page, "Beto");
   const beto = await newUser(browser, request, "Beto");
   await befriend(page, "Ana", beto.page, beto.username);
 
   await page.goto("/es/guests");
+  await page.getByLabel("¿Quién es Beto?").selectOption({ label: "Beto" });
+  await page.getByRole("button", { name: "Vincular" }).click();
+  await expect(page.getByText("Esperando que Beto confirme.")).toBeVisible();
+
+  // The owner can take a pending request back…
+  await page.getByRole("button", { name: "Cancelar la solicitud de Beto" }).click();
+  await expect(page.getByText("Esperando que Beto confirme.")).toHaveCount(0);
+  await beto.page.goto("/es");
+  await expect(beto.page.getByText("¿Sos vos?")).toHaveCount(0);
+
+  // …and ask again; this time Beto says no.
   await page.getByLabel("¿Quién es Beto?").selectOption({ label: "Beto" });
   await page.getByRole("button", { name: "Vincular" }).click();
   await expect(page.getByText("Esperando que Beto confirme.")).toBeVisible();
@@ -90,6 +101,14 @@ test("an admin links any guest to an account after confirming", async ({ page, r
   await guest.getByRole("button", { name: "Buscar" }).click();
   await expect(guest.getByRole("alert")).toContainText(`«${guestName}» (de Ana) pasa a ser Caro`);
   await expect(guest.getByRole("alert")).toContainText("se mueven 1 partida");
+
+  // Cancelling goes back to the search, without linking anything.
+  await guest.getByRole("button", { name: "Cancelar" }).click();
+  await expect(guest.getByLabel(`Cuenta de ${guestName} (nombre de usuario)`)).toBeVisible();
+  await expect(guest.getByRole("alert")).toHaveCount(0);
+
+  await guest.getByLabel(`Cuenta de ${guestName} (nombre de usuario)`).fill(caro.username);
+  await guest.getByRole("button", { name: "Buscar" }).click();
   await guest.getByRole("button", { name: "Vincular" }).click();
   await expect(admin.page.getByRole("status")).toHaveText("Listo: se movió 1 partida.");
   await expect(admin.page.getByRole("listitem").filter({ hasText: guestName })).toHaveCount(0);
