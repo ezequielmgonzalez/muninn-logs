@@ -1,0 +1,40 @@
+name: Reset staging
+
+# Rebuilds the staging database from main's migrations, for when a pull
+# request applied a migration that never reached main (abandoned, or edited
+# after it ran). Deletes all staging data; accounts survive and get their
+# profile back (backfill_missing_profiles), but go through onboarding again.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-db
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  reset:
+    name: Reset db-staging
+    runs-on: ubuntu-latest
+    environment: db-staging
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm supabase db reset --project-ref "$SUPABASE_PROJECT_REF" --no-seed --yes

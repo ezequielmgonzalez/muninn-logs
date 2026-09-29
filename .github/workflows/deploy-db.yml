@@ -1,10 +1,18 @@
 name: Deploy Supabase
 
-# Migrations and config reach staging first; production only runs if staging
-# succeeded.
+# Merged to main: migrations and config reach staging, then production if
+# staging succeeded. Opened or updated pull request: staging only, so its
+# Vercel preview (which uses staging) runs against the PR's own schema.
+# If an abandoned or rewritten PR leaves staging out of step with main, run
+# the Reset staging workflow.
 on:
   push:
     branches: [main]
+    paths:
+      - supabase/migrations/**
+      - supabase/config.toml
+      - supabase/templates/**
+  pull_request:
     paths:
       - supabase/migrations/**
       - supabase/config.toml
@@ -28,6 +36,8 @@ jobs:
     secrets: inherit
 
   production:
+    # Pull requests never touch production.
+    if: github.event_name != 'pull_request'
     needs: staging
     uses: ./.github/workflows/db-push.yml
     with:
