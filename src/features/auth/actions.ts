@@ -24,7 +24,7 @@ export type SignInState =
       email: string;
     };
 
-export type OnboardingState =
+export type ProfileState =
   | { status: "idle" }
   | {
       status: "error";
@@ -89,10 +89,8 @@ export async function verifyCode(
   return redirect({ href: "/", locale });
 }
 
-export async function completeOnboarding(
-  _state: OnboardingState,
-  formData: FormData,
-): Promise<OnboardingState> {
+/** Sets the username and display name: first during onboarding, later from "Editar perfil". */
+export async function saveProfile(_state: ProfileState, formData: FormData): Promise<ProfileState> {
   const submitted = {
     username: String(formData.get("username") ?? ""),
     displayName: String(formData.get("displayName") ?? ""),
@@ -114,7 +112,7 @@ export async function completeOnboarding(
     .eq("id", userId);
   if (error) {
     // 23505 = unique_violation on profiles.username.
-    if (error.code !== "23505") logUnexpected("completeOnboarding", error);
+    if (error.code !== "23505") logUnexpected("saveProfile", error);
     return {
       status: "error",
       error: error.code === "23505" ? "usernameTaken" : "generic",
@@ -122,7 +120,10 @@ export async function completeOnboarding(
     };
   }
 
-  return redirect({ href: "/", locale });
+  // After an edit, home confirms it; after onboarding, home is simply the next step.
+  return formData.get("mode") === "edit"
+    ? redirect({ href: { pathname: "/", query: { profileSaved: "1" } }, locale })
+    : redirect({ href: "/", locale });
 }
 
 export async function signOut(formData: FormData) {

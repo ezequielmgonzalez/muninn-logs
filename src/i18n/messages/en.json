@@ -244,6 +244,13 @@
       ]
     }
   },
+  "EditProfile": {
+    "title": "Edit profile",
+    "description": "If you change your username, friends will find you by the new one.",
+    "submit": "Save changes",
+    "saved": "Profile updated.",
+    "link": "Edit profile"
+  },
   "LocaleSwitcher": {
     "label": "Language",
     "es": "Español",
