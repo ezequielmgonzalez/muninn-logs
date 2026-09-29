@@ -7,19 +7,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { completeOnboarding, type OnboardingState } from "./actions";
+import { type ProfileState, saveProfile } from "./actions";
 
-const idle: OnboardingState = { status: "idle" };
+const idle: ProfileState = { status: "idle" };
 
-export function OnboardingForm({ defaultDisplayName }: { defaultDisplayName: string }) {
+type ProfileFormProps = {
+  /** "onboarding": first username choice. "edit": changing it later. */
+  mode: "onboarding" | "edit";
+  defaultDisplayName: string;
+  defaultUsername?: string;
+  submitLabel: string;
+};
+
+export function ProfileForm({ mode, defaultDisplayName, defaultUsername, submitLabel }: ProfileFormProps) {
   const t = useTranslations("Onboarding");
   const locale = useLocale();
-  const [state, action, pending] = useActionState(completeOnboarding, idle);
+  const [state, action, pending] = useActionState(saveProfile, idle);
   const submitted = state.status === "error" ? state : undefined;
 
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="mode" value={mode} />
       <div className="flex flex-col gap-2">
         <Label htmlFor="username">{t("usernameLabel")}</Label>
         <Input
@@ -29,7 +38,7 @@ export function OnboardingForm({ defaultDisplayName }: { defaultDisplayName: str
           autoComplete="username"
           autoCapitalize="none"
           pattern="[a-zA-Z0-9_]{3,20}"
-          defaultValue={submitted?.username}
+          defaultValue={submitted?.username ?? defaultUsername}
           aria-describedby="username-hint"
           required
           autoFocus
@@ -59,7 +68,7 @@ export function OnboardingForm({ defaultDisplayName }: { defaultDisplayName: str
         </p>
       )}
       <Button type="submit" className="h-11 text-base" disabled={pending}>
-        {t("submit")}
+        {submitLabel}
       </Button>
     </form>
   );
