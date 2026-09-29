@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 
 export type PaintTone =
   | "ink"
+  /** Neutral data without its own color (e.g. a player with no leader). */
+  | "ink-muted"
   | "chart-1"
   | "chart-2"
   | "chart-3"
@@ -95,6 +97,7 @@ export function PaintedBand({
 type PaintedBarProps = {
   /** Share of the full width, from 0 to 1. Values outside are clamped. */
   value: number;
+  /** A categorical color, or ink-muted for data without its own color. */
   tone: Exclude<PaintTone, "ink">;
   className?: string;
 };

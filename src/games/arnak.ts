@@ -38,7 +38,7 @@ export type ArnakScoreCategory = (typeof ARNAK_SCORE_CATEGORIES)[number];
  */
 export const ARNAK_LEADER_STYLES: Record<
   ArnakLeader,
-  { emoji: string; tone: Exclude<PaintTone, "ink"> }
+  { emoji: string; tone: Exclude<PaintTone, "ink" | "ink-muted"> }
 > = {
   captain: { emoji: "⚓", tone: "chart-3" },
   falconer: { emoji: "🦅", tone: "chart-6" },

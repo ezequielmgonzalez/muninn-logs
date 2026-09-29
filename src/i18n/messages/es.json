@@ -9,7 +9,7 @@
     "journal": "Diario de {name}",
     "friends": "Amigos",
     "friendsWithRequests": "Amigos ({count})",
-    "saved": "Partida guardada."
+    "matches": "Partidas"
   },
   "Auth": {
     "title": "Iniciar sesión",
@@ -112,6 +112,26 @@
       "duplicate": "Hay un jugador o un líder repetido.",
       "generic": "Algo salió mal. Probá de nuevo."
     }
+  },
+  "Matches": {
+    "title": "Partidas",
+    "empty": "Todavía no hay partidas en tu diario.",
+    "logFirst": "Cargar la primera",
+    "place": "{rank}º de {count}",
+    "winner": "Ganó {names}",
+    "sharedWin": "Empate: {names}",
+    "you": "vos",
+    "allMatches": "Todas las partidas",
+    "saved": "Partida guardada.",
+    "duration": "{minutes} min",
+    "results": "Resultado",
+    "byCategory": "Por categoría",
+    "wonTiebreak": "ganó el desempate",
+    "points": "{total} puntos",
+    "delete": "Eliminar partida",
+    "deleteConfirm": "¿Eliminar esta partida? No se puede deshacer.",
+    "deleteYes": "Sí, eliminar",
+    "deleteNo": "Cancelar"
   },
   "LocaleSwitcher": {
     "label": "Idioma",
