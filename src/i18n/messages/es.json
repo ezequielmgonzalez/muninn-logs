@@ -111,7 +111,8 @@
       "notAllowed": "No podés agregar a uno de los jugadores. Puede que ya no sean amigos.",
       "duplicate": "Hay un jugador o un líder repetido.",
       "generic": "Algo salió mal. Probá de nuevo."
-    }
+    },
+    "editTitle": "Editar partida"
   },
   "Matches": {
     "title": "Partidas",
@@ -131,7 +132,8 @@
     "delete": "Eliminar partida",
     "deleteConfirm": "¿Eliminar esta partida? No se puede deshacer.",
     "deleteYes": "Sí, eliminar",
-    "deleteNo": "Cancelar"
+    "deleteNo": "Cancelar",
+    "edit": "Editar partida"
   },
   "LocaleSwitcher": {
     "label": "Idioma",

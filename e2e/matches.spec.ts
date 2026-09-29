@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { signUp } from "./helpers/auth";
 import { befriend } from "./helpers/friends";
-import { fillScores, saveMatch } from "./helpers/matches";
+import { addGuest, fillScores, saveMatch } from "./helpers/matches";
 
 test("a logged match shows its result to everyone who played, but only its creator can delete it", async ({
   page,
@@ -45,6 +45,9 @@ test("a logged match shows its result to everyone who played, but only its creat
   await expect(beto).toHaveURL(/\/es\/matches\/[0-9a-f-]{36}$/);
   await expect(beto.getByRole("heading", { name: "Resultado" })).toBeVisible();
   await expect(beto.getByRole("button", { name: "Eliminar partida" })).toHaveCount(0);
+  await expect(beto.getByRole("link", { name: "Editar partida" })).toHaveCount(0);
+  const betoEdit = await beto.goto(`${beto.url()}/edit`);
+  expect(betoEdit?.status()).toBe(404);
 
   // Ana deletes it, after confirming, and it's gone for both.
   await page.getByRole("link", { name: /Ganó Beto/ }).click();
@@ -62,4 +65,33 @@ test("an unknown match is a 404", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   const response = await page.goto("/es/matches/00000000-0000-4000-8000-000000000000");
   expect(response?.status()).toBe(404);
+});
+
+test("editing a match starts from its saved values and replaces them", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await page.goto("/es/matches/new");
+  await addGuest(page, "Jessi");
+  await page.getByLabel("Líder de Jessi").selectOption("mystic");
+  await fillScores(page, "Ana", [10, 5, 10, 5, 12, 2]); // 40
+  await fillScores(page, "Jessi", [8, 5, 8, 5, 12, 1]); // 37
+  await saveMatch(page);
+  await expect(page.getByRole("link", { name: /Todas las partidas/ })).toBeVisible();
+
+  await page.getByRole("link", { name: "Editar partida" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Editar partida");
+  // Saved values, with fear back as a number of cards.
+  await expect(page.getByLabel("Investigación de Ana")).toHaveValue("10");
+  await expect(page.getByLabel("Miedo (cartas) de Ana")).toHaveValue("2");
+  await expect(page.getByLabel("Líder de Jessi")).toHaveValue("mystic");
+
+  // Jessi's cards were miscounted, and Nuevo also played.
+  await page.getByLabel("Cartas de Jessi").fill("20"); // 45
+  await addGuest(page, "Nuevo");
+  await fillScores(page, "Nuevo", [1, 0, 0, 0, 2, 0]);
+  await saveMatch(page);
+
+  const results = page.getByRole("list").filter({ hasText: "Nuevo" });
+  await expect(results.getByRole("listitem")).toHaveCount(3);
+  await expect(results.getByRole("listitem").first()).toContainText("Jessi");
+  await expect(results.getByRole("listitem").first()).toContainText("45");
 });
