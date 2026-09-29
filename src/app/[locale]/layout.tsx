@@ -6,6 +6,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 import { Paper } from "@/components/paper";
+import { SiteFooter } from "@/components/site-footer";
 import { routing } from "@/i18n/routing";
 
 import "../globals.css";
@@ -60,7 +61,10 @@ export default async function LocaleLayout({
         {/* Painted bands bleed up to 30px past their box; clip it here, not on
             <body>, whose overflow browsers hand to the viewport instead. */}
         <div className="flex flex-1 flex-col overflow-x-clip">
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider>
+            {children}
+            <SiteFooter />
+          </NextIntlClientProvider>
         </div>
       </body>
     </html>
