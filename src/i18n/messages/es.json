@@ -157,6 +157,24 @@
     "noLeaders": "Todavía no jugaste con líderes.",
     "logGame": "Cargar partida"
   },
+  "FriendProfile": {
+    "back": "Amigos",
+    "compare": "Compararme",
+    "empty": "{name} todavía no tiene partidas registradas."
+  },
+  "Compare": {
+    "title": "Vos vs. {name}",
+    "you": "Vos",
+    "stat": "Estadística",
+    "better": "mejor",
+    "note": "Cada columna promedia todas las partidas de esa persona, no solo las que jugaron juntos.",
+    "rows": {
+      "games": "Partidas",
+      "winRate": "Win Rate",
+      "avgPlace": "Lugar promedio",
+      "avgPoints": "Puntos promedio"
+    }
+  },
   "LocaleSwitcher": {
     "label": "Idioma",
     "es": "Español",

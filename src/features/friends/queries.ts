@@ -28,3 +28,28 @@ export async function countIncomingRequests(myId: string) {
     .eq("status", "pending");
   return count ?? 0;
 }
+
+/**
+ * An accepted friend's profile by username, or null for anyone else. Profiles
+ * of pending requests and match co-players are visible too, so the friendship
+ * is checked explicitly.
+ */
+export async function getFriendByUsername(myId: string, username: string) {
+  const supabase = await createClient();
+  const { data: friend } = await supabase
+    .from("profiles")
+    .select("id, username, display_name")
+    .eq("username", username.toLowerCase())
+    .maybeSingle();
+  if (!friend || friend.id === myId) return null;
+
+  const { data: friendship } = await supabase
+    .from("friendships")
+    .select("status")
+    .or(
+      `and(requester_id.eq.${myId},addressee_id.eq.${friend.id}),and(requester_id.eq.${friend.id},addressee_id.eq.${myId})`,
+    )
+    .eq("status", "accepted")
+    .maybeSingle();
+  return friendship ? friend : null;
+}

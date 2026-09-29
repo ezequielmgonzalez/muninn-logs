@@ -157,6 +157,24 @@
     "noLeaders": "You haven't played with leaders yet.",
     "logGame": "Log a game"
   },
+  "FriendProfile": {
+    "back": "Friends",
+    "compare": "Compare with me",
+    "empty": "{name} has no logged games yet."
+  },
+  "Compare": {
+    "title": "You vs. {name}",
+    "you": "You",
+    "stat": "Stat",
+    "better": "better",
+    "note": "Each column averages all of that person's games, not only the ones you played together.",
+    "rows": {
+      "games": "Games",
+      "winRate": "Win Rate",
+      "avgPlace": "Average place",
+      "avgPoints": "Average points"
+    }
+  },
   "LocaleSwitcher": {
     "label": "Language",
     "es": "Español",
