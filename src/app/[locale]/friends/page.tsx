@@ -10,11 +10,12 @@ import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function FriendsPage() {
-  const [profile, locale, t, tHome] = await Promise.all([
+  const [profile, locale, t, tHome, tGuests] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("Friends"),
     getTranslations("HomePage"),
+    getTranslations("Guests"),
   ]);
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
@@ -90,6 +91,9 @@ export default async function FriendsPage() {
             <p className="type-caption text-ink-muted">{t("empty")}</p>
           )}
         </section>
+        <Link href="/guests" className="self-end text-sm text-ink-muted underline-offset-4 hover:underline">
+          {tGuests("link")} →
+        </Link>
       </main>
     </>
   );

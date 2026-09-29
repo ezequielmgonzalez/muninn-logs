@@ -73,12 +73,13 @@ export async function signUp(
   page: Page,
   request: APIRequestContext,
   name: string,
-): Promise<{ username: string }> {
+): Promise<{ username: string; email: string }> {
   const username = uniqueUsername();
-  await signInWithCode(page, request, uniqueEmail());
+  const email = uniqueEmail();
+  await signInWithCode(page, request, email);
   await expect(page).toHaveURL("/es/onboarding");
   await page.getByLabel("Nombre", { exact: true }).fill(name);
   await chooseUsername(page, username);
   await expect(page).toHaveURL("/es");
-  return { username };
+  return { username, email };
 }

@@ -251,6 +251,53 @@
     "saved": "Profile updated.",
     "link": "Edit profile"
   },
+  "Guests": {
+    "title": "Your guests",
+    "link": "Your guests",
+    "description": "Players without an account you added to your games. If one of them signs up, link them: their games move to their journal.",
+    "empty": "You haven't created any guests yet.",
+    "matches": "{count, plural, one {# game} other {# games}}",
+    "whoIs": "Who is {name}?",
+    "chooseFriend": "Choose a friend",
+    "send": "Link",
+    "noFriends": "To link a guest, first add that person as a friend.",
+    "pending": "Waiting for {friend} to confirm.",
+    "cancel": "Cancel",
+    "cancelFor": "Cancel the request for {name}",
+    "errors": {
+      "alreadyRequested": "This guest already has a pending request.",
+      "notAllowed": "You can't link this guest to that person.",
+      "generic": "Something went wrong. Try again."
+    },
+    "received": "{requester} says you're “{guest}” in {count, plural, one {# game} other {# games}}. Is that you?",
+    "yes": "Yes, that's me",
+    "no": "That's not me",
+    "linked": "Done: {count, plural, one {# game was} other {# games were}} added to your journal.",
+    "acceptErrors": {
+      "conflict": "Not possible: you already appear in a game together with that guest.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "AdminGuests": {
+    "title": "Manage guests",
+    "link": "Manage guests",
+    "description": "Link any guest to an account, without asking for confirmation. This can't be undone.",
+    "empty": "There are no guests.",
+    "owner": "{owner}'s",
+    "usernameLabel": "{name}'s account (username)",
+    "find": "Find",
+    "confirm": "“{guest}” ({owner}) becomes {user} (@{username}): {count, plural, one {# game moves} other {# games move}}. This can't be undone.",
+    "confirmYes": "Link",
+    "cancel": "Cancel",
+    "linked": "Done: {count, plural, one {# game was} other {# games were}} moved.",
+    "errors": {
+      "invalidUsername": "That isn't a valid username.",
+      "notFound": "We couldn't find anyone with that username.",
+      "conflict": "Not possible: that account already played a game together with this guest.",
+      "notAllowed": "Your account doesn't have admin permissions.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
   "LocaleSwitcher": {
     "label": "Language",
     "es": "Español",

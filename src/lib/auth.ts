@@ -19,3 +19,14 @@ export async function getCurrentProfile() {
     .single();
   return profile;
 }
+
+/**
+ * Whether the signed-in user has the admin role (app_metadata, which users
+ * can't edit). For showing admin screens only: the database checks it again.
+ */
+export async function isAdmin() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const appMetadata = data?.claims.app_metadata as { role?: string } | undefined;
+  return appMetadata?.role === "admin";
+}

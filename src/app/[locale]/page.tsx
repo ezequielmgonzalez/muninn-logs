@@ -5,11 +5,13 @@ import { PaintedBand } from "@/components/painted-band";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/features/auth/actions";
 import { countIncomingRequests } from "@/features/friends/queries";
+import { listReceivedClaims } from "@/features/guests/queries";
+import { ReceivedClaims } from "@/features/guests/received-claims";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";
 import { getPlayerStats } from "@/features/stats/queries";
 import { Link, redirect } from "@/i18n/navigation";
-import { getCurrentProfile } from "@/lib/auth";
+import { getCurrentProfile, isAdmin } from "@/lib/auth";
 
 export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   const [profile, locale, t] = await Promise.all([
@@ -20,17 +22,23 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   if (!profile) return <Landing />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const [tStats, tAuth, tEdit, format, stats, recent, incomingRequests, { profileSaved }] = await Promise.all([
+  const [tStats, tAuth, tEdit, tGuests, tAdmin, format, stats, recent, incomingRequests, claims, admin, params] =
+    await Promise.all([
     getTranslations("Stats"),
     getTranslations("Auth"),
     getTranslations("EditProfile"),
+    getTranslations("Guests"),
+    getTranslations("AdminGuests"),
     getFormatter(),
     getPlayerStats(profile.id),
     listMatches(3),
     countIncomingRequests(profile.id),
-    // Set by "Editar perfil" after saving.
+    listReceivedClaims(),
+    isAdmin(),
+    // profileSaved: set by "Editar perfil". linked: games moved by accepting a guest link.
     searchParams,
   ]);
+  const { profileSaved, linked } = params;
 
   const seeMore = (href: string, label: string) => (
     <Link href={href} className="self-end text-sm text-ink-muted underline-offset-4 hover:underline">
@@ -44,6 +52,12 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
         {t("journal", { name: profile.display_name })}
       </PaintedBand>
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-11 px-6 py-11">
+        {claims.length > 0 && <ReceivedClaims claims={claims} />}
+        {typeof linked === "string" && (
+          <p role="status" className="type-body-strong -mb-5 text-center text-ink-body">
+            {tGuests("linked", { count: Number(linked) })}
+          </p>
+        )}
         {profileSaved === "1" && (
           <p role="status" className="type-body-strong -mb-5 text-center text-ink-body">
             {tEdit("saved")}
@@ -94,6 +108,11 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
             <Button asChild variant="ghost">
               <Link href="/profile/edit">{tEdit("link")}</Link>
             </Button>
+            {admin && (
+              <Button asChild variant="ghost">
+                <Link href="/admin/guests">{tAdmin("link")}</Link>
+              </Button>
+            )}
             <form action={signOut}>
               <input type="hidden" name="locale" value={locale} />
               <Button type="submit" variant="ghost">
