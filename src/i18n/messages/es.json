@@ -9,7 +9,8 @@
     "journal": "Diario de {name}",
     "friends": "Amigos",
     "friendsWithRequests": "Amigos ({count})",
-    "matches": "Partidas"
+    "matches": "Partidas",
+    "stats": "Estadísticas"
   },
   "Auth": {
     "title": "Iniciar sesión",
@@ -134,6 +135,27 @@
     "deleteYes": "Sí, eliminar",
     "deleteNo": "Cancelar",
     "edit": "Editar partida"
+  },
+  "Stats": {
+    "expeditions": "{count, plural, one {# expedición registrada} other {# expediciones registradas}}",
+    "winRate": "Win Rate",
+    "ofGames": "de {count, plural, one {# partida} other {# partidas}}",
+    "wins": "Victorias",
+    "avgPlace": "Lugar promedio",
+    "avgPoints": "Puntos promedio",
+    "byCategory": "Por categoría",
+    "leaders": "Líderes más jugados",
+    "sortBy": "Ordenar líderes por",
+    "metrics": {
+      "winRate": "Win Rate",
+      "avgPlace": "Lugar prom.",
+      "avgPoints": "Puntos prom.",
+      "avgResearch": "Investigación prom."
+    },
+    "games": "{count, plural, one {# partida} other {# partidas}}",
+    "empty": "Todavía no hay partidas tuyas registradas. Cuando cargues una, acá vas a ver cómo jugás.",
+    "noLeaders": "Todavía no jugaste con líderes.",
+    "logGame": "Cargar partida"
   },
   "LocaleSwitcher": {
     "label": "Idioma",

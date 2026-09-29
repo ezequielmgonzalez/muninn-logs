@@ -49,3 +49,13 @@ export const ARNAK_LEADER_STYLES: Record<
   mechanic: { emoji: "⚙️", tone: "chart-8" },
   journalist: { emoji: "📰", tone: "chart-7" },
 };
+
+/** Each scoring category's color from design/tokens.json; fear stays neutral. */
+export const ARNAK_CATEGORY_TONES: Record<ArnakScoreCategory, Exclude<PaintTone, "ink">> = {
+  research: "chart-5",
+  temple: "chart-2",
+  idols: "chart-8",
+  guardians: "chart-1",
+  cards: "chart-6",
+  fear: "ink-muted",
+};

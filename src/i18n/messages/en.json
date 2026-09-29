@@ -9,7 +9,8 @@
     "journal": "{name}'s journal",
     "friends": "Friends",
     "friendsWithRequests": "Friends ({count})",
-    "matches": "Games"
+    "matches": "Games",
+    "stats": "Stats"
   },
   "Auth": {
     "title": "Sign in",
@@ -134,6 +135,27 @@
     "deleteYes": "Yes, delete",
     "deleteNo": "Cancel",
     "edit": "Edit game"
+  },
+  "Stats": {
+    "expeditions": "{count, plural, one {# expedition logged} other {# expeditions logged}}",
+    "winRate": "Win Rate",
+    "ofGames": "of {count, plural, one {# game} other {# games}}",
+    "wins": "Wins",
+    "avgPlace": "Average place",
+    "avgPoints": "Average points",
+    "byCategory": "By category",
+    "leaders": "Most played leaders",
+    "sortBy": "Sort leaders by",
+    "metrics": {
+      "winRate": "Win Rate",
+      "avgPlace": "Avg place",
+      "avgPoints": "Avg points",
+      "avgResearch": "Avg research"
+    },
+    "games": "{count, plural, one {# game} other {# games}}",
+    "empty": "You haven't played any logged games yet. Once you log one, this is where you'll see how you play.",
+    "noLeaders": "You haven't played with leaders yet.",
+    "logGame": "Log a game"
   },
   "LocaleSwitcher": {
     "label": "Language",

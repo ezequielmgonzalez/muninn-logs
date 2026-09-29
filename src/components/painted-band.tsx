@@ -73,15 +73,17 @@ export function PaintedBand({
       )}
     >
       <PaintLayers tone="ink" />
-      {/* Always above the sharp layer, never on the faint one: keeps text contrast. */}
-      <div className="relative z-2 flex items-baseline justify-between gap-4">
+      {/* Always above the sharp layer, never on the faint one: keeps text contrast.
+          When title and trailing don't fit side by side (phones), the trailing
+          part wraps below instead of squeezing the title onto several lines. */}
+      <div className="relative z-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
         <Tag
           className={cn(
             size === "page"
               ? // band-lg, scaled down on phones so a name fits on one line.
                 "font-display text-[20px] leading-[26px] font-bold tracking-[0.14em] uppercase sm:text-[26px] sm:leading-[30px]"
               : "type-band-md",
-            "m-0 min-w-0",
+            "m-0",
           )}
         >
           {children}
