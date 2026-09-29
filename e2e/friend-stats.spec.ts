@@ -39,6 +39,7 @@ test("a friend's profile shows their stats, and comparing marks who does better"
   await expect(page.getByRole("img", { name: /^50\s%\sde 2 partidas$/ })).toBeVisible();
 
   await page.getByRole("link", { name: "Compararme" }).click();
+  await expect(page).toHaveURL(`/es/compare?with=${betoUsername}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Vos vs. Beto");
 
   // Win rate: Ana 100 % (better) vs Beto 50 %.
@@ -65,5 +66,9 @@ test("someone who isn't your friend has no profile or comparison for you", async
   await sendFriendRequest(page, carlaUsername);
 
   expect((await page.goto(`/es/friends/${carlaUsername}`))?.status()).toBe(404);
-  expect((await page.goto(`/es/friends/${carlaUsername}/compare`))?.status()).toBe(404);
+
+  // Asking to compare with her is ignored: no column, no stats.
+  await page.goto(`/es/compare?with=${carlaUsername}`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Comparar");
+  await expect(page.getByRole("table")).toHaveCount(0);
 });

@@ -19,31 +19,36 @@ function stats(overrides: Partial<PlayerStats>, categories: Record<string, numbe
 const row = (rows: ReturnType<typeof compareStats>, key: string) => rows.find((r) => r.key === key)!;
 
 describe("compareStats", () => {
-  it("favors the higher win rate and average points", () => {
-    const rows = compareStats(stats({ wins: 3 }), stats({ wins: 1, avg_points: 60 }));
-    expect(row(rows, "winRate")).toMatchObject({ mine: 0.75, theirs: 0.25, better: "mine" });
-    expect(row(rows, "avgPoints").better).toBe("theirs");
+  it("marks the higher win rate and average points", () => {
+    const rows = compareStats([stats({ wins: 3 }), stats({ wins: 1, avg_points: 60 })]);
+    expect(row(rows, "winRate")).toMatchObject({ values: [0.75, 0.25], best: [true, false] });
+    expect(row(rows, "avgPoints").best).toEqual([false, true]);
   });
 
-  it("favors the lower average place", () => {
-    const rows = compareStats(stats({ avg_place: 1.5 }), stats({ avg_place: 2.5 }));
-    expect(row(rows, "avgPlace").better).toBe("mine");
+  it("marks the lower average place", () => {
+    const rows = compareStats([stats({ avg_place: 2.5 }), stats({ avg_place: 1.5 }), stats({ avg_place: 3 })]);
+    expect(row(rows, "avgPlace").best).toEqual([false, true, false]);
   });
 
-  it("favors the less negative fear average", () => {
-    const rows = compareStats(stats({}, { fear: -1 }), stats({}, { fear: -3 }));
-    expect(row(rows, "fear").better).toBe("mine");
+  it("marks the less negative fear average", () => {
+    const rows = compareStats([stats({}, { fear: -1 }), stats({}, { fear: -3 })]);
+    expect(row(rows, "fear").best).toEqual([true, false]);
   });
 
-  it("calls equal values a tie, and never judges games played", () => {
-    const rows = compareStats(stats({ games: 10 }), stats({ games: 2 }));
-    expect(row(rows, "avgPoints").better).toBe("tie");
-    expect(row(rows, "games").better).toBeNull();
+  it("marks everyone tied for the best, but nobody when all tie", () => {
+    const rows = compareStats([stats({ avg_points: 60 }), stats({ avg_points: 60 }), stats({ avg_points: 40 })]);
+    expect(row(rows, "avgPoints").best).toEqual([true, true, false]);
+    expect(row(compareStats([stats({}), stats({}), stats({})]), "avgPoints").best).toEqual([false, false, false]);
   });
 
-  it("can't judge when one of them has no games", () => {
-    const rows = compareStats(stats({}), stats({ games: 0, wins: 0, avg_points: null, avg_place: null }));
-    expect(row(rows, "winRate")).toMatchObject({ theirs: null, better: null });
-    expect(row(rows, "avgPlace").better).toBeNull();
+  it("never judges games played", () => {
+    expect(row(compareStats([stats({ games: 10 }), stats({ games: 2 })]), "games").best).toEqual([false, false]);
+  });
+
+  it("ignores players without games, and judges nothing with fewer than two values", () => {
+    const empty = stats({ games: 0, wins: 0, avg_points: null, avg_place: null });
+    const rows = compareStats([stats({ avg_place: 2 }), empty, stats({ avg_place: 1 })]);
+    expect(row(rows, "avgPlace").best).toEqual([false, false, true]);
+    expect(row(compareStats([stats({}), empty]), "avgPlace").best).toEqual([false, false]);
   });
 });
