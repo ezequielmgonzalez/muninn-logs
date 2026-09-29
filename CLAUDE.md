@@ -63,7 +63,8 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 | Staging | `reabwxbptbzokwxnxmae` | Vercel preview deployments |
 | Production | `niltnathzxgedevqaltz` | https://muninn-logs.vercel.app |
 
-- Merging a change to `supabase/migrations/`, `supabase/config.toml` or `supabase/templates/` runs `.github/workflows/deploy-db.yml`: migrations and then `supabase config push`, staging first, then production.
+- Changes to `supabase/migrations/`, `supabase/config.toml` or `supabase/templates/` run `.github/workflows/deploy-db.yml`: migrations, then `supabase config push`. A pull request deploys to staging only, so its Vercel preview has its schema; merging deploys staging, then production.
+- Never edit a migration after its pull request ran it on staging. If staging drifts from `main` (abandoned PR, rewritten migration), run the **Reset staging** workflow: it rebuilds staging from `main` and deletes its data.
 - Auth settings (email templates, OTP length, SMTP, redirect URLs, rate limits) live in `supabase/config.toml`. Shared values sit at the top; each hosted project's `[remotes.<name>]` block overrides only what differs. Never change them in the Supabase dashboard: the next deploy overwrites it. Preview a change with `pnpm supabase config diff --project-ref <ref>` (needs `pnpm supabase login`).
 - If local sign-in emails show a link instead of a 6-digit code, the local gateway lost the email templates: `pnpm supabase stop && pnpm supabase start`.
 - Google sign-in is built but off (`NEXT_PUBLIC_AUTH_GOOGLE_ENABLED`).

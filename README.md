@@ -34,7 +34,9 @@ Commit the regenerated types with the migration; CI fails if they're stale.
 | Staging | `muninn-logs-staging` | Vercel preview deployments |
 | Production | `muninn-logs-prod` | https://muninn-logs.vercel.app |
 
-Merging a change to `supabase/migrations/`, `supabase/config.toml` or `supabase/templates/` runs **Deploy Supabase** (`.github/workflows/deploy-db.yml`): it applies pending migrations and pushes the config (Auth settings, email templates, SMTP) to staging, then to production if staging succeeded. Each hosted project's overrides are its `[remotes.<name>]` block in `config.toml`; preview them with `pnpm supabase config diff --project-ref <ref>`.
+A pull request that changes `supabase/migrations/`, `supabase/config.toml` or `supabase/templates/` deploys it to **staging** only, so the PR's Vercel preview runs against its schema. If staging ever drifts from `main` (an abandoned PR, a rewritten migration), run the **Reset staging** workflow, which rebuilds it from `main` and deletes its data.
+
+Merging such a change runs **Deploy Supabase** (`.github/workflows/deploy-db.yml`): it applies pending migrations and pushes the config (Auth settings, email templates, SMTP) to staging, then to production if staging succeeded. Each hosted project's overrides are its `[remotes.<name>]` block in `config.toml`; preview them with `pnpm supabase config diff --project-ref <ref>`.
 
 It needs the repository secrets `SUPABASE_ACCESS_TOKEN` and `SUPABASE_AUTH_SMTP_PASS` (the Gmail app password), and in the `db-staging` and `db-production` GitHub environments, the `SUPABASE_PROJECT_REF` variable and `SUPABASE_DB_PASSWORD` secret.
 
