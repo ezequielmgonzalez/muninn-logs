@@ -9,8 +9,12 @@
     "journal": "{name}'s journal",
     "friends": "Friends",
     "friendsWithRequests": "Friends ({count})",
-    "matches": "Games",
-    "stats": "Stats"
+    "summary": "Your summary",
+    "recent": "Latest games",
+    "seeAllMatches": "See all games",
+    "seeStats": "See stats",
+    "noMatches": "There are no games in your journal yet. Log the first one after you play.",
+    "games": "Games"
   },
   "Auth": {
     "title": "Sign in",

@@ -24,7 +24,7 @@ test("the profile shows how you play, per category and per leader", async ({ pag
   await saveMatch(page);
 
   await page.goto("/es");
-  await page.getByRole("link", { name: "Estadísticas" }).click();
+  await page.getByRole("link", { name: "Ver estadísticas" }).click();
   await expect(page).toHaveURL("/es/profile");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Ana");
   await expect(page.getByText("2 expediciones registradas")).toBeVisible();
