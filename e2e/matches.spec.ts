@@ -37,7 +37,7 @@ test("a logged match shows its result to everyone who played, but only its creat
 
   // Beto played, so he sees it too, with his place, but can't delete it.
   await beto.goto("/es");
-  await beto.getByRole("link", { name: "Partidas" }).click();
+  await beto.getByRole("link", { name: "Ver todas las partidas" }).click();
   const betoMatch = beto.getByRole("link", { name: /Ganó Beto/ });
   await expect(betoMatch).toContainText("1º de 2");
   await betoMatch.click();
