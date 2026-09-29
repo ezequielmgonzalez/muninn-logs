@@ -63,6 +63,8 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
           echo "MAILPIT_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
+          # Local-only key, so e2e tests can grant roles (e.g. admin) through the Auth admin API.
+          echo "SUPABASE_SECRET_KEY=$SECRET_KEY" >> "$GITHUB_ENV"
 
       - run: pnpm build
       - run: pnpm test:e2e

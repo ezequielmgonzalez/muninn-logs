@@ -251,6 +251,53 @@
     "saved": "Perfil actualizado.",
     "link": "Editar perfil"
   },
+  "Guests": {
+    "title": "Tus invitados",
+    "link": "Tus invitados",
+    "description": "Jugadores sin cuenta que agregaste a tus partidas. Si alguno se crea una cuenta, vinculalo: sus partidas pasan a su diario.",
+    "empty": "Todavía no creaste invitados.",
+    "matches": "{count, plural, one {# partida} other {# partidas}}",
+    "whoIs": "¿Quién es {name}?",
+    "chooseFriend": "Elegí un amigo",
+    "send": "Vincular",
+    "noFriends": "Para vincular un invitado, primero agregá a esa persona como amiga.",
+    "pending": "Esperando que {friend} confirme.",
+    "cancel": "Cancelar",
+    "cancelFor": "Cancelar la solicitud de {name}",
+    "errors": {
+      "alreadyRequested": "Ya hay una solicitud pendiente para este invitado.",
+      "notAllowed": "No podés vincular este invitado con esa persona.",
+      "generic": "Algo salió mal. Probá de nuevo."
+    },
+    "received": "{requester} dice que sos «{guest}» en {count, plural, one {# partida} other {# partidas}}. ¿Sos vos?",
+    "yes": "Sí, soy yo",
+    "no": "No soy yo",
+    "linked": "Listo: sumamos {count, plural, one {# partida} other {# partidas}} a tu diario.",
+    "acceptErrors": {
+      "conflict": "No se puede: ya aparecés en una partida junto a ese invitado.",
+      "generic": "Algo salió mal. Probá de nuevo."
+    }
+  },
+  "AdminGuests": {
+    "title": "Administrar invitados",
+    "link": "Administrar invitados",
+    "description": "Vinculá cualquier invitado con una cuenta, sin pedir confirmación. No se puede deshacer.",
+    "empty": "No hay invitados.",
+    "owner": "de {owner}",
+    "usernameLabel": "Cuenta de {name} (nombre de usuario)",
+    "find": "Buscar",
+    "confirm": "«{guest}» ({owner}) pasa a ser {user} (@{username}): se mueven {count, plural, one {# partida} other {# partidas}}. No se puede deshacer.",
+    "confirmYes": "Vincular",
+    "cancel": "Cancelar",
+    "linked": "Listo: se {count, plural, one {movió # partida} other {movieron # partidas}}.",
+    "errors": {
+      "invalidUsername": "Ese no es un nombre de usuario válido.",
+      "notFound": "No encontramos a nadie con ese nombre de usuario.",
+      "conflict": "No se puede: esa cuenta ya jugó una partida junto a este invitado.",
+      "notAllowed": "Tu cuenta no tiene permisos de administración.",
+      "generic": "Algo salió mal. Probá de nuevo."
+    }
+  },
   "LocaleSwitcher": {
     "label": "Idioma",
     "es": "Español",
