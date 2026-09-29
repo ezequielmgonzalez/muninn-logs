@@ -3,7 +3,8 @@ name: Push to Supabase
 # Reusable: applies pending migrations and the config.toml settings (Auth,
 # email templates, SMTP...) to one hosted project. The GitHub environment
 # holds its project ref (variable) and database password (secret); the Gmail
-# app password for SMTP is a repository secret shared by both projects.
+# app password (SMTP) and the Google OAuth client secret are repository
+# secrets shared by both projects.
 on:
   workflow_call:
     inputs:
@@ -24,6 +25,7 @@ jobs:
       SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       SUPABASE_AUTH_SMTP_PASS: ${{ secrets.SUPABASE_AUTH_SMTP_PASS }}
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: ${{ secrets.SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET }}
     steps:
       - uses: actions/checkout@v7
 
