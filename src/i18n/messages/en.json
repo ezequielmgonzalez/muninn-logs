@@ -9,7 +9,7 @@
     "journal": "{name}'s journal",
     "friends": "Friends",
     "friendsWithRequests": "Friends ({count})",
-    "saved": "Game saved."
+    "matches": "Games"
   },
   "Auth": {
     "title": "Sign in",
@@ -112,6 +112,26 @@
       "duplicate": "A player or leader appears twice.",
       "generic": "Something went wrong. Try again."
     }
+  },
+  "Matches": {
+    "title": "Games",
+    "empty": "There are no games in your journal yet.",
+    "logFirst": "Log the first one",
+    "place": "{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of {count}",
+    "winner": "{names} won",
+    "sharedWin": "Tie: {names}",
+    "you": "you",
+    "allMatches": "All games",
+    "saved": "Game saved.",
+    "duration": "{minutes} min",
+    "results": "Result",
+    "byCategory": "By category",
+    "wonTiebreak": "won the tiebreak",
+    "points": "{total} points",
+    "delete": "Delete game",
+    "deleteConfirm": "Delete this game? This can't be undone.",
+    "deleteYes": "Yes, delete",
+    "deleteNo": "Cancel"
   },
   "LocaleSwitcher": {
     "label": "Language",

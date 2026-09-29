@@ -1,20 +1,7 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { formError, signUp } from "./helpers/auth";
-
-const CATEGORIES = ["Investigación", "Templo", "Ídolos", "Guardianes", "Cartas", "Miedo (cartas)"];
-
-/** Types a player's row of the score pad, in the order of CATEGORIES. */
-async function fillScores(page: Page, name: string, points: number[]) {
-  for (const [i, category] of CATEGORIES.entries()) {
-    await page.getByLabel(`${category} de ${name}`).fill(String(points[i]));
-  }
-}
-
-async function addGuest(page: Page, name: string) {
-  await page.getByLabel("Agregar jugador").fill(name);
-  await page.getByRole("button", { name: `Crear invitado “${name}”` }).click();
-}
+import { addGuest, fillScores, saveMatch } from "./helpers/matches";
 
 test("logs a match with guests, leaders and a tiebreak", async ({ page, request }) => {
   await signUp(page, request, "Ana");
@@ -41,9 +28,7 @@ test("logs a match with guests, leaders and a tiebreak", async ({ page, request 
   await expect(page.getByText("Empate en 42 puntos.")).toBeVisible();
   await page.getByRole("radio", { name: "Jessi" }).check();
 
-  await save.click();
-  await expect(page).toHaveURL("/es?saved=1");
-  await expect(page.getByRole("status")).toHaveText("Partida guardada.");
+  await saveMatch(page);
 });
 
 test("reuses a guest instead of creating a duplicate", async ({ page, request }) => {
@@ -52,8 +37,7 @@ test("reuses a guest instead of creating a duplicate", async ({ page, request })
   // First match creates the guest Jessi.
   await page.goto("/es/matches/new");
   await addGuest(page, "Jessi");
-  await page.getByRole("button", { name: "Guardar partida" }).click();
-  await expect(page).toHaveURL("/es?saved=1");
+  await saveMatch(page);
 
   // Next time, a partial name suggests her (and still allows a new guest)…
   await page.goto("/es/matches/new");
