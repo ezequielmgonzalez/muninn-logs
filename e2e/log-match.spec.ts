@@ -83,3 +83,22 @@ test("logging a match requires signing in", async ({ page }) => {
   await page.goto("/es/matches/new");
   await expect(page).toHaveURL("/es/login");
 });
+
+test("a game can be logged without a date", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await page.goto("/es/matches/new");
+  await expect(page.getByLabel("Fecha")).not.toHaveValue(""); // new games default to today
+  await page.getByLabel("Fecha").fill("");
+  await addGuest(page, "Jessi");
+  await saveMatch(page);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Partida sin fecha");
+
+  // Editing keeps it undated rather than silently dating it today.
+  await page.getByRole("link", { name: "Editar partida" }).click();
+  await expect(page.getByLabel("Fecha")).toHaveValue("");
+  await saveMatch(page);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Partida sin fecha");
+
+  await page.goto("/es/matches");
+  await expect(page.getByRole("link", { name: /Sin fecha/ })).toBeVisible();
+});

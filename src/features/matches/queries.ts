@@ -20,7 +20,8 @@ export type MatchPlayer = {
 
 export type MatchSummary = {
   id: string;
-  playedOn: string;
+  /** Null for undated games. */
+  playedOn: string | null;
   durationMinutes: number | null;
   boardSide: "bird" | "snake" | null;
   loggedByMe: boolean;
@@ -42,7 +43,7 @@ const MATCH_COLUMNS = `
 
 type MatchRow = {
   id: string;
-  played_on: string;
+  played_on: string | null;
   created_by: string;
   duration_minutes: number | null;
   setup: unknown;
@@ -104,7 +105,7 @@ export async function listMatches(limit = 50): Promise<MatchSummary[]> {
   const { data, error } = await supabase
     .from("matches")
     .select(MATCH_COLUMNS)
-    .order("played_on", { ascending: false })
+    .order("played_on", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;

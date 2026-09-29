@@ -20,7 +20,9 @@ export async function MatchList({ matches }: { matches: MatchSummary[] }) {
             <Link href={`/matches/${match.id}`} className="flex flex-col gap-1 py-4">
               <span className="flex items-baseline justify-between gap-3">
                 <span className="type-body-strong">
-                  {format.dateTime(playedOnDate(match.playedOn), { dateStyle: "medium", timeZone: "UTC" })}
+                  {match.playedOn
+                    ? format.dateTime(playedOnDate(match.playedOn), { dateStyle: "medium", timeZone: "UTC" })
+                    : t("undated")}
                 </span>
                 {me && (
                   <span className="shrink-0 text-sm text-ink-muted">

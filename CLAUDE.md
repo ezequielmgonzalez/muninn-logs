@@ -54,6 +54,7 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 
 - Unit tests sit next to the code as `*.test.ts(x)`. E2E tests in `e2e/` sign in for real: codes are read from Mailpit (`e2e/helpers/auth.ts`). Use `formError(page)` for form errors: Next's route announcer also has `role="alert"`.
 - When a test passes on the first run, break the code on purpose to confirm it can fail.
+- pgTAP tests must pass on a local database that e2e runs have filled: scope every query to the test's own fixture ids, never assume the tables are empty. And a statement can't see rows a function it calls inserts: store the result (e.g. a temp table), then check it in the next statement.
 
 ## Environments
 

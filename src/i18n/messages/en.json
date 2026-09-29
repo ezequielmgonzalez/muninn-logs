@@ -117,7 +117,8 @@
       "duplicate": "A player or leader appears twice.",
       "generic": "Something went wrong. Try again."
     },
-    "editTitle": "Edit game"
+    "editTitle": "Edit game",
+    "dateHint": "Optional: leave it empty if you don't know it."
   },
   "Matches": {
     "title": "Games",
@@ -138,7 +139,9 @@
     "deleteConfirm": "Delete this game? This can't be undone.",
     "deleteYes": "Yes, delete",
     "deleteNo": "Cancel",
-    "edit": "Edit game"
+    "edit": "Edit game",
+    "undated": "No date",
+    "undatedTitle": "Undated game"
   },
   "Stats": {
     "expeditions": "{count, plural, one {# expedition logged} other {# expeditions logged}}",

@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(21);
+select plan(22);
 
 set constraints all immediate;
 
@@ -137,6 +137,20 @@ select results_eq(
      order by r.rank, 1 $$,
   $$ values ('Ana', 42, true), ('Jessi', 42, false), ('Bob', 23, false), ('Nuevo', 3, false) $$,
   'totals include negative fear, and won_tiebreak decides the tie for first'
+);
+
+-- Two statements: a statement doesn't see rows inserted by a function it calls.
+create temporary table undated as
+select public.log_match('arnak', null, $json$[
+  {"player_id": "f0000000-0000-0000-0000-000000000001",
+   "scores": {"research": 0, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}},
+  {"new_guest_name": "Sin Fecha",
+   "scores": {"research": 0, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}}
+]$json$) as id;
+
+select ok(
+  (select m.played_on is null from public.matches m join undated using (id)),
+  'a match can be logged without a date'
 );
 
 -- ---------------------------------------------------------------------------

@@ -210,7 +210,8 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub": "33333333-3333-3333-3333-333333333333", "role": "authenticated", "app_metadata": {"role": "admin"}}';
 
 select results_eq(
-  'select name, owner_name, matches from public.admin_list_guests()',
+  $$ select name, owner_name, matches from public.admin_list_guests()
+     where id::text like 'b0000000-%' $$,
   $$ values ('Toto', 'Ana', 1), ('Xavi', 'carla', 0) $$,
   'an admin sees every guest, whose it is and how many matches it has'
 );

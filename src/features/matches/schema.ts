@@ -29,7 +29,8 @@ const playerSchema = z
 
 export const logMatchSchema = z
   .object({
-    playedOn: z.iso.date(),
+    /** Optional: games logged long after (e.g. from old score pads) may have no date. */
+    playedOn: z.iso.date().nullable(),
     boardSide: z.enum(["bird", "snake"]).nullable(),
     durationMinutes: z.number().int().min(1).max(1440).nullable(),
     // Arnak without the solo mode: 2 to 4 players, in turn order.

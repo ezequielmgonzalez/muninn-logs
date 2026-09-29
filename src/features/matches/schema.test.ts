@@ -23,6 +23,10 @@ describe("logMatchSchema", () => {
     expect(result.data?.players[1].newGuestName).toBe("Jessi");
   });
 
+  it("accepts a game without a date", () => {
+    expect(logMatchSchema.safeParse(match([player({ playerId: ana }), player({ playerId: bob })], { playedOn: null })).success).toBe(true);
+  });
+
   it.each([
     ["one player", match([player({ playerId: ana })])],
     ["five players", match(Array.from({ length: 5 }, (_, i) => player({ newGuestName: `P${i}` })))],
