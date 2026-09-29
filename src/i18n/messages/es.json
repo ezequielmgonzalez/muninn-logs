@@ -167,17 +167,22 @@
     "empty": "{name} todavía no tiene partidas registradas."
   },
   "Compare": {
-    "title": "Vos vs. {name}",
+    "title": "Vos vs. {names}",
     "you": "Vos",
     "stat": "Estadística",
-    "better": "mejor",
+    "better": "el mejor",
     "note": "Cada columna promedia todas las partidas de esa persona, no solo las que jugaron juntos.",
     "rows": {
       "games": "Partidas",
       "winRate": "Win Rate",
       "avgPlace": "Lugar promedio",
       "avgPoints": "Puntos promedio"
-    }
+    },
+    "pickTitle": "Comparar",
+    "choose": "Elegí hasta {max} amigos",
+    "submit": "Comparar",
+    "noFriends": "Agregá amigos para compararte con ellos.",
+    "link": "Comparar con varios amigos"
   },
   "Legal": {
     "updated": "Última actualización: 29 de septiembre de 2026",

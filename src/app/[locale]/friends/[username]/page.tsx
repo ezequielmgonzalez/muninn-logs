@@ -38,7 +38,7 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
             ← {t("back")}
           </Link>
           <Button asChild className="h-11 text-base">
-            <Link href={`/friends/${friend.username}/compare`}>{t("compare")}</Link>
+            <Link href={{ pathname: "/compare", query: { with: friend.username ?? "" } }}>{t("compare")}</Link>
           </Button>
         </div>
         {stats.games === 0 ? (

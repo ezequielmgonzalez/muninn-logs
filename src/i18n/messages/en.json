@@ -167,17 +167,22 @@
     "empty": "{name} has no logged games yet."
   },
   "Compare": {
-    "title": "You vs. {name}",
+    "title": "You vs. {names}",
     "you": "You",
     "stat": "Stat",
-    "better": "better",
+    "better": "the best",
     "note": "Each column averages all of that person's games, not only the ones you played together.",
     "rows": {
       "games": "Games",
       "winRate": "Win Rate",
       "avgPlace": "Average place",
       "avgPoints": "Average points"
-    }
+    },
+    "pickTitle": "Compare",
+    "choose": "Choose up to {max} friends",
+    "submit": "Compare",
+    "noFriends": "Add friends to compare yourself with them.",
+    "link": "Compare with several friends"
   },
   "Legal": {
     "updated": "Last updated: September 29, 2026",
