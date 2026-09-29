@@ -236,6 +236,9 @@ isOneToOne: false
               "display_name": string,"id": string,"username": string
             }[]
                            },
+"get_player_stats":
+{ Args: { "game_slug"?: string,"target_user_id": string }; Returns: Json
+                           },
 "list_addable_players":
 { Args: Record<PropertyKey, never>; Returns: {
               "id": string,"is_guest": boolean,"is_me": boolean,"name": string,"owner_name": string

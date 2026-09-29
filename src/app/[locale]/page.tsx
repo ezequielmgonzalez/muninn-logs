@@ -33,6 +33,9 @@ export default async function Home() {
               <Link href="/matches">{t("matches")}</Link>
             </Button>
             <Button asChild variant="outline" className="h-11 w-full text-base">
+              <Link href="/profile">{t("stats")}</Link>
+            </Button>
+            <Button asChild variant="outline" className="h-11 w-full text-base">
               <Link href="/friends">
                 {incomingRequests > 0
                   ? t("friendsWithRequests", { count: incomingRequests })

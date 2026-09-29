@@ -130,7 +130,7 @@ A user's **visible matches** are the ones they logged or played in. **Shared a m
 | A guest and their stats  | Its owner and anyone who shared a match with that guest; stats count only those shared matches |
 | Friendships              | The two users involved                                                                        |
 
-**Friends' stats without exposing their matches.** Matches stay private even from friends, but comparing yourself with a friend needs their overall numbers. Stats for a user are served by a database function (`security definer`) that returns aggregates only (games, wins, win rate, averages per category), and only when the caller is that user or an accepted friend. Match rows themselves stay behind RLS. *Not built yet: its return shape depends on the stats screen, so it lands with that feature.*
+**Friends' stats without exposing their matches.** Matches stay private even from friends, but comparing yourself with a friend needs their overall numbers. `get_player_stats(user_id, game_slug)` (`security definer`) first checks that the caller is that user or an accepted friend (otherwise 42501), then returns aggregates only: games, wins (a shared first place counts), average points and place, the average per score category, and the same per leader. Match rows themselves stay behind RLS.
 
 **Finding people.** There is no public user list. A friend request starts from an exact username lookup: `find_profile_by_username()` returns at most one profile, ignoring case and surrounding spaces, and only to signed-in users.
 
