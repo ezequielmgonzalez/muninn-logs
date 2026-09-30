@@ -158,6 +158,12 @@ A match, its players and their scores are saved by one database function, `log_m
 
 `list_addable_players()` returns who the caller may add, which is narrower than who they can see: a non-friend met in a shared match is visible, but not addable.
 
+## Importing matches
+
+Admins can load many past matches at once from a CSV (`/admin/import`), e.g. games transcribed from old score pads. The file is parsed in the browser (`src/features/import/`), one row per player per game, with Spanish or English headers and `,` or `;`. Every problem is listed by row or by game before anything is saved, and each name in the file is matched to an addable player or becomes a new guest.
+
+`import_matches(games)` saves them in one transaction: each element has `log_match()`'s arguments, and a new guest's name creates one guest for the whole import (compared case-insensitively), not one per game. It's `security invoker` like `log_match()`, so RLS still decides who may be added; it only adds the admin check. Any error rolls back every match and guest, naming the game that failed.
+
 ## Claiming a guest
 
 When a guest turns out to be someone with an account, their record can become that account ("Jessi" becomes @jessi): the guest's match rows move to the user's player, scores and all, and the guest disappears. One-way. Two ways in:

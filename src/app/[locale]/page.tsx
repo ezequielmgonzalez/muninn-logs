@@ -22,13 +22,14 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   if (!profile) return <Landing searchParams={searchParams} />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const [tStats, tAuth, tEdit, tGuests, tAdmin, format, stats, recent, incomingRequests, claims, admin, params] =
+  const [tStats, tAuth, tEdit, tGuests, tAdmin, tImport, format, stats, recent, incomingRequests, claims, admin, params] =
     await Promise.all([
     getTranslations("Stats"),
     getTranslations("Auth"),
     getTranslations("EditProfile"),
     getTranslations("Guests"),
     getTranslations("AdminGuests"),
+    getTranslations("AdminImport"),
     getFormatter(),
     getPlayerStats(profile.id),
     listMatches(3),
@@ -111,6 +112,11 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
             {admin && (
               <Button asChild variant="ghost">
                 <Link href="/admin/guests">{tAdmin("link")}</Link>
+              </Button>
+            )}
+            {admin && (
+              <Button asChild variant="ghost">
+                <Link href="/admin/import">{tImport("link")}</Link>
               </Button>
             )}
             <form action={signOut}>

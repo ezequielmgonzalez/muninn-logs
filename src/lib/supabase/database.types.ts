@@ -287,6 +287,9 @@ isOneToOne: false
 "get_player_stats":
 { Args: { "game_slug"?: string,"target_user_id": string }; Returns: Json
                            },
+"import_matches":
+{ Args: { "games": Json }; Returns: number
+                           },
 "list_addable_players":
 { Args: Record<PropertyKey, never>; Returns: {
               "id": string,"is_guest": boolean,"is_me": boolean,"name": string,"owner_name": string
