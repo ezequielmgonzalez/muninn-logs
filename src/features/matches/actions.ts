@@ -31,7 +31,10 @@ export async function saveMatch(_state: SaveMatchState, formData: FormData): Pro
   if (!input.success) return { status: "error", error: "invalid" };
 
   const supabase = await createClient();
-  const args = toLogMatchArgs(input.data);
+  const { played_on, ...rest } = toLogMatchArgs(input.data);
+  // played_on may be null (undated game), which the functions accept; the
+  // generated types mark every argument without a default as non-null.
+  const args = { ...rest, played_on: played_on as string };
   const { data: matchId, error } = existingId
     ? await supabase.rpc("update_match", {
         match_id: existingId.data,

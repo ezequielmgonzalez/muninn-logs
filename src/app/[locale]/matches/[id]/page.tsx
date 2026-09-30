@@ -53,7 +53,9 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
             </p>
           )}
           <PaintedBand as="h1">
-            {format.dateTime(playedOnDate(match.playedOn), { dateStyle: "long", timeZone: "UTC" })}
+            {match.playedOn
+              ? format.dateTime(playedOnDate(match.playedOn), { dateStyle: "long", timeZone: "UTC" })
+              : t("undatedTitle")}
           </PaintedBand>
           {details.length > 0 && <p className="type-caption text-ink-muted">{details.join(" · ")}</p>}
         </div>

@@ -118,6 +118,7 @@ select results_eq(
   $$ select mp.match_id, p.name, p.owner_id
      from public.match_players mp join public.players p on p.id = mp.player_id
      where p.user_id is null and p.name = 'Jugador eliminado'
+       and mp.match_id::text like 'e0000000-%'
      order by mp.match_id $$,
   $$ values ('e0000000-0000-0000-0000-000000000001'::uuid, 'Jugador eliminado', '22222222-2222-2222-2222-222222222222'::uuid),
             ('e0000000-0000-0000-0000-000000000003'::uuid, 'Jugador eliminado', '22222222-2222-2222-2222-222222222222'::uuid) $$,

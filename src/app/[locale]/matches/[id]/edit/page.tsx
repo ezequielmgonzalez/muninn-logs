@@ -63,7 +63,7 @@ export default async function EditMatchPage({ params }: PageProps<"/[locale]/mat
           addable={addable}
           initial={{
             matchId: match.id,
-            playedOn: match.playedOn,
+            playedOn: match.playedOn ?? "",
             boardSide: match.boardSide,
             durationMinutes: match.durationMinutes,
             players,

@@ -117,7 +117,8 @@
       "duplicate": "Hay un jugador o un líder repetido.",
       "generic": "Algo salió mal. Probá de nuevo."
     },
-    "editTitle": "Editar partida"
+    "editTitle": "Editar partida",
+    "dateHint": "Opcional: dejala vacía si no la sabés."
   },
   "Matches": {
     "title": "Partidas",
@@ -138,7 +139,9 @@
     "deleteConfirm": "¿Eliminar esta partida? No se puede deshacer.",
     "deleteYes": "Sí, eliminar",
     "deleteNo": "Cancelar",
-    "edit": "Editar partida"
+    "edit": "Editar partida",
+    "undated": "Sin fecha",
+    "undatedTitle": "Partida sin fecha"
   },
   "Stats": {
     "expeditions": "{count, plural, one {# expedición registrada} other {# expediciones registradas}}",

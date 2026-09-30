@@ -157,13 +157,13 @@ isOneToOne: false
                   ]
                 },"matches": {
                   Row: {
-                    "created_at": string,"created_by": string,"duration_minutes": number | null,"game_id": string,"id": string,"played_on": string,"setup": NonNullable<Json>,"updated_at": string
+                    "created_at": string,"created_by": string,"duration_minutes": number | null,"game_id": string,"id": string,"played_on": string | null,"setup": NonNullable<Json>,"updated_at": string
                   }
                   Insert: {
-                    "created_at"?: string,"created_by"?: string,"duration_minutes"?: number | null,"game_id": string,"id"?: string,"played_on": string,"setup"?: NonNullable<Json>,"updated_at"?: string
+                    "created_at"?: string,"created_by"?: string,"duration_minutes"?: number | null,"game_id": string,"id"?: string,"played_on"?: string | null,"setup"?: NonNullable<Json>,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"created_by"?: string,"duration_minutes"?: number | null,"game_id"?: string,"id"?: string,"played_on"?: string,"setup"?: NonNullable<Json>,"updated_at"?: string
+                    "created_at"?: string,"created_by"?: string,"duration_minutes"?: number | null,"game_id"?: string,"id"?: string,"played_on"?: string | null,"setup"?: NonNullable<Json>,"updated_at"?: string
                   }
                   Relationships: [
                     {

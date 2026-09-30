@@ -99,11 +99,13 @@ export function LogMatchForm({ addable, initial }: { addable: AddablePlayer[]; i
   const [duration, setDuration] = useState(initial?.durationMinutes?.toString() ?? "");
   const [tiebreakKey, setTiebreakKey] = useState<string | null>(initial?.tiebreakKey ?? null);
 
-  // Set on the client: the server doesn't know the player's time zone.
+  // New games default to today, set on the client (the server doesn't know
+  // the player's time zone). Never when editing: an undated game stays undated.
+  const isNew = !initial;
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client-only default
-    setPlayedOn((current) => current || localToday());
-  }, []);
+    if (isNew) setPlayedOn((current) => current || localToday());
+  }, [isNew]);
 
   const totals = players.map((p) => total(numericScores(p.scores)));
   // Only ask about a tie once every player has scores, not while all are 0.
@@ -112,7 +114,7 @@ export function LogMatchForm({ addable, initial }: { addable: AddablePlayer[]; i
   const tiebreakWinner = tiedKeys.includes(tiebreakKey ?? "") ? tiebreakKey : null;
 
   const payload: LogMatchInput = {
-    playedOn,
+    playedOn: playedOn === "" ? null : playedOn,
     boardSide,
     durationMinutes: duration === "" ? null : Number(duration),
     players: players.map((p) => ({
@@ -153,8 +155,11 @@ export function LogMatchForm({ addable, initial }: { addable: AddablePlayer[]; i
             value={playedOn}
             max={localToday()}
             onChange={(e) => setPlayedOn(e.target.value)}
-            required
+            aria-describedby="played-on-hint"
           />
+          <p id="played-on-hint" className="text-sm text-ink-muted">
+            {t("dateHint")}
+          </p>
         </div>
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 text-sm font-medium">{t("boardSide")}</legend>
