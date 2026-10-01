@@ -81,13 +81,19 @@ export function PaintedBand({
 
 const BAR_MASKS = ["ink--bar1", "ink--bar2", "ink--bar3", "ink--bar4"] as const;
 
+/** Colors that tell players apart in a comparison: you, then up to four friends. */
+export const PLAYER_TONES = ["player-you", "player-2", "player-3", "player-4", "player-5"] as const;
+export type PlayerTone = (typeof PLAYER_TONES)[number];
+
 type BrushBarProps = {
   /** Share of the full width, from 0 to 1. Values outside are clamped. */
   value: number;
-  /** A categorical color, or ink-muted for data without its own color. */
-  tone: Exclude<PaintTone, "ink">;
+  /** A leader's or category's color, a player's color, or ink-muted for data without one. */
+  tone: Exclude<PaintTone, "ink"> | PlayerTone;
   /** The bar's position in its list: bars alternate the four strokes (i % 4). */
   index?: number;
+  /** "thin": 9px, for grouped bars (one per player in a category). */
+  size?: "default" | "thin";
   className?: string;
 };
 
@@ -96,17 +102,26 @@ type BrushBarProps = {
  * Zero gets a hairline instead of a stroke. Decorative: always show the name
  * and value as text next to it.
  */
-export function BrushBar({ value, tone, index = 0, className }: BrushBarProps) {
+export function BrushBar({ value, tone, index = 0, size = "default", className }: BrushBarProps) {
   const percent = Math.min(Math.max(value, 0), 1) * 100;
+  const thin = size === "thin";
   return (
-    <div aria-hidden data-brush-bar={tone} className={cn("relative h-[15px] notebook:h-[18px]", className)}>
+    <div
+      aria-hidden
+      data-brush-bar={tone}
+      className={cn("relative", thin ? "h-[9px]" : "h-[15px] notebook:h-[18px]", className)}
+    >
       {percent === 0 ? (
         <div data-paint-layer="hairline" className="absolute inset-x-0 top-1/2 h-px bg-hairline/18" />
       ) : (
         <div className="absolute inset-y-0 left-0" style={{ width: `${percent}%` }}>
           <div
             data-paint-layer="stroke"
-            className={cn("ink inset-x-0 -inset-y-[5px] notebook:-inset-y-[6px]", BAR_MASKS[index % 4])}
+            className={cn(
+              "ink inset-x-0",
+              thin ? "-inset-y-[3px]" : "-inset-y-[5px] notebook:-inset-y-[6px]",
+              BAR_MASKS[index % 4],
+            )}
             style={{ background: `var(--${tone})` }}
           />
         </div>

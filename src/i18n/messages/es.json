@@ -222,7 +222,10 @@
     "choose": "Elegí hasta {max} amigos",
     "submit": "Comparar",
     "noFriends": "Agregá amigos para compararte con ellos.",
-    "link": "Comparar con varios amigos"
+    "link": "Comparar con varios amigos",
+    "chartTitle": "Puntos por categoría",
+    "bestNote": "Mejor valor de cada fila. En lugar promedio, menos es mejor.",
+    "chartValue": "{name}: {value}"
   },
   "Legal": {
     "updated": "Última actualización: 29 de septiembre de 2026",

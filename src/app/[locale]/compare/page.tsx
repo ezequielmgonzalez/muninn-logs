@@ -1,12 +1,14 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/notebook/painted-band";
-import { Button } from "@/components/ui/button";
+import { InkButton } from "@/components/notebook/ink-button";
+import { NotebookPage } from "@/components/notebook/notebook-page";
+import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { BrushBar, PaintedBand, PLAYER_TONES } from "@/components/notebook/painted-band";
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
-import { type ComparisonRow, compareStats } from "@/features/stats/compare";
+import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
 import { getPlayerStats } from "@/features/stats/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -14,11 +16,10 @@ import { cn } from "@/lib/utils";
 const MAX_FRIENDS = 4;
 
 export default async function ComparePage({ searchParams }: PageProps<"/[locale]/compare">) {
-  const [profile, locale, t, tHome, tGame, format] = await Promise.all([
+  const [profile, locale, t, tGame, format] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("Compare"),
-    getTranslations("HomePage"),
     getTranslations("Games.arnak"),
     getFormatter(),
   ]);
@@ -49,94 +50,153 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
     return format.number(value, { maximumFractionDigits: key === "avgPlace" ? 2 : 1 });
   };
 
-  return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">{tHome("journal", { name: profile.display_name })}</Link>
+  const names = [t("you"), ...chosen.map((f) => f.display_name)];
+  const bars = chosen.length > 0 ? categoryBars(stats) : [];
+  const dot = (i: number) => (
+    <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ background: `var(--${PLAYER_TONES[i]})` }} />
+  );
+
+  // Picking friends: a plain GET form, so the selection lives in the URL and
+  // can be shared or bookmarked. Chips are checkboxes, painted when checked.
+  const picker =
+    friends.length === 0 ? (
+      <p className="type-caption mt-5 text-ink-muted">{t("noFriends")}</p>
+    ) : (
+      <form method="get">
+        <fieldset className="mt-5">
+          <legend className="type-caption text-sm text-ink-muted">{t("choose", { max: MAX_FRIENDS })}</legend>
+          <div className="mt-2 flex flex-wrap gap-x-3.5 gap-y-2.5">
+            {friends
+              .filter((f) => f.username)
+              .map((f) => (
+                <label
+                  key={f.id}
+                  className="group relative inline-flex h-10 cursor-pointer items-center border-b-[1.5px] border-ink-body/30 px-4 text-[15px] text-ink-body has-checked:border-transparent has-checked:text-band-text has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-bronze"
+                >
+                  <input
+                    type="checkbox"
+                    name="with"
+                    value={f.username!}
+                    defaultChecked={chosen.some((c) => c.id === f.id)}
+                    className="peer sr-only"
+                  />
+                  <span aria-hidden className="ink ink--tab -inset-x-1.5 -inset-y-1 hidden bg-ink peer-checked:block" />
+                  <span className="relative z-2">{f.display_name}</span>
+                </label>
+              ))}
+          </div>
+        </fieldset>
+        <InkButton type="submit" className="mt-5.5 notebook:mt-[26px]">
+          {t("submit")}
+        </InkButton>
+      </form>
+    );
+
+  const chart = (
+    <section className="order-3">
+      <PaintedBand variant={2} flip>
+        {t("chartTitle")}
       </PaintedBand>
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-11">
-        <PaintedBand as="h1">
-          {chosen.length > 0 ? t("title", { names: format.list(chosen.map((f) => f.display_name)) }) : t("pickTitle")}
-        </PaintedBand>
+      <p aria-hidden className="mt-4.5 mb-3.5 flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
+        {names.map((name, i) => (
+          <span key={i} className="inline-flex items-center gap-1.5">
+            {dot(i)}
+            {name}
+          </span>
+        ))}
+      </p>
+      <ul>
+        {bars.map((category) => (
+          <li key={category.slug} className="mb-3.5">
+            <p className="m-0 mb-0.5 text-sm">{tGame(`scoreCategories.${category.slug}`)}</p>
+            <ul>
+              {category.players.map((player, i) => (
+                <li key={i} className="mt-1">
+                  <span className="sr-only">
+                    {t("chartValue", { name: names[i], value: display(category.slug, player.value) })}
+                  </span>
+                  <BrushBar value={player.bar} tone={PLAYER_TONES[i]} size="thin" index={i + bars.indexOf(category)} />
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 
-        {friends.length === 0 ? (
-          <p className="type-caption text-ink-muted">{t("noFriends")}</p>
-        ) : (
-          // A plain GET form: the selection lives in the URL, so it can be shared or bookmarked.
-          <form method="get" className="flex flex-col gap-3">
-            <fieldset className="flex flex-col gap-2">
-              <legend className="mb-1 text-sm text-ink-muted">{t("choose", { max: MAX_FRIENDS })}</legend>
-              <div className="flex flex-wrap gap-2">
-                {friends
-                  .filter((f) => f.username)
-                  .map((f) => (
-                    <label
-                      key={f.id}
-                      className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md border border-input px-3 has-checked:border-primary has-checked:bg-primary has-checked:text-primary-foreground"
-                    >
-                      <input
-                        type="checkbox"
-                        name="with"
-                        value={f.username!}
-                        defaultChecked={chosen.some((c) => c.id === f.id)}
-                        className="sr-only"
-                      />
-                      {f.display_name}
-                    </label>
-                  ))}
-              </div>
-            </fieldset>
-            <Button type="submit" variant="outline" className="h-11 self-start text-base">
-              {t("submit")}
-            </Button>
-          </form>
-        )}
-
-        {chosen.length > 0 && (
-          <>
-            <div className="-mx-2 overflow-x-auto px-2">
-              <table className="w-full min-w-[20rem] table-fixed border-collapse">
-                <thead>
-                  <tr className="border-b">
-                    <th scope="col" className="w-28 pb-2 text-left text-sm font-medium text-ink-muted">
-                      {t("stat")}
-                    </th>
-                    {[t("you"), ...chosen.map((f) => f.display_name)].map((name) => (
-                      <th key={name} scope="col" className="truncate px-1 pb-2 text-center type-body-strong">
-                        {name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.key} className="border-b last:border-b-0">
-                      <th scope="row" className="py-3 text-left text-sm font-medium">
-                        {label(row.key)}
-                      </th>
-                      {row.values.map((value, i) => (
-                        <td
-                          key={i}
-                          className={cn("py-3 text-center", row.best[i] ? "type-stat-lg text-ink-body" : "text-ink-muted")}
-                        >
-                          {display(row.key, value)}
-                          {row.best[i] && (
-                            <>
-                              <span aria-hidden className="ml-1 inline-block size-2 rounded-full bg-bronze align-middle" />
-                              <span className="sr-only"> ({t("better")})</span>
-                            </>
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="type-caption text-ink-muted">{t("note")}</p>
-          </>
-        )}
-      </main>
+  const table = (
+    <>
+      <PaintedBand as="h1">{t("title", { names: format.list(chosen.map((f) => f.display_name)) })}</PaintedBand>
+      <div className="mt-3.5 overflow-x-auto notebook:mt-4.5">
+        <table className="w-full border-collapse text-sm notebook:text-[15px]">
+          <thead>
+            <tr>
+              <th scope="col" className="w-[34%] border-b-[1.5px] border-ink-body/40 px-1 pt-2 pb-2.5 text-left font-normal text-ink-muted notebook:w-[38%]">
+                {t("stat")}
+              </th>
+              {names.map((name, i) => (
+                <th key={i} scope="col" className="border-b-[1.5px] border-ink-body/40 px-1 pt-2 pb-2.5 text-center font-semibold">
+                  <span className="inline-flex max-w-full items-center gap-1.5">
+                    {dot(i)}
+                    <span className="truncate">{name}</span>
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.key}>
+                <th scope="row" className="border-b border-ink-body/14 px-1 py-[9px] text-left font-normal text-ink-body">
+                  {label(row.key)}
+                </th>
+                {row.values.map((value, i) => (
+                  <td
+                    key={i}
+                    className={cn(
+                      "border-b border-ink-body/14 px-1 py-[9px] text-center",
+                      row.best[i] ? "font-bold text-ink-body" : "text-ink-muted",
+                    )}
+                  >
+                    {display(row.key, value)}
+                    {row.best[i] && (
+                      <>
+                        <span aria-hidden className="ml-[5px] inline-block size-[7px] rounded-full bg-bronze align-[2px]" />
+                        <span className="sr-only"> ({t("better")})</span>
+                      </>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="type-caption mt-3 text-ink-muted">
+        <span aria-hidden className="mr-1.5 inline-block size-[7px] rounded-full bg-bronze align-[2px]" />
+        {t("bestNote")}
+      </p>
+      <p className="type-caption mt-2 text-ink-muted">{t("note")}</p>
     </>
+  );
+
+  return (
+    // Amigos stays current: comparing is reached from there.
+    <NotebookShell active="friends">
+      {/* On phones the left page dissolves so the table can sit between the chips and the chart. */}
+      <NotebookPage side="left" className={chosen.length > 0 ? "max-notebook:contents" : undefined}>
+        <section className="order-1">
+          <PaintedBand as={chosen.length > 0 ? "h2" : "h1"}>{t("pickTitle")}</PaintedBand>
+          {picker}
+        </section>
+        {chosen.length > 0 && <div className="mt-11 max-notebook:mt-0 max-notebook:contents">{chart}</div>}
+      </NotebookPage>
+      {chosen.length > 0 && (
+        <NotebookPage side="right" order={2}>
+          {table}
+        </NotebookPage>
+      )}
+    </NotebookShell>
   );
 }
