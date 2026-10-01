@@ -169,7 +169,10 @@
     "deleteNo": "Cancelar",
     "edit": "Editar partida",
     "undated": "Sin fecha",
-    "undatedTitle": "Partida sin fecha"
+    "undatedTitle": "Partida sin fecha",
+    "pages": "Páginas {from}–{to} de {total}",
+    "older": "Anteriores",
+    "newer": "Más recientes"
   },
   "Stats": {
     "expeditions": "{count, plural, one {# expedición registrada} other {# expediciones registradas}}",
