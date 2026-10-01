@@ -48,7 +48,7 @@ export function LeaderRanking({ leaders }: { leaders: LeaderStats[] }) {
         <p className="type-caption text-ink-muted">{t("noLeaders")}</p>
       ) : (
         <ol className="flex flex-col gap-4">
-          {ranked.map(({ leader, value, bar }) => {
+          {ranked.map(({ leader, value, bar }, i) => {
             const style = ARNAK_LEADER_STYLES[leader.slug];
             return (
               <li key={leader.slug} className="flex items-center gap-3.5">
@@ -71,7 +71,7 @@ export function LeaderRanking({ leaders }: { leaders: LeaderStats[] }) {
                     <span className="type-stat-lg shrink-0">{display(value)}</span>
                   </span>
                   {/* A sliver even for the weakest, so every row keeps its stroke. */}
-                  <PaintedBar value={Math.max(bar, 0.08)} tone={style.tone} />
+                  <PaintedBar value={Math.max(bar, 0.08)} tone={style.tone} index={i} />
                 </div>
               </li>
             );

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cargar partida — celular</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; font-family: 'Spectral', Georgia, serif; color: #2B241E; }
+  .mj-band-text { font-family: 'Cinzel', Georgia, serif; text-transform: uppercase; letter-spacing: 0.14em; position: relative; z-index: 2; font-weight: 600; color: #F1E9D8; }
+  .mj-ink { position: absolute; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; pointer-events: none; }
+  .mj-m-band1 { -webkit-mask-image: url(../assets/brush/brush-band-1.png); mask-image: url(../assets/brush/brush-band-1.png); }
+  .mj-m-band2 { -webkit-mask-image: url(../assets/brush/brush-band-2.png); mask-image: url(../assets/brush/brush-band-2.png); }
+  .mj-m-sweepin { -webkit-mask-image: url(../assets/brush/brush-sweep-in.png); mask-image: url(../assets/brush/brush-sweep-in.png); }
+  .mj-m-tab { -webkit-mask-image: url(../assets/brush/brush-tab.png); mask-image: url(../assets/brush/brush-tab.png); }
+  .mj-m-blot { -webkit-mask-image: url(../assets/brush/ink-blot.png); mask-image: url(../assets/brush/ink-blot.png); }
+  .mj-m-bar0 { -webkit-mask-image: url(../assets/brush/brush-bar-1.png); mask-image: url(../assets/brush/brush-bar-1.png); }
+  .mj-m-bar1 { -webkit-mask-image: url(../assets/brush/brush-bar-2.png); mask-image: url(../assets/brush/brush-bar-2.png); }
+  .mj-m-bar2 { -webkit-mask-image: url(../assets/brush/brush-bar-3.png); mask-image: url(../assets/brush/brush-bar-3.png); }
+  .mj-m-bar3 { -webkit-mask-image: url(../assets/brush/brush-bar-4.png); mask-image: url(../assets/brush/brush-bar-4.png); }
+  .mj-sheet { position: absolute; background-size: 100% 100%; background-repeat: no-repeat; pointer-events: none; }
+  .mj-sheet-left { background-image: url(../assets/paper/page-left.webp); }
+  .mj-sheet-right { background-image: url(../assets/paper/page-right.webp); }
+  .mj-sheet-insert { background-image: url(../assets/paper/page-insert.webp); }
+  .mj-sheet-page { background-image: url(../assets/paper/page-mobile.webp); }
+  .mj-sheet-tabbar { background-image: url(../assets/paper/tabbar.webp); }
+  .mj-backdrop { background-color: #8A7350; background-image: url(../assets/paper/backdrop.webp); background-size: cover; background-position: 50% 40%; }
+
+  .mj-band { position: relative; height: 50px; display: flex; align-items: center; justify-content: center; }
+  .mj-band > .mj-ink { inset: -12px -26px; background: #211D19; }
+  .mj-band.mj-flip > .mj-ink { transform: scaleX(-1); }
+  .mj-band .mj-band-text { font-size: 14px; }
+  .mj-sm .mj-band { height: 46px; }
+  .mj-sm .mj-band > .mj-ink { inset: -11px -18px; }
+  .mj-sm .mj-band .mj-band-text { font-size: 13px; }
+
+  .mj-nav-btn { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: flex; align-items: center; gap: 12px; width: 100%; height: 52px; padding-left: 38px; font-family: 'Spectral', Georgia, serif; font-size: 18px; color: #2B241E; }
+  .mj-nav-btn[aria-current="page"] { color: #F1E9D8; }
+  .mj-nav-btn > .mj-ink { left: 12px; top: -12px; bottom: -12px; right: 34px; background: #211D19; }
+  .mj-nav-btn > svg, .mj-nav-btn > span { position: relative; z-index: 2; }
+
+  .mj-inkbtn { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; height: 52px; width: 100%; font-family: 'Cinzel', Georgia, serif; font-size: 14px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F1E9D8; }
+  .mj-inkbtn > .mj-ink { inset: -9px -12px; background: #211D19; }
+  .mj-inkbtn > span, .mj-inkbtn > svg { position: relative; z-index: 2; }
+  .mj-inkbtn[disabled] { cursor: not-allowed; }
+  .mj-inkbtn[disabled] > .mj-ink { opacity: 0.42; }
+  .mj-inkbtn:focus-visible, .mj-nav-btn:focus-visible, .mj-seg-btn:focus-visible, .mj-chip:focus-visible, .mj-icon-btn:focus-visible, .mj-tab:focus-visible, .mj-fab:focus-visible { outline: 2px solid #8A6A3E; outline-offset: 3px; }
+
+  .mj-field { margin-bottom: 22px; }
+  .mj-label { display: block; font-size: 14px; font-weight: 600; color: #2B241E; margin-bottom: 2px; }
+  .mj-help { font-size: 13px; font-style: italic; color: #6E6154; margin-top: 6px; }
+  .mj-input { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 42px; font-family: 'Spectral', Georgia, serif; font-size: 16px; color: #2B241E; padding: 8px 2px 6px; border-bottom: 1.5px solid rgba(43,32,20,0.45); }
+  .mj-input::placeholder { color: #8A7D6E; font-style: italic; }
+  .mj-input:focus-visible { border-bottom: 2px solid #8A6A3E; }
+  .mj-input-wrap { position: relative; }
+  .mj-input-wrap > svg { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); color: #6E6154; pointer-events: none; }
+
+  .mj-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .mj-seg-btn { all: unset; box-sizing: border-box; cursor: pointer; position: relative; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #2B241E; border-bottom: 1.5px solid rgba(43,32,20,0.3); }
+  .mj-seg-btn[aria-pressed="true"] { color: #F1E9D8; border-bottom-color: transparent; }
+  .mj-seg-btn > .mj-ink { inset: -3px -6px; background: #211D19; }
+  .mj-seg-btn > span { position: relative; z-index: 2; }
+
+  .mj-chip { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; font-size: 15px; color: #2B241E; border-bottom: 1.5px solid rgba(43,32,20,0.3); }
+  .mj-chip[aria-pressed="true"] { color: #F1E9D8; border-bottom-color: transparent; }
+  .mj-chip > .mj-ink { inset: -4px -6px; background: #211D19; }
+  .mj-chip > span { position: relative; z-index: 2; }
+  .mj-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; display: inline-block; }
+
+  .mj-link { color: #2B241E; text-decoration: none; font-size: 14px; border-bottom: 1px solid rgba(43,32,20,0.35); padding-bottom: 1px; }
+  .mj-link:hover { border-bottom-color: #8A6A3E; }
+  .mj-muted { color: #6E6154; }
+  .mj-it { font-style: italic; }
+  .mj-right { display: flex; justify-content: flex-end; }
+
+  .mj-avatar-frame { width: 46px; height: 46px; border-radius: 4px; border: 2px solid #8A6A3E; box-shadow: 0 2px 5px rgba(43,32,20,0.35); flex: 0 0 auto; overflow: hidden; }
+  .mj-sm .mj-avatar-frame { width: 40px; height: 40px; }
+  .mj-avatar { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+  .mj-mini { width: 20px; height: 20px; border-radius: 3px; border: 1.5px solid #8A6A3E; overflow: hidden; flex: 0 0 auto; display: inline-block; }
+  .mj-mini img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+  .mj-mono { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #8A6A3E; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 17px; color: #211D19; flex: 0 0 auto; }
+
+  .mj-entry { padding: 14px 0 13px; border-bottom: 1px solid rgba(43,32,20,0.14); }
+  .mj-entry-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .mj-entry-date { font-size: 15px; font-weight: 700; }
+  .mj-entry-win { display: flex; align-items: center; gap: 7px; font-size: 17px; margin: 4px 0 6px; }
+  .mj-players { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 14px; color: #6E6154; }
+  .mj-player { display: inline-flex; align-items: center; gap: 5px; }
+  .mj-sep { color: rgba(43,32,20,0.35); }
+
+  .mj-stats3 { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+  .mj-stat-num { font-size: 30px; font-weight: 700; line-height: 1.15; color: #2B241E; }
+  .mj-stat-lbl { font-size: 13px; font-style: italic; color: #6E6154; }
+  .mj-sm .mj-stat-num { font-size: 26px; }
+
+  .mj-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(43,32,20,0.14); font-size: 15px; }
+  .mj-leader { display: flex; align-items: center; gap: 14px; margin-bottom: 15px; }
+  .mj-sm .mj-leader { gap: 12px; margin-bottom: 13px; }
+  .mj-leader-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .mj-bar { position: relative; height: 18px; }
+  .mj-bar > .mj-ink { inset: -6px 0; }
+  .mj-sm .mj-bar { height: 15px; }
+  .mj-sm .mj-bar > .mj-ink { inset: -5px 0; }
+
+  .mj-icon-btn { all: unset; box-sizing: border-box; cursor: pointer; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; color: #6E6154; }
+  .mj-player-card { padding: 12px 0 12px; border-bottom: 1px solid rgba(43,32,20,0.18); }
+  .mj-player-head { display: flex; align-items: center; gap: 8px; }
+  .mj-turn { font-family: 'Cinzel', Georgia, serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #6E6154; text-transform: uppercase; }
+  .mj-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 14px; margin-top: 8px; }
+  .mj-score-lbl { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #6E6154; }
+  .mj-score-lbl .mj-dot { width: 7px; height: 7px; }
+  .mj-score-in { min-height: 30px; padding: 3px 2px 2px; font-size: 17px; font-weight: 600; }
+  .mj-total { display: flex; align-items: baseline; gap: 6px; margin-left: auto; }
+  .mj-total b { font-size: 20px; }
+
+  .mj-pop { position: relative; z-index: 3; margin-top: 4px; background: #F2ECDD; border-radius: 4px; box-shadow: 0 10px 24px rgba(43,32,20,0.28), 0 0 0 1px rgba(43,32,20,0.12); padding: 6px 0; }
+  .mj-pop-h { font-family: 'Cinzel', Georgia, serif; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #6E6154; padding: 8px 16px 4px; }
+  .mj-opt { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px; padding: 6px 16px; font-size: 15px; color: #2B241E; }
+  .mj-opt[aria-selected="true"] { background: rgba(138,106,62,0.14); }
+  .mj-opt small { font-size: 13px; font-style: italic; color: #6E6154; }
+
+  .mj-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .mj-table th { font-weight: 600; text-align: center; padding: 8px 4px 10px; border-bottom: 1.5px solid rgba(43,32,20,0.4); }
+  .mj-table th:first-child, .mj-table td:first-child { text-align: left; }
+  .mj-table td { text-align: center; padding: 9px 4px; border-bottom: 1px solid rgba(43,32,20,0.14); color: #6E6154; }
+  .mj-table td:first-child { color: #2B241E; }
+  .mj-table td.mj-best { color: #2B241E; font-weight: 700; }
+  .mj-best-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #8A6A3E; margin-left: 5px; vertical-align: 2px; }
+  .mj-sm .mj-table { font-size: 14px; }
+
+  .mj-tab { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 58px; min-width: 0; font-family: 'Spectral', Georgia, serif; font-size: 11px; font-weight: 500; color: #2B241E; }
+  .mj-tab[aria-current="page"] { color: #F1E9D8; }
+  .mj-tab > .mj-ink { inset: 2px -2px; background: #211D19; }
+  .mj-tab > svg, .mj-tab > span { position: relative; z-index: 2; }
+  .mj-fab { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: -40px; font-family: 'Spectral', Georgia, serif; font-size: 11px; font-weight: 600; color: #2B241E; }
+  .mj-fab-disc { position: relative; width: 62px; height: 62px; display: flex; align-items: center; justify-content: center; }
+  .mj-fab-disc > .mj-ink { inset: -4px; background: #211D19; }
+  .mj-fab-disc > svg { position: relative; z-index: 2; }
+
+  html { background: #3a3027; }
+  body { display: flex; justify-content: center; padding: 24px 0; }
+</style>
+</head>
+<body>
+<!-- Reference mockup (390x1470). Static HTML: open it in a browser. Not production code. -->
+<div class="mj-backdrop mj-sm" style="width: 390px; height: 1470px; position: relative; overflow: hidden;">
+  <div style="position: absolute; left: 4px; top: 14px; width: 382px; height: 80px; border-radius: 10px; z-index: 1; background: radial-gradient(ellipse at 50% 30%, #3B3129 0%, #2A231E 70%, #1B1613 100%); box-shadow: 0 10px 24px rgba(48,30,12,0.5), inset 0 0 0 1px rgba(255,240,220,0.06), inset 0 0 18px rgba(0,0,0,0.5);"></div>
+  <div style="position: relative; z-index: 2; margin: 34px 10px 0; min-height: 1430px;">
+    <div class="mj-sheet mj-sheet-page" style="inset: 6px -4px -6px 4px; filter: brightness(0.68);"></div>
+    <div class="mj-sheet mj-sheet-page" style="inset: 3px -2px -3px 2px; filter: brightness(0.84);"></div>
+    <div class="mj-sheet mj-sheet-page" style="inset: 0;"></div>
+    <svg width="370" height="40" viewBox="0 0 370 40" aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 6; overflow: visible; pointer-events: none;"><ellipse cx="31.5" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M32.0 18 C 29.0 5, 30.0 -11, 36.0 -11 C 41.0 -11, 41.0 -4, 39.0 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M30.0 15 C 27.0 2, 28.0 -14, 34.0 -14 C 39.0 -14, 39.0 -6, 37.0 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M30.0 15 C 27.0 2, 28.0 -14, 34.0 -14 C 39.0 -14, 39.0 -6, 37.0 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M29.0 10 C 27.0 0, 27.5 -12.5, 33.5 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path><ellipse cx="75.8" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M76.3 18 C 73.3 5, 74.3 -11, 80.3 -11 C 85.3 -11, 85.3 -4, 83.3 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M74.3 15 C 71.3 2, 72.3 -14, 78.3 -14 C 83.3 -14, 83.3 -6, 81.3 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M74.3 15 C 71.3 2, 72.3 -14, 78.3 -14 C 83.3 -14, 83.3 -6, 81.3 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M73.3 10 C 71.3 0, 71.8 -12.5, 77.8 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path><ellipse cx="120.1" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M120.6 18 C 117.6 5, 118.6 -11, 124.6 -11 C 129.6 -11, 129.6 -4, 127.6 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M118.6 15 C 115.6 2, 116.6 -14, 122.6 -14 C 127.6 -14, 127.6 -6, 125.6 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M118.6 15 C 115.6 2, 116.6 -14, 122.6 -14 C 127.6 -14, 127.6 -6, 125.6 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M117.6 10 C 115.6 0, 116.1 -12.5, 122.1 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path><ellipse cx="164.4" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M164.9 18 C 161.9 5, 162.9 -11, 168.9 -11 C 173.9 -11, 173.9 -4, 171.9 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M162.9 15 C 159.9 2, 160.9 -14, 166.9 -14 C 171.9 -14, 171.9 -6, 169.9 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M162.9 15 C 159.9 2, 160.9 -14, 166.9 -14 C 171.9 -14, 171.9 -6, 169.9 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M161.9 10 C 159.9 0, 160.4 -12.5, 166.4 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path><ellipse cx="208.6" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M209.1 18 C 206.1 5, 207.1 -11, 213.1 -11 C 218.1 -11, 218.1 -4, 216.1 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M207.1 15 C 204.1 2, 205.1 -14, 211.1 -14 C 216.1 -14, 216.1 -6, 214.1 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M207.1 15 C 204.1 2, 205.1 -14, 211.1 -14 C 216.1 -14, 216.1 -6, 214.1 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M206.1 10 C 204.1 0, 204.6 -12.5, 210.6 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path><ellipse cx="252.9" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M253.4 18 C 250.4 5, 251.4 -11, 257.4 -11 C 262.4 -11, 262.4 -4, 260.4 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M251.4 15 C 248.4 2, 249.4 -14, 255.4 -14 C 260.4 -14, 260.4 -6, 258.4 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M251.4 15 C 248.4 2, 249.4 -14, 255.4 -14 C 260.4 -14, 260.4 -6, 258.4 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M250.4 10 C 248.4 0, 248.9 -12.5, 254.9 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path><ellipse cx="297.2" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M297.7 18 C 294.7 5, 295.7 -11, 301.7 -11 C 306.7 -11, 306.7 -4, 304.7 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M295.7 15 C 292.7 2, 293.7 -14, 299.7 -14 C 304.7 -14, 304.7 -6, 302.7 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M295.7 15 C 292.7 2, 293.7 -14, 299.7 -14 C 304.7 -14, 304.7 -6, 302.7 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M294.7 10 C 292.7 0, 293.2 -12.5, 299.2 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path><ellipse cx="341.5" cy="15" rx="4.6" ry="3.8" fill="#120E0B"></ellipse><path d="M342.0 18 C 339.0 5, 340.0 -11, 346.0 -11 C 351.0 -11, 351.0 -4, 349.0 2" stroke="rgba(0,0,0,0.35)" stroke-width="5.5" fill="none" stroke-linecap="round" transform="translate(2.5 3)"></path><path d="M340.0 15 C 337.0 2, 338.0 -14, 344.0 -14 C 349.0 -14, 349.0 -6, 347.0 -1" stroke="#3E2D1B" stroke-width="6" fill="none" stroke-linecap="round"></path><path d="M340.0 15 C 337.0 2, 338.0 -14, 344.0 -14 C 349.0 -14, 349.0 -6, 347.0 -1" stroke="#8A6A3E" stroke-width="3.8" fill="none" stroke-linecap="round"></path><path d="M339.0 10 C 337.0 0, 337.5 -12.5, 343.5 -12.5" stroke="#E0C48E" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"></path></svg>
+    <main style="position: relative; z-index: 5; box-sizing: border-box; padding: 46px 26px 152px;"><div class="mj-band" style=""><div class="mj-ink mj-m-band1"></div><h2 class="mj-band-text" style="margin: 0;">Nueva partida</h2></div><div class="mj-field" style="margin-top: 22px;">
+  <label class="mj-label" for="fecha">Fecha</label>
+  <div class="mj-input-wrap"><input id="fecha" class="mj-input" value="01/10/2026"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"></rect><path d="M2.5 7.5 H15.5 M6 2 V5 M12 2 V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg></div>
+  <div class="mj-help">Opcional: dejala vacía si no la sabés.</div>
+</div>
+<div class="mj-field">
+  <span class="mj-label" style="margin-bottom: 8px;">Lado del tablero</span>
+  <div class="mj-seg" role="group" aria-label="Lado del tablero"><button type="button" class="mj-seg-btn" aria-pressed="false"><span>Sin registrar</span></button><button type="button" class="mj-seg-btn" aria-pressed="true"><span class="mj-ink mj-m-tab"></span><span>Pájaro</span></button><button type="button" class="mj-seg-btn" aria-pressed="false"><span>Serpiente</span></button></div>
+</div>
+<div class="mj-field">
+  <label class="mj-label" for="duracion">Duración <span class="mj-muted" style="font-weight: 400;">(opcional)</span></label>
+  <div class="mj-input-wrap"><input id="duracion" class="mj-input" inputmode="numeric" value="75"><span class="mj-muted" style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 14px;">min</span></div>
+</div><div class="mj-band mj-flip" style="margin-top: 30px;"><div class="mj-ink mj-m-band2"></div><h2 class="mj-band-text" style="margin: 0;">Jugadores</h2></div><div style="margin-top: 4px; margin-bottom: 22px;"><div class="mj-player-card">
+  <div class="mj-player-head">
+    <div style="flex: 1 1 auto; min-width: 0;"><div class="mj-turn">Turno 1</div><div style="font-size: 16px;"><b style="font-weight: 700;">Ezequiel</b> <span class="mj-muted">· vos</span></div></div>
+    <button type="button" class="mj-icon-btn" aria-label="Bajar turno"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3 V13 M4 9 L8 13 L12 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button type="button" class="mj-icon-btn" aria-label="Quitar a Ezequiel"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4 L12 12 M12 4 L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
+  </div>
+  <div style="display: flex; align-items: flex-end; gap: 14px; margin-top: 6px;">
+    <div class="mj-input-wrap" style="flex: 1 1 auto;"><button type="button" class="mj-input" aria-haspopup="listbox" style="cursor: pointer;"><span class="mj-mini" style="background: #3E5E8C; font-size: 16px;"><span role="img" aria-label="Capitán" class="" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: Cinzel, Georgia, serif; font-weight: 700; color: #F1E9D8; font-size: 70%;">C</span></span><span>Capitán</span></button><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 5 L7 9 L11 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+    <div class="mj-total"><span class="mj-muted mj-it" style="font-size: 13px;">Total</span><b>67</b></div>
+  </div>
+  <div class="mj-scores"><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #6A4E8C;"></span>Investigación</span><input class="mj-input mj-score-in" inputmode="numeric" value="24"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #B8862F;"></span>Templo</span><input class="mj-input mj-score-in" inputmode="numeric" value="8"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #A65A4E;"></span>Ídolos</span><input class="mj-input mj-score-in" inputmode="numeric" value="14"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #8C3E3E;"></span>Guardianes</span><input class="mj-input mj-score-in" inputmode="numeric" value="12"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #3E7A72;"></span>Cartas</span><input class="mj-input mj-score-in" inputmode="numeric" value="11"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #6E6154;"></span>Miedo</span><input class="mj-input mj-score-in" inputmode="numeric" value="-2"></label></div>
+</div><div class="mj-player-card">
+  <div class="mj-player-head">
+    <div style="flex: 1 1 auto; min-width: 0;"><div class="mj-turn">Turno 2</div><div style="font-size: 16px;"><b style="font-weight: 700;">Manuela</b> <span class="mj-muted">· amiga</span></div></div>
+    <button type="button" class="mj-icon-btn" aria-label="Subir turno"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13 V3 M4 7 L8 3 L12 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button type="button" class="mj-icon-btn" aria-label="Quitar a Manuela"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4 L12 12 M12 4 L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
+  </div>
+  <div style="display: flex; align-items: flex-end; gap: 14px; margin-top: 6px;">
+    <div class="mj-input-wrap" style="flex: 1 1 auto;"><button type="button" class="mj-input" aria-haspopup="listbox" style="cursor: pointer;"><span class="mj-mini" style="background: #6E7A3E; font-size: 16px;"><span role="img" aria-label="Periodista" class="" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: Cinzel, Georgia, serif; font-weight: 700; color: #F1E9D8; font-size: 70%;">P</span></span><span>Periodista</span></button><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 5 L7 9 L11 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+    <div class="mj-total"><span class="mj-muted mj-it" style="font-size: 13px;">Total</span><b>70</b></div>
+  </div>
+  <div class="mj-scores"><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #6A4E8C;"></span>Investigación</span><input class="mj-input mj-score-in" inputmode="numeric" value="21"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #B8862F;"></span>Templo</span><input class="mj-input mj-score-in" inputmode="numeric" value="12"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #A65A4E;"></span>Ídolos</span><input class="mj-input mj-score-in" inputmode="numeric" value="10"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #8C3E3E;"></span>Guardianes</span><input class="mj-input mj-score-in" inputmode="numeric" value="15"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #3E7A72;"></span>Cartas</span><input class="mj-input mj-score-in" inputmode="numeric" value="13"></label><label><span class="mj-score-lbl"><span class="mj-dot" style="background: #6E6154;"></span>Miedo</span><input class="mj-input mj-score-in" inputmode="numeric" value="-1"></label></div>
+</div></div><div class="mj-field" style="margin-bottom: 0;">
+  <label class="mj-label" for="buscar">Agregar jugador</label>
+  <div class="mj-input-wrap"><input id="buscar" class="mj-input" value="Je" placeholder="Amigo o invitado" role="combobox" aria-expanded="true"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M12 12 L16 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></div>
+  <div class="mj-pop" role="listbox" aria-label="Sugerencias">
+  <div class="mj-pop-h">Tus invitados</div>
+  <button type="button" class="mj-opt" role="option" aria-selected="true"><span class="mj-mono" style="width: 30px; height: 30px; font-size: 13px; border-style: dashed;">J</span><span>Jessi</span><small>· 6 partidas con vos</small></button>
+  <div class="mj-pop-h">Jugaron con vos</div>
+  <button type="button" class="mj-opt" role="option" aria-selected="false"><span class="mj-mono" style="width: 30px; height: 30px; font-size: 13px; border-style: dashed;">J</span><span>Jero</span><small>· invitado de Iñaki</small></button>
+  <div style="height: 1px; background: rgba(43,32,20,0.14); margin: 6px 0;"></div>
+  <button type="button" class="mj-opt" role="option" aria-selected="false"><span style="width: 30px; display: flex; justify-content: center;"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5 V13.5 M2.5 8 H13.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg></span><span>Crear invitado «Je»</span></button>
+</div>
+  <div class="mj-help">Amigos con cuenta, tus invitados o invitados con los que ya jugaste.</div>
+</div></main>
+  </div>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 118px; z-index: 10;">
+    <div class="mj-sheet mj-sheet-tabbar" style="left: -8px; right: -8px; top: 0; bottom: -6px; filter: drop-shadow(0 -6px 12px rgba(48,30,12,0.4));"></div>
+    <div style="position: relative; z-index: 2; box-sizing: border-box; padding: 22px 34px 0;">
+      <div style="font-size: 13px; font-style: italic; color: #6E6154; text-align: center; margin-bottom: 12px;">2 jugadores · va ganando Manuela con 70</div>
+      <button type="button" class="mj-inkbtn" style=""><span class="mj-ink mj-m-band1"></span><span>Guardar partida</span></button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

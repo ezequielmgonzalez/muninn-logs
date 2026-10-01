@@ -1,0 +1,88 @@
+:root {
+  /* Muninn Logs v3 — cuaderno de campo. Generated from tokens.json. */
+  --backdrop: #8A7350;
+  --cover: #2A231E;
+  --paper: #ECE6D8;
+  --paper-insert: #E2DBCB;
+  --surface-pop: #F2ECDD;
+  --ink: #211D19;
+  --ink-body: #2B241E;
+  --ink-muted: #6E6154;
+  --band-text: #F1E9D8;
+  --band-text-muted: #C9BC9C;
+  --bronze: #8A6A3E;
+  --bronze-light: #E0C48E;
+  --gold: #B8862F;
+  --hairline: #3A332C;
+  --chart-1: #8C3E3E;
+  --chart-2: #B8862F;
+  --chart-3: #3E5E8C;
+  --chart-4: #4E7A3E;
+  --chart-5: #6A4E8C;
+  --chart-6: #3E7A72;
+  --chart-7: #6E7A3E;
+  --chart-8: #A65A4E;
+  --player-you: #8A6A3E;
+  --player-2: #3E5E8C;
+  --player-3: #A65A4E;
+  --player-4: #4E7A3E;
+  --player-5: #6A4E8C;
+
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'Spectral', Georgia, serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 22px;
+  --space-6: 34px;
+  --space-7: 46px;
+  --space-8: 54px;
+  --radius-sm: 4px;
+  --radius-cover: 12px;
+  --shadow-cover: 0 22px 50px rgba(48,30,12,0.55), 0 4px 10px rgba(48,30,12,0.35);
+  --shadow-sheet: drop-shadow(0 10px 16px rgba(48,30,12,0.45));
+  --shadow-pop: 0 10px 24px rgba(43,32,20,0.28), 0 0 0 1px rgba(43,32,20,0.12);
+  --shadow-portrait: 0 2px 5px rgba(43,32,20,0.35);
+  --breakpoint-notebook: 1200px;
+  --page-width: 462px;
+  --page-height: 908px;
+  --spine-gap: 24px;
+  --insert-width: 300px;
+  --mobile-page-inset: 10px;
+  --tabbar-height: 96px;
+
+  /* shadcn/ui variables mapped onto the notebook (keep shadcn components, change their look) */
+  --background: var(--paper);
+  --foreground: var(--ink-body);
+  --card: var(--paper);
+  --card-foreground: var(--ink-body);
+  --popover: var(--surface-pop);
+  --popover-foreground: var(--ink-body);
+  --primary: var(--ink);
+  --primary-foreground: var(--band-text);
+  --secondary: var(--paper-insert);
+  --secondary-foreground: var(--ink-body);
+  --muted: var(--paper-insert);
+  --muted-foreground: var(--ink-muted);
+  --accent: rgba(138, 106, 62, 0.14);
+  --accent-foreground: var(--ink-body);
+  --destructive: #8C3E3E;
+  --border: rgba(43, 36, 30, 0.18);
+  --input: rgba(43, 36, 30, 0.45);
+  --ring: var(--bronze);
+  --radius: 4px;
+}
+
+/* Brush masks: a div with background-color + one of these classes. */
+.ink { position: absolute; pointer-events: none; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.ink--band1 { -webkit-mask-image: url(/brush/brush-band-1.png); mask-image: url(/brush/brush-band-1.png); }
+.ink--band2 { -webkit-mask-image: url(/brush/brush-band-2.png); mask-image: url(/brush/brush-band-2.png); }
+.ink--sweep { -webkit-mask-image: url(/brush/brush-sweep-in.png); mask-image: url(/brush/brush-sweep-in.png); }
+.ink--tab { -webkit-mask-image: url(/brush/brush-tab.png); mask-image: url(/brush/brush-tab.png); }
+.ink--blot { -webkit-mask-image: url(/brush/ink-blot.png); mask-image: url(/brush/ink-blot.png); }
+.ink--bar1 { -webkit-mask-image: url(/brush/brush-bar-1.png); mask-image: url(/brush/brush-bar-1.png); }
+.ink--bar2 { -webkit-mask-image: url(/brush/brush-bar-2.png); mask-image: url(/brush/brush-bar-2.png); }
+.ink--bar3 { -webkit-mask-image: url(/brush/brush-bar-3.png); mask-image: url(/brush/brush-bar-3.png); }
+.ink--bar4 { -webkit-mask-image: url(/brush/brush-bar-4.png); mask-image: url(/brush/brush-bar-4.png); }

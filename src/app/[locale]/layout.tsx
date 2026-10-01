@@ -5,13 +5,12 @@ import * as rootParams from "next/root-params";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
-import { Paper } from "@/components/paper";
 import { SiteFooter } from "@/components/site-footer";
 import { routing } from "@/i18n/routing";
 
 import "../globals.css";
 
-// Display face: only for text on a painted band. globals.css reads these variables.
+// Display face: text on a brush stroke and small labels. globals.css reads these variables.
 const cinzel = Cinzel({
   variable: "--font-cinzel",
   subsets: ["latin"],
@@ -32,7 +31,7 @@ export function generateStaticParams() {
 
 export const viewport: Viewport = {
   // The paper's color, for the browser chrome on phones.
-  themeColor: "#eae0c8",
+  themeColor: "#ece6d8",
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -57,8 +56,7 @@ export default async function LocaleLayout({
       className={`${cinzel.variable} ${spectral.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <Paper />
-        {/* Painted bands bleed up to 30px past their box; clip it here, not on
+        {/* Brush strokes bleed up to 26px past their box; clip it here, not on
             <body>, whose overflow browsers hand to the viewport instead. */}
         <div className="flex flex-1 flex-col overflow-x-clip">
           <NextIntlClientProvider>
