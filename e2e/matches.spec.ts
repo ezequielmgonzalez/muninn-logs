@@ -95,3 +95,27 @@ test("editing a match starts from its saved values and replaces them", async ({ 
   await expect(results.getByRole("listitem").first()).toContainText("Jessi");
   await expect(results.getByRole("listitem").first()).toContainText("45");
 });
+
+test("the list puts a month on each page, two at a time", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  for (const [date, guest] of [["2026-09-20", "Jessi"], ["2026-08-10", "Toto"], ["2026-07-05", "Lola"]]) {
+    await page.goto("/es/matches/new");
+    await page.getByLabel("Fecha").fill(date);
+    await addGuest(page, guest);
+    await saveMatch(page);
+  }
+
+  await page.goto("/es/matches");
+  await expect(page.getByRole("heading", { name: "Septiembre 2026" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Agosto 2026" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Julio 2026" })).toHaveCount(0);
+
+  await page.getByRole("link", { name: "Anteriores →" }).click();
+  await expect(page).toHaveURL("/es/matches?page=1");
+  await expect(page.getByRole("heading", { name: "Julio 2026" })).toBeVisible();
+  // Scoreless games are ties: each entry names both players.
+  await expect(page.getByRole("link", { name: /Lola/ })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: /Jessi/ })).toHaveCount(0);
+  await page.getByRole("link", { name: "← Más recientes" }).click();
+  await expect(page).toHaveURL("/es/matches");
+});

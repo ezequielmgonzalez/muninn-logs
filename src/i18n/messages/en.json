@@ -169,7 +169,10 @@
     "deleteNo": "Cancel",
     "edit": "Edit game",
     "undated": "No date",
-    "undatedTitle": "Undated game"
+    "undatedTitle": "Undated game",
+    "pages": "Pages {from}–{to} of {total}",
+    "older": "Older",
+    "newer": "Newer"
   },
   "Stats": {
     "expeditions": "{count, plural, one {# expedition logged} other {# expeditions logged}}",
