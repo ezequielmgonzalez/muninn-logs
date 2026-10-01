@@ -14,7 +14,13 @@
     "seeAllMatches": "Ver todas las partidas",
     "seeStats": "Ver estadísticas",
     "noMatches": "Todavía no hay partidas en tu diario. Cargá la primera después de jugar.",
-    "games": "Partidas"
+    "games": "Partidas",
+    "leaders": "Tus líderes",
+    "leaderWinRate": "ganaste {rate}",
+    "leaderGames": "{count, plural, one {partida} other {partidas}}",
+    "leadersHint": "Los tres que más jugaste.",
+    "pendingRequests": "{count, plural, one {Tenés # solicitud de amistad} other {Tenés # solicitudes de amistad}}",
+    "account": "Tu cuenta"
   },
   "Nav": {
     "sections": "Secciones",
@@ -134,7 +140,7 @@
     "title": "Partidas",
     "empty": "Todavía no hay partidas en tu diario.",
     "logFirst": "Cargar la primera",
-    "place": "{rank}º de {count}",
+    "place": "Saliste {rank}.º de {count}",
     "winner": "Ganó {names}",
     "sharedWin": "Empate: {names}",
     "you": "vos",

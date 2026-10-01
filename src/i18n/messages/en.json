@@ -14,7 +14,13 @@
     "seeAllMatches": "See all games",
     "seeStats": "See stats",
     "noMatches": "There are no games in your journal yet. Log the first one after you play.",
-    "games": "Games"
+    "games": "Games",
+    "leaders": "Your leaders",
+    "leaderWinRate": "you won {rate}",
+    "leaderGames": "{count, plural, one {game} other {games}}",
+    "leadersHint": "The three you've played most.",
+    "pendingRequests": "{count, plural, one {You have # friend request} other {You have # friend requests}}",
+    "account": "Your account"
   },
   "Nav": {
     "sections": "Sections",
@@ -134,7 +140,7 @@
     "title": "Games",
     "empty": "There are no games in your journal yet.",
     "logFirst": "Log the first one",
-    "place": "{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of {count}",
+    "place": "You came {rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} of {count}",
     "winner": "{names} won",
     "sharedWin": "Tie: {names}",
     "you": "you",

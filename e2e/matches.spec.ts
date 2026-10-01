@@ -33,13 +33,13 @@ test("a logged match shows its result to everyone who played, but only its creat
 
   // Ana's list shows it, with her place.
   await page.getByRole("link", { name: /Todas las partidas/ }).click();
-  await expect(page.getByRole("link", { name: /Ganó Beto/ })).toContainText("2º de 2");
+  await expect(page.getByRole("link", { name: /Ganó Beto/ })).toContainText("Saliste 2.º de 2");
 
   // Beto played, so he sees it too, with his place, but can't delete it.
   await beto.goto("/es");
   await beto.getByRole("link", { name: "Ver todas las partidas" }).click();
   const betoMatch = beto.getByRole("link", { name: /Ganó Beto/ });
-  await expect(betoMatch).toContainText("1º de 2");
+  await expect(betoMatch).toContainText("Saliste 1.º de 2");
   await betoMatch.click();
   // Wait for the match page itself: the list also has a heading and no delete button.
   await expect(beto).toHaveURL(/\/es\/matches\/[0-9a-f-]{36}$/);
