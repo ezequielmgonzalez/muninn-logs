@@ -63,9 +63,13 @@ export async function chooseUsername(page: Page, username: string) {
   await page.getByRole("button", { name: "Continuar" }).click();
 }
 
-/** An error shown by a form. Excludes Next.js's route announcer, which also has role="alert". */
+/**
+ * An error shown by a form. Excludes Next.js's route announcer, which also has
+ * role="alert", and copies hidden by the layout (e.g. the match form's save
+ * area exists on the desktop page and in the phone's save bar).
+ */
 export function formError(page: Page) {
-  return page.locator("p[role=alert]");
+  return page.locator("p[role=alert]").filter({ visible: true });
 }
 
 /** Creates a signed-in user with a username, starting from a fresh page. */
