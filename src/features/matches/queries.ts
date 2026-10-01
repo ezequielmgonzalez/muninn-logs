@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { ArnakLeader, ArnakScoreCategory } from "@/games/arnak";
+import { ARNAK_BOARD_SIDES, type ArnakBoardSide, type ArnakLeader, type ArnakScoreCategory } from "@/games/arnak";
 import { createClient } from "@/lib/supabase/server";
 
 // Reading matches. RLS already limits them to ones the user logged or played.
@@ -23,7 +23,7 @@ export type MatchSummary = {
   /** Null for undated games. */
   playedOn: string | null;
   durationMinutes: number | null;
-  boardSide: "bird" | "snake" | null;
+  boardSide: ArnakBoardSide | null;
   loggedByMe: boolean;
   /** Ranked: winners first, then by rank and turn order. */
   players: MatchPlayer[];
@@ -92,7 +92,7 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
       id: row.id,
       playedOn: row.played_on,
       durationMinutes: row.duration_minutes,
-      boardSide: setup.board_side === "bird" || setup.board_side === "snake" ? setup.board_side : null,
+      boardSide: ARNAK_BOARD_SIDES.find((side) => side === setup.board_side) ?? null,
       loggedByMe: row.created_by === me,
       players,
     };

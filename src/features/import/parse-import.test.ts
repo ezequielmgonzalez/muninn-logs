@@ -51,6 +51,20 @@ describe("parseImport", () => {
     expect(games[0].players[0]).toMatchObject({ scores: expect.objectContaining({ fear: 1 }), wonTiebreak: true });
   });
 
+  it.each([
+    ["Cascada", "waterfall"],
+    ["árbol", "tree"],
+    ["Monos", "monkey"],
+    ["lizard", "lizard"],
+  ])("reads the board side %s", (written, side) => {
+    const { games, issues } = parseImport(
+      `partida,jugador,investigacion,templo,idolos,guardianes,cartas,miedo,tablero\n1,Ana,1,0,0,0,0,0,${written}\n1,Bob,0,0,0,0,0,0,`,
+      leaders,
+    );
+    expect(issues).toEqual([]);
+    expect(games[0].boardSide).toBe(side);
+  });
+
   it("continues the game above when the game cell is blank (merged cells)", () => {
     const { games } = parse("1;;Ana;;1;1;1;1;1;0", ";;Bob;;1;1;1;1;1;0", "2;;Ana;;1;1;1;1;1;0", ";;Bob;;1;1;1;1;1;0");
     expect(games.map((g) => g.players.length)).toEqual([2, 2]);

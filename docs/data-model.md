@@ -70,7 +70,7 @@ Catalog rows are inserted by migrations/seeds, never by users. They store slugs 
 | `created_by`       | uuid        | → `profiles`. Doesn't have to be a participant        |
 | `played_on`        | date        | Required                                              |
 | `duration_minutes` | integer     | Optional, > 0                                         |
-| `setup`            | jsonb       | Game-specific setup, validated by the game's Zod schema. Arnak: `{"board_side": "bird" \| "snake"}` (optional) |
+| `setup`            | jsonb       | Game-specific setup, validated by the game's Zod schema. Arnak: `{"board_side": "bird" \| "snake" \| "waterfall" \| "tree" \| "monkey" \| "lizard"}` (optional; `ARNAK_BOARD_SIDES` in `src/games/arnak.ts`) |
 | `created_at`       | timestamptz |                                                       |
 | `updated_at`       | timestamptz |                                                       |
 
