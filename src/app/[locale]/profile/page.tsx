@@ -1,10 +1,11 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
-import { Button } from "@/components/ui/button";
+import { LeaderRanking } from "@/features/stats/leader-ranking";
 import { getPlayerStats } from "@/features/stats/queries";
-import { StatsView } from "@/features/stats/stats-view";
-import { Link, redirect } from "@/i18n/navigation";
+import { CategoriesSection, WinRateSection } from "@/features/stats/stats-view";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function ProfilePage() {
@@ -18,24 +19,35 @@ export default async function ProfilePage() {
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   const stats = await getPlayerStats(profile.id);
+  const title = <h1 className="sr-only">{tHome("journal", { name: profile.display_name })}</h1>;
+
+  if (stats.games === 0) {
+    // Nothing to show yet: the insert and the tab bar offer "Cargar partida".
+    return (
+      <NotebookShell
+        active="stats"
+        left={
+          <>
+            {title}
+            <PaintedBand>{t("winRate")}</PaintedBand>
+            <p className="type-caption mt-5.5 text-ink-muted">{t("empty")}</p>
+          </>
+        }
+      />
+    );
+  }
 
   return (
-    <>
-      <PaintedBand as="h1" size="page" trailing={t("expeditions", { count: stats.games })}>
-        <Link href="/">{tHome("journal", { name: profile.display_name })}</Link>
-      </PaintedBand>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-11">
-        {stats.games === 0 ? (
-          <div className="mx-auto flex max-w-md flex-col items-start gap-4">
-            <p className="type-caption text-ink-muted">{t("empty")}</p>
-            <Button asChild className="h-11 text-base">
-              <Link href="/matches/new">{t("logGame")}</Link>
-            </Button>
-          </div>
-        ) : (
-          <StatsView stats={stats} />
-        )}
-      </main>
-    </>
+    <NotebookShell
+      active="stats"
+      left={
+        <>
+          {title}
+          <WinRateSection stats={stats} />
+          <CategoriesSection stats={stats} className="mt-8 notebook:mt-8.5" />
+        </>
+      }
+      right={<LeaderRanking leaders={stats.leaders} />}
+    />
   );
 }

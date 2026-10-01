@@ -1,13 +1,13 @@
-/** The bronze progress ring from the profile mockup. */
+/** The bronze progress ring (design/screens/estadisticas-*.html): the win rate inside. */
 export function WinRateRing({ rate, label, caption }: { rate: number; label: string; caption: string }) {
-  const radius = 72;
+  const radius = 74;
   const circumference = 2 * Math.PI * radius;
   return (
-    <svg viewBox="0 0 168 168" className="size-42" role="img" aria-label={`${label} ${caption}`}>
-      <circle cx="84" cy="84" r={radius} fill="none" stroke="rgba(43,32,20,0.16)" strokeWidth="13" />
+    <svg viewBox="0 0 176 176" className="size-[150px] notebook:size-40" role="img" aria-label={`${label} ${caption}`}>
+      <circle cx="88" cy="88" r={radius} fill="none" stroke="rgba(43,32,20,0.14)" strokeWidth="13" />
       <circle
-        cx="84"
-        cy="84"
+        cx="88"
+        cy="88"
         r={radius}
         fill="none"
         stroke="var(--bronze)"
@@ -15,12 +15,12 @@ export function WinRateRing({ rate, label, caption }: { rate: number; label: str
         strokeLinecap="round"
         strokeDasharray={circumference}
         strokeDashoffset={circumference * (1 - rate)}
-        transform="rotate(-90 84 84)"
+        transform="rotate(-90 88 88)"
       />
-      <text x="84" y="84" textAnchor="middle" className="type-stat-hero fill-ink-body">
+      <text x="88" y="86" textAnchor="middle" className="type-stat-hero fill-ink-body">
         {label}
       </text>
-      <text x="84" y="106" textAnchor="middle" className="fill-ink-muted text-[12px] italic">
+      <text x="88" y="108" textAnchor="middle" className="fill-ink-muted text-[13px] italic">
         {caption}
       </text>
     </svg>
