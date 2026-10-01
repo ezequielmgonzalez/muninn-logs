@@ -56,6 +56,9 @@ v3, "cuaderno de campo": surfaces are paper inside a notebook, every accent is a
 
 - Unit tests sit next to the code as `*.test.ts(x)`. E2E tests in `e2e/` sign in for real: codes are read from Mailpit (`e2e/helpers/auth.ts`). Use `formError(page)` for form errors: Next's route announcer also has `role="alert"`.
 - When a test passes on the first run, break the code on purpose to confirm it can fail.
+- While building, run only what the change touches: `pnpm vitest related <files> --run` for unit tests, and the e2e spec files of the screen or feature being changed (`CI=1 pnpm test:e2e e2e/<name>.spec.ts`, after `pnpm build`). Before opening a pull request, run the whole suite once (lint, typecheck, unit, build, full e2e): e2e tests drive the browser and import no app code, so "only changed" selection can't see that a shared component (Button, the notebook shell) broke another screen.
+- Batch screenshots and fixes so each round needs one `pnpm build`, not one per tweak.
+- Playwright wipes `test-results/` on every run: never keep backups or anything else you need there.
 - pgTAP tests must pass on a local database that e2e runs have filled: scope every query to the test's own fixture ids, never assume the tables are empty. And a statement can't see rows a function it calls inserts: store the result (e.g. a temp table), then check it in the next statement.
 
 ## Environments
