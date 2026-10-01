@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { type FormPlayer, LogMatchForm } from "@/features/matches/log-match-form";
 import { getMatch } from "@/features/matches/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";

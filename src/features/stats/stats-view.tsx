@@ -1,6 +1,6 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { ARNAK_CATEGORY_TONES } from "@/games/arnak";
 
 import { LeaderRanking } from "./leader-ranking";

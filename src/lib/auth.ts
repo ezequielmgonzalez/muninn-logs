@@ -1,12 +1,15 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 
 /**
  * The signed-in user's profile, or null when signed out.
  * getClaims() verifies the session's JWT, unlike getSession().
+ * Cached per request: the notebook shell and the page both ask for it.
  */
-export async function getCurrentProfile() {
+export const getCurrentProfile = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims.sub;
@@ -18,7 +21,7 @@ export async function getCurrentProfile() {
     .eq("id", userId)
     .single();
   return profile;
-}
+});
 
 /**
  * Whether the signed-in user has the admin role (app_metadata, which users

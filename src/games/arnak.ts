@@ -1,4 +1,4 @@
-import type { PaintTone } from "@/components/painted-band";
+import type { PaintTone } from "@/components/notebook/painted-band";
 
 // Lost Ruins of Arnak catalog. Must match the rows seeded in
 // supabase/migrations/*_seed_arnak_catalog.sql; labels live in the

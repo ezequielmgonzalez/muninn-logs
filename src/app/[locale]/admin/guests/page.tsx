@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { AdminLinkForm } from "@/features/guests/admin-link-form";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile, isAdmin } from "@/lib/auth";

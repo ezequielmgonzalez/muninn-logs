@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { Link } from "@/i18n/navigation";
 
 type Section = { heading: string; body: string };

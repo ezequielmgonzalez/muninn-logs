@@ -3,7 +3,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useEffect, useId, useState } from "react";
 
-import { PaintedBand } from "@/components/painted-band";
+import { NativeSelect } from "@/components/notebook/native-select";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -253,9 +254,8 @@ export function LogMatchForm({ addable, initial }: { addable: AddablePlayer[]; i
                     </Button>
                   </div>
                 </div>
-                <select
+                <NativeSelect
                   aria-label={t("leader", { name: p.name })}
-                  className="h-11 w-full rounded-md border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                   value={p.leader ?? ""}
                   onChange={(e) =>
                     update(p.key, { leader: e.target.value === "" ? null : (e.target.value as ArnakLeader) })
@@ -267,7 +267,7 @@ export function LogMatchForm({ addable, initial }: { addable: AddablePlayer[]; i
                       {ARNAK_LEADER_STYLES[leader].emoji} {tGame(`leaders.${leader}`)}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               </li>
             );
           })}

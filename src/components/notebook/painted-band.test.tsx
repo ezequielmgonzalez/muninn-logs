@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { PaintedBand, PaintedBar } from "./painted-band";
+import { PaintedBand, BrushBar } from "./painted-band";
 
 function stroke(container: HTMLElement) {
   return container.querySelector<HTMLElement>('[data-paint-layer="stroke"]');
@@ -43,38 +43,38 @@ describe("PaintedBand", () => {
   });
 });
 
-describe("PaintedBar", () => {
+describe("BrushBar", () => {
   function barWidth(container: HTMLElement) {
-    return container.querySelector<HTMLElement>("[data-painted-bar] > div")!.style.width;
+    return container.querySelector<HTMLElement>("[data-brush-bar] > div")!.style.width;
   }
 
   it("is as wide as its value, in the given categorical color", () => {
-    const { container } = render(<PaintedBar value={0.68} tone="chart-6" />);
+    const { container } = render(<BrushBar value={0.68} tone="chart-6" />);
     expect(barWidth(container)).toBe("68%");
     expect(stroke(container)!.style.background).toBe("var(--chart-6)");
   });
 
   it("alternates the four bar strokes by its position", () => {
     const masks = [0, 1, 2, 3, 4].map((index) => {
-      const { container } = render(<PaintedBar value={0.5} tone="chart-1" index={index} />);
+      const { container } = render(<BrushBar value={0.5} tone="chart-1" index={index} />);
       return [...stroke(container)!.classList].find((c) => c.startsWith("ink--"));
     });
     expect(masks).toEqual(["ink--bar1", "ink--bar2", "ink--bar3", "ink--bar4", "ink--bar1"]);
   });
 
   it("clamps values above 1", () => {
-    const { container } = render(<PaintedBar value={1.5} tone="chart-1" />);
+    const { container } = render(<BrushBar value={1.5} tone="chart-1" />);
     expect(barWidth(container)).toBe("100%");
   });
 
   it.each([0, -0.2])("draws a hairline instead of a stroke for %d", (value) => {
-    const { container } = render(<PaintedBar value={value} tone="chart-1" />);
+    const { container } = render(<BrushBar value={value} tone="chart-1" />);
     expect(stroke(container)).toBeNull();
     expect(container.querySelector('[data-paint-layer="hairline"]')).not.toBeNull();
   });
 
   it("is hidden from assistive tech (its value is shown as text next to it)", () => {
-    const { container } = render(<PaintedBar value={0.5} tone="chart-2" />);
-    expect(container.querySelector("[data-painted-bar]")).toHaveAttribute("aria-hidden", "true");
+    const { container } = render(<BrushBar value={0.5} tone="chart-2" />);
+    expect(container.querySelector("[data-brush-bar]")).toHaveAttribute("aria-hidden", "true");
   });
 });

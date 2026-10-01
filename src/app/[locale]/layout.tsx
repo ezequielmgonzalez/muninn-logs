@@ -58,10 +58,11 @@ export default async function LocaleLayout({
       <body className="flex min-h-full flex-col">
         {/* Brush strokes bleed up to 26px past their box; clip it here, not on
             <body>, whose overflow browsers hand to the viewport instead. */}
-        <div className="flex flex-1 flex-col overflow-x-clip">
+        <div className="group/app flex flex-1 flex-col overflow-x-clip">
           <NextIntlClientProvider>
             {children}
-            <SiteFooter />
+            {/* Notebook screens carry the legal links on the insert or the page. */}
+            <SiteFooter className="group-has-data-notebook/app:hidden" />
           </NextIntlClientProvider>
         </div>
       </body>

@@ -81,7 +81,7 @@ export function PaintedBand({
 
 const BAR_MASKS = ["ink--bar1", "ink--bar2", "ink--bar3", "ink--bar4"] as const;
 
-type PaintedBarProps = {
+type BrushBarProps = {
   /** Share of the full width, from 0 to 1. Values outside are clamped. */
   value: number;
   /** A categorical color, or ink-muted for data without its own color. */
@@ -96,10 +96,10 @@ type PaintedBarProps = {
  * Zero gets a hairline instead of a stroke. Decorative: always show the name
  * and value as text next to it.
  */
-export function PaintedBar({ value, tone, index = 0, className }: PaintedBarProps) {
+export function BrushBar({ value, tone, index = 0, className }: BrushBarProps) {
   const percent = Math.min(Math.max(value, 0), 1) * 100;
   return (
-    <div aria-hidden data-painted-bar={tone} className={cn("relative h-[15px] notebook:h-[18px]", className)}>
+    <div aria-hidden data-brush-bar={tone} className={cn("relative h-[15px] notebook:h-[18px]", className)}>
       {percent === 0 ? (
         <div data-paint-layer="hairline" className="absolute inset-x-0 top-1/2 h-px bg-hairline/18" />
       ) : (
