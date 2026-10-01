@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { InkButton } from "@/components/notebook/ink-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -16,12 +16,12 @@ export function AddFriendForm() {
   const [state, action, pending] = useActionState(addFriend, idle);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
+    <form action={action} className="flex flex-col gap-5.5">
+      <div>
         <Label htmlFor="friend-username">{t("usernameLabel")}</Label>
         <Input
-          className="h-11"
           id="friend-username"
+          placeholder={t("usernamePlaceholder")}
           name="username"
           autoComplete="off"
           autoCapitalize="none"
@@ -29,7 +29,7 @@ export function AddFriendForm() {
           aria-describedby="friend-username-hint"
           required
         />
-        <p id="friend-username-hint" className="text-sm text-ink-muted">
+        <p id="friend-username-hint" className="type-caption mt-1.5 text-ink-muted">
           {t("usernameHint")}
         </p>
       </div>
@@ -43,9 +43,9 @@ export function AddFriendForm() {
           {t(state.status, { name: state.name })}
         </p>
       )}
-      <Button type="submit" className="h-11 text-base" disabled={pending}>
+      <InkButton type="submit" disabled={pending}>
         {t("send")}
-      </Button>
+      </InkButton>
     </form>
   );
 }

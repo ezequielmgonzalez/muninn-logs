@@ -93,7 +93,13 @@
       "alreadyFriends": "You're already friends.",
       "alreadyRequested": "You already sent them a request.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "addTitle": "Add a friend",
+    "usernamePlaceholder": "@username",
+    "compare": "Compare",
+    "compareWith": "Compare with {name}",
+    "guestsTitle": "Guests",
+    "guestsText": "Players without an account you've added to your games. If one of them signs up, you can link them so they keep their history."
   },
   "LogMatch": {
     "title": "New game",

@@ -1,5 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { CloseIcon } from "@/components/notebook/icons";
+import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { acceptFriendRequest, removeFriendship } from "@/features/friends/actions";
@@ -10,11 +12,10 @@ import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function FriendsPage() {
-  const [profile, locale, t, tHome, tGuests, tCompare] = await Promise.all([
+  const [profile, locale, t, tGuests, tCompare] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("Friends"),
-    getTranslations("HomePage"),
     getTranslations("Guests"),
     getTranslations("Compare"),
   ]);
@@ -28,81 +29,129 @@ export default async function FriendsPage() {
   const actionButton = (
     action: (formData: FormData) => Promise<void>,
     userId: string,
-    label: string,
     ariaLabel: string,
-    variant: "default" | "outline" | "ghost",
+    content: React.ReactNode,
+    props: React.ComponentProps<typeof Button>,
   ) => (
     <form action={action}>
       <input type="hidden" name="userId" value={userId} />
-      <Button type="submit" variant={variant} className="h-10" aria-label={ariaLabel}>
-        {label}
+      <Button type="submit" aria-label={ariaLabel} {...props}>
+        {content}
       </Button>
     </form>
   );
+  const seeMore = (href: string, label: string) => (
+    <p className="mt-4.5 flex justify-end">
+      <Button asChild variant="link">
+        <Link href={href}>{label} →</Link>
+      </Button>
+    </p>
+  );
 
-  return (
+  const left = (
     <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">{tHome("journal", { name: profile.display_name })}</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-11 px-6 py-11">
-        <section className="flex flex-col gap-5">
-          <PaintedBand as="h1">{t("title")}</PaintedBand>
+      <h1 className="sr-only">{t("title")}</h1>
+      <section>
+        <PaintedBand>{t("addTitle")}</PaintedBand>
+        <div className="mt-5.5">
           <AddFriendForm />
-        </section>
+        </div>
+      </section>
 
-        {incoming.length > 0 && (
-          <section className="flex flex-col gap-5">
-            <PaintedBand>{t("incoming")}</PaintedBand>
+      {outgoing.length > 0 && (
+        <section className="mt-11">
+          <PaintedBand variant={2}>{t("outgoing")}</PaintedBand>
+          <div className="mt-2">
+            <FriendList
+              people={outgoing}
+              actions={(person) =>
+                actionButton(removeFriendship, person.id, t("cancelName", { name: person.display_name }), t("cancel"), {
+                  variant: "ghost",
+                  size: "sm",
+                })
+              }
+            />
+          </div>
+        </section>
+      )}
+
+      <section className="mt-11">
+        <PaintedBand variant={2} flip>
+          {t("guestsTitle")}
+        </PaintedBand>
+        <p className="mt-5.5 text-ink-body">{t("guestsText")}</p>
+        {seeMore("/guests", tGuests("link"))}
+      </section>
+    </>
+  );
+
+  const right = (
+    <>
+      {incoming.length > 0 && (
+        <section className="mb-11">
+          <PaintedBand variant={2} flip>
+            {t("incoming")}
+          </PaintedBand>
+          <div className="mt-2">
             <FriendList
               people={incoming}
               actions={(person) => (
                 <>
-                  {actionButton(acceptFriendRequest, person.id, t("accept"), t("acceptName", { name: person.display_name }), "default")}
-                  {actionButton(removeFriendship, person.id, t("decline"), t("declineName", { name: person.display_name }), "outline")}
+                  {actionButton(acceptFriendRequest, person.id, t("acceptName", { name: person.display_name }), t("accept"), {
+                    size: "sm",
+                    className: "type-ink-button h-9 px-3 text-xs",
+                  })}
+                  {actionButton(removeFriendship, person.id, t("declineName", { name: person.display_name }), t("decline"), {
+                    variant: "ghost",
+                    size: "sm",
+                  })}
                 </>
               )}
             />
-          </section>
-        )}
-
-        {outgoing.length > 0 && (
-          <section className="flex flex-col gap-5">
-            <PaintedBand>{t("outgoing")}</PaintedBand>
-            <FriendList
-              people={outgoing}
-              actions={(person) =>
-                actionButton(removeFriendship, person.id, t("cancel"), t("cancelName", { name: person.display_name }), "ghost")
-              }
-            />
-          </section>
-        )}
-
-        <section className="flex flex-col gap-5">
-          <PaintedBand>{t("friends")}</PaintedBand>
-          {friends.length > 0 ? (
-            <FriendList
-              people={friends}
-              linkToProfile
-              actions={(person) =>
-                actionButton(removeFriendship, person.id, t("remove"), t("removeName", { name: person.display_name }), "ghost")
-              }
-            />
-          ) : (
-            <p className="type-caption text-ink-muted">{t("empty")}</p>
-          )}
+          </div>
         </section>
-        <div className="flex flex-col items-end gap-2">
-          {friends.length > 0 && (
-            <Link href="/compare" className="text-sm text-ink-muted underline-offset-4 hover:underline">
-              {tCompare("link")} →
-            </Link>
-          )}
-          <Link href="/guests" className="text-sm text-ink-muted underline-offset-4 hover:underline">
-            {tGuests("link")} →
-          </Link>
-        </div>
-      </main>
+      )}
+
+      <section>
+        <PaintedBand>{t("friends")}</PaintedBand>
+        {friends.length > 0 ? (
+          <>
+            <div className="mt-2">
+              <FriendList
+                people={friends}
+                linkToProfile
+                actions={(person) => (
+                  <>
+                    {person.username && (
+                      <Button asChild variant="link">
+                        <Link
+                          href={{ pathname: "/compare", query: { with: person.username } }}
+                          aria-label={t("compareWith", { name: person.display_name })}
+                        >
+                          {t("compare")}
+                        </Link>
+                      </Button>
+                    )}
+                    {actionButton(
+                      removeFriendship,
+                      person.id,
+                      t("removeName", { name: person.display_name }),
+                      <CloseIcon />,
+                      { variant: "ghost", size: "icon", title: t("remove") },
+                    )}
+                  </>
+                )}
+              />
+            </div>
+            {seeMore("/compare", tCompare("link"))}
+          </>
+        ) : (
+          <p className="type-caption mt-5.5 text-ink-muted">{t("empty")}</p>
+        )}
+      </section>
     </>
   );
+
+  // On phones your friends come first, then adding one.
+  return <NotebookShell active="friends" left={left} right={right} mobileOrder="right-first" />;
 }
