@@ -35,7 +35,7 @@ test("a friend's profile shows their stats, and comparing marks who does better"
   await page.getByRole("link", { name: "Beto" }).click();
   await expect(page).toHaveURL(`/es/friends/${betoUsername}`);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Beto");
-  await expect(page.getByText("2 expediciones registradas")).toBeVisible();
+  await expect(page.getByText("2 expediciones registradas").filter({ visible: true })).toBeVisible();
   await expect(page.getByRole("img", { name: /^50\s%\sde 2 partidas$/ })).toBeVisible();
 
   await page.getByRole("link", { name: "Compararme" }).click();

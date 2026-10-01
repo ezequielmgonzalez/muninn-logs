@@ -40,7 +40,7 @@ test("a guest's owner asks a friend, who accepts and gets the guest's games", as
   await expect(beto.page.getByText("Ana dice que sos «Beto» en 1 partida. ¿Sos vos?")).toBeVisible();
   await beto.page.getByRole("button", { name: "Sí, soy yo" }).click();
   await expect(beto.page.getByRole("status")).toHaveText("Listo: sumamos 1 partida a tu diario.");
-  await expect(beto.page.getByText("1 expedición registrada")).toBeVisible();
+  await expect(beto.page.getByText("1 expedición registrada").filter({ visible: true })).toBeVisible();
 
   // The guest is gone from Ana's list: it is Beto now.
   await page.reload();
@@ -73,7 +73,7 @@ test("the owner can cancel, and declining leaves the guest as it was", async ({ 
   await beto.page.goto("/es");
   await beto.page.getByRole("button", { name: "No soy yo" }).click();
   await expect(beto.page.getByText("¿Sos vos?")).toHaveCount(0);
-  await expect(beto.page.getByText("0 expediciones registradas")).toBeVisible();
+  await expect(beto.page.getByText("0 expediciones registradas").filter({ visible: true })).toBeVisible();
 
   await page.reload();
   await expect(page.getByLabel("¿Quién es Beto?")).toBeVisible(); // no request pending
@@ -114,7 +114,7 @@ test("an admin links any guest to an account after confirming", async ({ page, r
   await expect(admin.page.getByRole("listitem").filter({ hasText: guestName })).toHaveCount(0);
 
   await caro.page.goto("/es");
-  await expect(caro.page.getByText("1 expedición registrada")).toBeVisible();
+  await expect(caro.page.getByText("1 expedición registrada").filter({ visible: true })).toBeVisible();
   await caro.page.close();
   await admin.page.close();
 });

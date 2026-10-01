@@ -20,7 +20,7 @@ test("a request, once accepted, makes both users friends", async ({ page, reques
 
   // Beto sees the pending request from home.
   await beto.page.goto("/es");
-  await beto.page.getByRole("link", { name: "Amigos (1)" }).click();
+  await beto.page.getByRole("link", { name: "Tenés 1 solicitud de amistad →" }).click();
   await beto.page.getByRole("button", { name: "Aceptar a Ana" }).click();
   await expect(beto.page.getByRole("button", { name: "Eliminar a Ana de tus amigos" })).toBeVisible();
 

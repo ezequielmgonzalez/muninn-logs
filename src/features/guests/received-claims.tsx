@@ -14,7 +14,7 @@ const idle: AcceptLinkState = { status: "idle" };
 /** "Ana says you're Jessi in 12 games. Is that you?", one card per request. */
 export function ReceivedClaims({ claims }: { claims: Claim[] }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="mb-8 flex flex-col">
       {claims.map((claim) => (
         <ClaimCard key={claim.id} claim={claim} />
       ))}
@@ -28,7 +28,7 @@ function ClaimCard({ claim }: { claim: Claim }) {
   const [state, accept, pending] = useActionState(acceptGuestLink, idle);
 
   return (
-    <div className="flex flex-col gap-3 rounded-md border border-bronze/60 bg-card/70 p-4">
+    <div className="flex flex-col gap-4 border-b border-ink-body/14 py-4 first:pt-0">
       <p className="text-ink-body">
         {t("received", { requester: claim.requested_by_name, guest: claim.guest_name, count: claim.matches })}
       </p>

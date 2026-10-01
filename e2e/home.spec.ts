@@ -8,7 +8,7 @@ test("home is a dashboard: a summary and the latest games", async ({ page, reque
 
   // Nothing played yet.
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Ana");
-  await expect(page.getByText("0 expediciones registradas")).toBeVisible();
+  await expect(page.getByText("0 expediciones registradas").filter({ visible: true })).toBeVisible();
   await expect(page.getByText("Todavía no hay partidas en tu diario.")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Últimas partidas" })).toHaveCount(0);
 
@@ -19,7 +19,7 @@ test("home is a dashboard: a summary and the latest games", async ({ page, reque
   await saveMatch(page);
 
   await page.goto("/es");
-  await expect(page.getByText("1 expedición registrada")).toBeVisible();
+  await expect(page.getByText("1 expedición registrada").filter({ visible: true })).toBeVisible();
   const summary = page.getByRole("definition");
   await expect(summary.nth(0)).toHaveText(/^100\s%$/); // Win Rate
   await expect(summary.nth(1)).toHaveText("1"); // Lugar promedio

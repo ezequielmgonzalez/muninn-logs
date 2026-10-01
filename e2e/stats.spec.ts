@@ -27,7 +27,7 @@ test("the profile shows how you play, per category and per leader", async ({ pag
   await page.getByRole("link", { name: "Ver estadísticas" }).click();
   await expect(page).toHaveURL("/es/profile");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Ana");
-  await expect(page.getByText("2 expediciones registradas")).toBeVisible();
+  await expect(page.getByText("2 expediciones registradas").filter({ visible: true })).toBeVisible();
 
   // 1 win in 2 games, places 1 and 2. Spanish writes "50 %", with a no-break space.
   await expect(page.getByRole("img", { name: /^50\s%\sde 2 partidas$/ })).toBeVisible();
@@ -54,7 +54,7 @@ test("the profile shows how you play, per category and per leader", async ({ pag
 test("the profile invites a new player to log their first game", async ({ page, request }) => {
   await signUp(page, request, "Nuevo");
   await page.goto("/es/profile");
-  await expect(page.getByText("0 expediciones registradas")).toBeVisible();
+  await expect(page.getByText("0 expediciones registradas").filter({ visible: true })).toBeVisible();
   await page.getByRole("link", { name: "Cargar partida" }).click();
   await expect(page).toHaveURL("/es/matches/new");
 });

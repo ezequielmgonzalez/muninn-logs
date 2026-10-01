@@ -1,7 +1,8 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
-import { PaintedBand } from "@/components/notebook/painted-band";
+import { DiaryIdentity, NotebookShell } from "@/components/notebook/notebook-shell";
+import { BrushBar, PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/features/auth/actions";
 import { countIncomingRequests } from "@/features/friends/queries";
@@ -10,6 +11,7 @@ import { ReceivedClaims } from "@/features/guests/received-claims";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";
 import { getPlayerStats } from "@/features/stats/queries";
+import { ARNAK_LEADER_STYLES } from "@/games/arnak";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile, isAdmin } from "@/lib/auth";
 
@@ -22,115 +24,167 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   if (!profile) return <Landing searchParams={searchParams} />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const [tStats, tAuth, tEdit, tGuests, tAdmin, tImport, format, stats, recent, incomingRequests, claims, admin, params] =
+  const [tStats, tAuth, tEdit, tGuests, tAdmin, tImport, tLeaders, format, stats, recent, incomingRequests, claims, admin, params] =
     await Promise.all([
-    getTranslations("Stats"),
-    getTranslations("Auth"),
-    getTranslations("EditProfile"),
-    getTranslations("Guests"),
-    getTranslations("AdminGuests"),
-    getTranslations("AdminImport"),
-    getFormatter(),
-    getPlayerStats(profile.id),
-    listMatches(3),
-    countIncomingRequests(profile.id),
-    listReceivedClaims(),
-    isAdmin(),
-    // profileSaved: set by "Editar perfil". linked: games moved by accepting a guest link.
-    searchParams,
-  ]);
+      getTranslations("Stats"),
+      getTranslations("Auth"),
+      getTranslations("EditProfile"),
+      getTranslations("Guests"),
+      getTranslations("AdminGuests"),
+      getTranslations("AdminImport"),
+      getTranslations("Games.arnak.leaders"),
+      getFormatter(),
+      getPlayerStats(profile.id),
+      listMatches(4),
+      countIncomingRequests(profile.id),
+      listReceivedClaims(),
+      isAdmin(),
+      // profileSaved: set by "Editar perfil". linked: games moved by accepting a guest link.
+      searchParams,
+    ]);
   const { profileSaved, linked } = params;
+  const percent = (value: number) => format.number(value, { style: "percent", maximumFractionDigits: 0 });
 
-  const seeMore = (href: string, label: string) => (
-    <Link href={href} className="self-end text-sm text-ink-muted underline-offset-4 hover:underline">
-      {label} →
-    </Link>
-  );
+  // "Tus líderes": the three most played, bars scaled to the first.
+  const topLeaders = [...stats.leaders].sort((a, b) => b.games - a.games).slice(0, 3);
+  const mostGames = topLeaders[0]?.games ?? 0;
 
-  return (
+  const left = (
     <>
-      <PaintedBand as="h1" size="page" trailing={tStats("expeditions", { count: stats.games })}>
-        {t("journal", { name: profile.display_name })}
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-11 px-6 py-11">
-        {claims.length > 0 && <ReceivedClaims claims={claims} />}
-        {typeof linked === "string" && (
-          <p role="status" className="type-body-strong -mb-5 text-center text-ink-body">
-            {tGuests("linked", { count: Number(linked) })}
-          </p>
-        )}
-        {profileSaved === "1" && (
-          <p role="status" className="type-body-strong -mb-5 text-center text-ink-body">
-            {tEdit("saved")}
-          </p>
-        )}
-        <Button asChild className="h-11 w-full text-base">
-          <Link href="/matches/new">{t("logGame")}</Link>
-        </Button>
+      {/* On phones the diary's name opens the page; on desktop it's on the insert. */}
+      <DiaryIdentity className="mb-11 text-center notebook:hidden" />
+      <h1 className="sr-only">{t("journal", { name: profile.display_name })}</h1>
+      {claims.length > 0 && <ReceivedClaims claims={claims} />}
+      {typeof linked === "string" && (
+        <p role="status" className="type-body-strong mb-8 text-center text-ink-body">
+          {tGuests("linked", { count: Number(linked) })}
+        </p>
+      )}
+      {profileSaved === "1" && (
+        <p role="status" className="type-body-strong mb-8 text-center text-ink-body">
+          {tEdit("saved")}
+        </p>
+      )}
 
-        <section className="flex flex-col gap-5">
-          <PaintedBand as="h2">{t("summary")}</PaintedBand>
-          {stats.games === 0 ? (
-            <p className="type-caption text-ink-muted">{t("noMatches")}</p>
-          ) : (
-            <>
-              <dl className="grid grid-cols-3 gap-2 text-center">
-                {[
-                  [tStats("winRate"), format.number(stats.wins / stats.games, { style: "percent", maximumFractionDigits: 0 })],
-                  [tStats("avgPlace"), format.number(stats.avg_place ?? 0, { maximumFractionDigits: 2 })],
-                  [t("games"), String(stats.games)],
-                ].map(([label, value]) => (
-                  <div key={label} className="flex flex-col-reverse gap-1">
-                    <dt className="text-sm text-ink-muted">{label}</dt>
-                    <dd className="type-stat-lg">{value}</dd>
+      <section>
+        <PaintedBand>{t("summary")}</PaintedBand>
+        {stats.games === 0 ? (
+          <p className="type-caption mt-[26px] text-ink-muted">{t("noMatches")}</p>
+        ) : (
+          <>
+            <dl className="mt-[26px] grid grid-cols-3 text-center">
+              {[
+                [tStats("winRate"), percent(stats.wins / stats.games)],
+                [tStats("avgPlace"), format.number(stats.avg_place ?? 0, { maximumFractionDigits: 2 })],
+                [t("games"), String(stats.games)],
+              ].map(([label, value]) => (
+                <div key={label} className="flex flex-col-reverse">
+                  <dt className="type-caption text-ink-muted">{label}</dt>
+                  <dd className="type-stat-num m-0 text-ink-body">{value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-5.5 flex justify-end">
+              <Button asChild variant="link">
+                <Link href="/profile">{t("seeStats")} →</Link>
+              </Button>
+            </p>
+          </>
+        )}
+      </section>
+
+      {topLeaders.length > 0 && (
+        <section className="mt-11">
+          <PaintedBand variant={2} flip>
+            {t("leaders")}
+          </PaintedBand>
+          <ol className="mt-[26px] flex flex-col gap-[13px] notebook:gap-[15px]">
+            {topLeaders.map((leader, i) => {
+              const style = ARNAK_LEADER_STYLES[leader.slug];
+              return (
+                <li key={leader.slug} className="flex items-center gap-3 notebook:gap-3.5">
+                  {/* The portrait frame from the design, with the leader's emoji. */}
+                  <span
+                    aria-hidden
+                    className="flex size-10 shrink-0 items-center justify-center rounded-sm border-2 border-bronze bg-paper text-xl shadow-portrait notebook:size-[46px] notebook:text-2xl"
+                  >
+                    {style.emoji}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-baseline justify-between gap-3">
+                      <span className="truncate text-[15px]">
+                        <b className="font-semibold">{tLeaders(leader.slug)}</b>{" "}
+                        <span className="text-ink-muted">· {t("leaderWinRate", { rate: percent(leader.wins / leader.games) })}</span>
+                      </span>
+                      <span className="shrink-0 text-[17px] font-bold">
+                        {leader.games}{" "}
+                        <span className="type-caption font-normal text-ink-muted">{t("leaderGames", { count: leader.games })}</span>
+                      </span>
+                    </div>
+                    <BrushBar value={leader.games / mostGames} tone={style.tone} index={i} />
                   </div>
-                ))}
-              </dl>
-              {seeMore("/profile", t("seeStats"))}
-            </>
-          )}
+                </li>
+              );
+            })}
+          </ol>
+          <p className="type-caption mt-4 text-ink-muted">{t("leadersHint")}</p>
         </section>
-
-        {recent.length > 0 && (
-          <section className="flex flex-col gap-3">
-            <PaintedBand as="h2">{t("recent")}</PaintedBand>
-            <MatchList matches={recent} />
-            {seeMore("/matches", t("seeAllMatches"))}
-          </section>
-        )}
-
-        <div className="flex flex-col items-center gap-4">
-          <Button asChild variant="outline" className="h-11 w-full text-base">
-            <Link href="/friends">
-              {incomingRequests > 0 ? t("friendsWithRequests", { count: incomingRequests }) : t("friends")}
-            </Link>
-          </Button>
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button asChild variant="ghost">
-              <Link href="/profile/edit">{tEdit("link")}</Link>
-            </Button>
-            {admin && (
-              <Button asChild variant="ghost">
-                <Link href="/admin/guests">{tAdmin("link")}</Link>
-              </Button>
-            )}
-            {admin && (
-              <Button asChild variant="ghost">
-                <Link href="/admin/import">{tImport("link")}</Link>
-              </Button>
-            )}
-            <form action={signOut}>
-              <input type="hidden" name="locale" value={locale} />
-              <Button type="submit" variant="ghost">
-                {tAuth("signOut")}
-              </Button>
-            </form>
-          </div>
-          <LocaleSwitcher />
-        </div>
-      </main>
+      )}
     </>
   );
+
+  const right = (
+    <>
+      {incomingRequests > 0 && (
+        <p className="mb-8 text-center">
+          <Button asChild variant="link">
+            <Link href="/friends">{t("pendingRequests", { count: incomingRequests })} →</Link>
+          </Button>
+        </p>
+      )}
+      {recent.length > 0 && (
+        <section>
+          <PaintedBand>{t("recent")}</PaintedBand>
+          <div className="mt-3.5">
+            <MatchList matches={recent} />
+          </div>
+          <p className="mt-[18px] flex justify-end">
+            <Button asChild variant="link">
+              <Link href="/matches">{t("seeAllMatches")} →</Link>
+            </Button>
+          </p>
+        </section>
+      )}
+
+      {/* The account's own links, quietly at the end of the page. */}
+      <nav aria-label={t("account")} className="mt-11 flex flex-col items-center gap-3 text-sm">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/profile/edit">{tEdit("link")}</Link>
+          </Button>
+          {admin && (
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/guests">{tAdmin("link")}</Link>
+            </Button>
+          )}
+          {admin && (
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/import">{tImport("link")}</Link>
+            </Button>
+          )}
+          <form action={signOut}>
+            <input type="hidden" name="locale" value={locale} />
+            <Button type="submit" variant="ghost" size="sm">
+              {tAuth("signOut")}
+            </Button>
+          </form>
+        </div>
+        <LocaleSwitcher />
+      </nav>
+    </>
+  );
+
+  return <NotebookShell active="home" left={left} right={right} />;
 }
 
 /** The signed-out home: what Muninn Logs is, and a way in. */
