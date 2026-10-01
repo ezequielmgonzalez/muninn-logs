@@ -3,9 +3,9 @@
 @import "shadcn/tailwind.css";
 
 /*
- * "Diario de expedición" design system. Source of truth: design/ (tokens.json,
- * brand.md). One theme only ("Pergamino"); there is no dark theme yet, and it
- * is NOT an inversion of these tokens (see design/brand.md, open questions).
+ * "Cuaderno de campo" (v3) design system. Source of truth: design/ (README.md,
+ * tokens.json, tokens.css). One theme only; there is no dark theme yet, and it
+ * is NOT an inversion of these tokens (see design/README.md, open questions).
  */
 
 /* Only an explicit .dark ancestor triggers dark: styles, and nothing sets it.
@@ -20,13 +20,19 @@
   --font-heading: var(--font-display);
 
   /* Brand tokens (design/tokens.json) as Tailwind colors: bg-ink, text-ink-muted, ... */
-  --color-surface-page: var(--surface-page);
+  --color-backdrop: var(--backdrop);
+  --color-cover: var(--cover);
+  --color-paper: var(--paper);
+  --color-paper-insert: var(--paper-insert);
+  --color-surface-pop: var(--surface-pop);
   --color-ink: var(--ink);
   --color-ink-body: var(--ink-body);
   --color-ink-muted: var(--ink-muted);
   --color-band-text: var(--band-text);
   --color-band-text-muted: var(--band-text-muted);
   --color-bronze: var(--bronze);
+  --color-bronze-light: var(--bronze-light);
+  --color-gold: var(--gold);
   --color-hairline: var(--hairline);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -36,6 +42,11 @@
   --color-chart-6: var(--chart-6);
   --color-chart-7: var(--chart-7);
   --color-chart-8: var(--chart-8);
+  --color-player-you: var(--player-you);
+  --color-player-2: var(--player-2);
+  --color-player-3: var(--player-3);
+  --color-player-4: var(--player-4);
+  --color-player-5: var(--player-5);
 
   /* shadcn semantic tokens, mapped onto the brand tokens below. */
   --color-background: var(--background);
@@ -57,7 +68,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* One radius in the system: 4px (portrait frames, small controls). */
+  /* One radius in the system: 4px (portrait frames, small controls). The
+   * notebook's leather cover is the only other one. */
   --radius-sm: var(--radius);
   --radius-md: var(--radius);
   --radius-lg: var(--radius);
@@ -65,81 +77,180 @@
   --radius-2xl: var(--radius);
   --radius-3xl: var(--radius);
   --radius-4xl: var(--radius);
+  --radius-cover: var(--radius-cover);
+
+  --shadow-cover: var(--shadow-cover);
+  --shadow-pop: var(--shadow-pop);
+  --shadow-portrait: var(--shadow-portrait);
+
+  /* The open notebook (two pages) from this width; the field notebook below. */
+  --breakpoint-notebook: 1200px;
 }
 
+/* design/tokens.css */
 :root {
-  /* Brand tokens: design/tokens.json */
-  --surface-page: #eae0c8;
+  --backdrop: #8a7350;
+  --cover: #2a231e;
+  --paper: #ece6d8;
+  --paper-insert: #e2dbcb;
+  --surface-pop: #f2ecdd;
   --ink: #211d19;
   --ink-body: #2b241e;
   --ink-muted: #6e6154;
   --band-text: #f1e9d8;
   --band-text-muted: #c9bc9c;
   --bronze: #8a6a3e;
+  --bronze-light: #e0c48e;
+  --gold: #b8862f;
   --hairline: #3a332c;
-  --chart-1: #8c3e3e; /* rojo apagado */
-  --chart-2: #b8862f; /* oro/ámbar */
-  --chart-3: #3e5e8c; /* azul */
-  --chart-4: #4e7a3e; /* verde */
-  --chart-5: #6a4e8c; /* violeta */
-  --chart-6: #3e7a72; /* verde azulado */
-  --chart-7: #6e7a3e; /* oliva */
-  --chart-8: #a65a4e; /* óxido/terracota */
+  /* One color per Arnak leader (also used for score categories). */
+  --chart-1: #8c3e3e;
+  --chart-2: #b8862f;
+  --chart-3: #3e5e8c;
+  --chart-4: #4e7a3e;
+  --chart-5: #6a4e8c;
+  --chart-6: #3e7a72;
+  --chart-7: #6e7a3e;
+  --chart-8: #a65a4e;
+  /* Telling players apart in the comparison. */
+  --player-you: #8a6a3e;
+  --player-2: #3e5e8c;
+  --player-3: #a65a4e;
+  --player-4: #4e7a3e;
+  --player-5: #6a4e8c;
+
+  --radius-cover: 12px;
+  --shadow-cover: 0 22px 50px rgba(48, 30, 12, 0.55), 0 4px 10px rgba(48, 30, 12, 0.35);
+  /* Paper is a torn-edged image: shadow it with filter: drop-shadow, never box-shadow. */
+  --shadow-sheet: drop-shadow(0 10px 16px rgba(48, 30, 12, 0.45));
+  --shadow-pop: 0 10px 24px rgba(43, 32, 20, 0.28), 0 0 0 1px rgba(43, 32, 20, 0.12);
+  --shadow-portrait: 0 2px 5px rgba(43, 32, 20, 0.35);
 
   /* shadcn semantic tokens */
-  --background: var(--surface-page);
+  --background: var(--paper);
   --foreground: var(--ink-body);
-  --card: #f3ecda; /* the paper's lightest tone (top of the gradient) */
+  --card: var(--paper);
   --card-foreground: var(--ink-body);
-  --popover: #f3ecda;
+  --popover: var(--surface-pop);
   --popover-foreground: var(--ink-body);
   --primary: var(--ink);
   --primary-foreground: var(--band-text);
-  --secondary: #dccfa9; /* the paper's darkest tone (edge of the gradient) */
+  --secondary: var(--paper-insert);
   --secondary-foreground: var(--ink-body);
-  --muted: #dccfa9;
+  --muted: var(--paper-insert);
   --muted-foreground: var(--ink-muted);
-  --accent: #dccfa9;
+  --accent: rgba(138, 106, 62, 0.14);
   --accent-foreground: var(--ink-body);
   --destructive: var(--chart-1);
-  /* Hairlines: always 12–16% opacity, never solid. */
-  --border: color-mix(in srgb, var(--hairline) 16%, transparent);
-  --input: var(--ink-muted);
+  /* Hairlines: always 12–18% opacity, never solid. */
+  --border: rgba(43, 36, 30, 0.18);
+  --input: rgba(43, 36, 30, 0.45);
   --ring: var(--bronze);
   --radius: 4px;
 }
 
-/* Type styles (design/tokens.json "type"). Display is only for text on a
- * painted band; numbers always use the body face. */
-@utility type-band-lg {
+/*
+ * Brush strokes: a div with a background-color and one of these masks (alpha =
+ * shape), absolutely positioned behind its text. Never border-radius,
+ * box-shadow or filter on it: the shape is the mask. See design/README.md.
+ */
+@utility ink {
+  position: absolute;
+  pointer-events: none;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+@utility ink--band1 {
+  mask-image: url(/brush/brush-band-1.png);
+}
+@utility ink--band2 {
+  mask-image: url(/brush/brush-band-2.png);
+}
+@utility ink--sweep {
+  mask-image: url(/brush/brush-sweep-in.png);
+}
+@utility ink--tab {
+  mask-image: url(/brush/brush-tab.png);
+}
+@utility ink--blot {
+  mask-image: url(/brush/ink-blot.png);
+}
+@utility ink--bar1 {
+  mask-image: url(/brush/brush-bar-1.png);
+}
+@utility ink--bar2 {
+  mask-image: url(/brush/brush-bar-2.png);
+}
+@utility ink--bar3 {
+  mask-image: url(/brush/brush-bar-3.png);
+}
+@utility ink--bar4 {
+  mask-image: url(/brush/brush-bar-4.png);
+}
+
+/* Type styles (design/tokens.json "type"). Display (Cinzel) is only for text
+ * on a brush stroke and small labels; numbers always use the body face. */
+@utility type-diary-name {
   font-family: var(--font-display);
-  font-size: 26px;
-  line-height: 30px;
+  font-size: 28px;
+  line-height: 34px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.06em;
+  @variant notebook {
+    font-size: 30px;
+  }
 }
 @utility type-band-md {
   font-family: var(--font-display);
-  font-size: 14px;
-  line-height: 18px;
+  font-size: 13px;
+  line-height: 16px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
+  @variant notebook {
+    font-size: 14px;
+    line-height: 18px;
+  }
 }
 @utility type-band-sm {
   font-family: var(--font-display);
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 13px;
+  line-height: 16px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
 }
+@utility type-ink-button {
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+@utility type-overline {
+  font-family: var(--font-display);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
 @utility type-stat-hero {
   font-family: var(--font-sans);
-  font-size: 34px;
-  line-height: 38px;
+  font-size: 38px;
+  line-height: 42px;
   font-weight: 700;
+}
+@utility type-stat-num {
+  font-family: var(--font-sans);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 700;
+  @variant notebook {
+    font-size: 30px;
+    line-height: 34px;
+  }
 }
 @utility type-stat-lg {
   font-family: var(--font-sans);
@@ -147,10 +258,28 @@
   line-height: 24px;
   font-weight: 700;
 }
+@utility type-nav {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 400;
+}
+@utility type-entry-title {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 400;
+}
+@utility type-label {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
 @utility type-body-strong {
   font-family: var(--font-sans);
   font-size: 15px;
-  line-height: 20px;
+  line-height: 22px;
   font-weight: 600;
 }
 @utility type-caption {
@@ -159,6 +288,12 @@
   line-height: 18px;
   font-weight: 400;
   font-style: italic;
+}
+@utility type-tab-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
 }
 
 @layer base {
@@ -170,5 +305,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 15px;
+    line-height: 22px;
   }
 }

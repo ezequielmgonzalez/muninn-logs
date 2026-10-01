@@ -63,7 +63,7 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
         <section className="flex flex-col gap-5">
           <PaintedBand>{t("results")}</PaintedBand>
           <ol className="flex flex-col gap-4">
-            {match.players.map((p) => (
+            {match.players.map((p, i) => (
               <li key={p.playerId} className="flex items-center gap-4">
                 <span className="type-stat-lg w-6 shrink-0 text-center text-ink-muted">{p.rank}</span>
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -81,6 +81,7 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
                   <PaintedBar
                     value={best > 0 ? Math.max(p.total, 0) / best : 0}
                     tone={p.leader ? ARNAK_LEADER_STYLES[p.leader].tone : "ink-muted"}
+                    index={i}
                   />
                   {p.wonTiebreak && p.isWinner && (
                     <span className="type-caption text-ink-muted">{t("wonTiebreak")}</span>

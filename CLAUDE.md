@@ -35,13 +35,15 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 
 ## Design
 
-"Diario de expedición": aged paper, section titles painted in ink. Read `design/README.md` → `SUMMARY.md` → `brand.md` before building UI; the HTML files there are references to open in a browser. One light theme ("Pergamino"); there is no dark theme, so don't add `dark:` styles.
+v3, "cuaderno de campo": surfaces are paper inside a notebook, every accent is a dry-brush stroke of ink. Read `design/HANDOFF.md` (the restyle plan, one PR per step) → `design/README.md` (the brand book) → `design/components/*.md` before building UI; `design/screens/*.html` are the mockups to open in a browser. One light theme; there is no dark theme, so don't add `dark:` styles.
 
-- Colors are Tailwind classes from the brand tokens: `bg-ink`, `text-ink-body`, `text-ink-muted`, `text-band-text(-muted)`, `bronze`, `chart-1`…`chart-8` (which leader/category gets which chart color is in `design/tokens.json`). shadcn's semantic tokens map onto them (`primary` = ink, `destructive` = chart-1), so shadcn components are already on-brand.
-- Type: `type-band-lg|md|sm` (Cinzel, uppercase, only for text on a painted band), `type-stat-hero|lg`, `type-body-strong`, `type-caption`. Everything else is Spectral (`font-sans`), numbers included.
-- Section titles and page mastheads are `<PaintedBand>` (`size="section" | "page"`); value bars are `<PaintedBar value tone>`. Never hand-roll the paint layers or add `border-radius` to a band; the SVG filters they need come from `<Paper />` in the root layout.
-- Leaders are shown by emoji plus their chart color (`ARNAK_LEADER_STYLES` in `src/games/arnak.ts`), never with the official leader art: it isn't licensed, so it must not be committed or displayed.
-- One radius (4px). Design spacing `space-1…8` = Tailwind `1, 2, 3, 4, 5, 7, 11, 14`. Form controls and primary buttons are `h-11` (44px touch targets); inputs keep 16px text on phones so iOS doesn't zoom.
+- Colors are Tailwind classes from `design/tokens.css`: `bg-paper`, `bg-ink`, `text-ink-body`, `text-ink-muted`, `text-band-text(-muted)`, `bronze`, `gold`, `chart-1`…`chart-8` (one per leader; which is which is in `design/tokens.json`), `player-you`, `player-2…5`. shadcn's semantic tokens map onto them (`primary` = ink, `destructive` = chart-1).
+- Type: Cinzel (`font-display`) only on a brush stroke and for small labels: `type-band-md|sm`, `type-ink-button`, `type-overline`, `type-diary-name`. Everything else is Spectral (`font-sans`), numbers included: `type-stat-hero|num|lg`, `type-entry-title`, `type-label`, `type-body-strong`, `type-caption`, `type-nav`, `type-tab-label`.
+- Brush strokes are a div with a background color and a mask from `public/brush/` (`ink ink--band1|band2|sweep|tab|blot|bar1…4`), absolutely positioned behind the text. Never `border-radius`, `box-shadow` or `filter` on the ink layer. Section titles are `<PaintedBand>` (`variant`, `flip`), value bars `<PaintedBar value tone index>` (bars alternate masks by `index`; zero draws a hairline).
+- Selected = painted: current nav item, tab, pressed option and chip get a stroke plus `aria-current` / `aria-pressed`. No bordered, rounded boxes as containers; paper takes `filter: drop-shadow`, not `box-shadow`. Form fields are underline-only.
+- The desktop notebook starts at the `notebook:` breakpoint (1200px); below it, the phone notebook.
+- Leaders are shown by emoji plus their chart color (`ARNAK_LEADER_STYLES` in `src/games/arnak.ts`), never with the official leader art: it isn't licensed, so it must not be committed or displayed (even where the design mentions portraits).
+- One radius (4px; the leather cover is 12px). Design spacing `space-1…8` (4, 8, 12, 16, 22, 34, 46, 54px) = Tailwind `1, 2, 3, 4, 5.5, 8.5, 11.5, 13.5`. Touch targets are at least 44px; inputs keep 16px text on phones so iOS doesn't zoom.
 
 ## Database
 

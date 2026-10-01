@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { PaintedBand, PaintedBar } from "./painted-band";
 
-function paintLayers(container: HTMLElement) {
-  return Array.from(container.querySelectorAll<HTMLElement>("[data-paint-layer]"));
+function stroke(container: HTMLElement) {
+  return container.querySelector<HTMLElement>('[data-paint-layer="stroke"]');
 }
 
 describe("PaintedBand", () => {
@@ -13,26 +13,33 @@ describe("PaintedBand", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Por categoría" })).toBeInTheDocument();
   });
 
-  it("paints two decorative layers of the same ink, with no rounded corners", () => {
+  it("paints one decorative ink stroke, shaped only by its mask", () => {
     const { container } = render(<PaintedBand>Win Rate</PaintedBand>);
-    const layers = paintLayers(container);
-
-    expect(layers.map((l) => l.dataset.paintLayer)).toEqual(["bleed", "stroke"]);
-    for (const layer of layers) {
-      expect(layer).toHaveAttribute("aria-hidden", "true");
-      expect(layer.style.background).toBe("var(--ink)");
-      // The band's shape comes from the SVG filter, never from border-radius.
-      expect(layer.className).not.toMatch(/rounded/);
-    }
+    const layer = stroke(container)!;
+    expect(layer).toHaveAttribute("aria-hidden", "true");
+    expect(layer).toHaveClass("ink", "ink--band1", "bg-ink");
+    // Never border-radius, box-shadow or filter on the ink layer.
+    expect(layer.className).not.toMatch(/rounded|shadow|filter|blur/);
   });
 
-  it("shows trailing text at the end of the band", () => {
+  it("uses the second stroke, mirrored, when asked", () => {
+    const { container } = render(
+      <PaintedBand variant={2} flip>
+        Líderes
+      </PaintedBand>,
+    );
+    expect(stroke(container)).toHaveClass("ink--band2", "-scale-x-100");
+    // The text itself is never mirrored.
+    expect(screen.getByRole("heading").className).not.toMatch(/scale/);
+  });
+
+  it("shows a page title's trailing text below the stroke", () => {
     render(
       <PaintedBand size="page" trailing="28 expediciones registradas">
         Diario de Ezequiel
       </PaintedBand>,
     );
-    expect(screen.getByText("28 expediciones registradas")).toBeInTheDocument();
+    expect(screen.getByText("28 expediciones registradas").tagName).toBe("P");
   });
 });
 
@@ -44,17 +51,26 @@ describe("PaintedBar", () => {
   it("is as wide as its value, in the given categorical color", () => {
     const { container } = render(<PaintedBar value={0.68} tone="chart-6" />);
     expect(barWidth(container)).toBe("68%");
-    for (const layer of paintLayers(container)) {
-      expect(layer.style.background).toBe("var(--chart-6)");
-    }
+    expect(stroke(container)!.style.background).toBe("var(--chart-6)");
   });
 
-  it.each([
-    [1.5, "100%"],
-    [-0.2, "0%"],
-  ])("clamps %d to %s", (value, width) => {
+  it("alternates the four bar strokes by its position", () => {
+    const masks = [0, 1, 2, 3, 4].map((index) => {
+      const { container } = render(<PaintedBar value={0.5} tone="chart-1" index={index} />);
+      return [...stroke(container)!.classList].find((c) => c.startsWith("ink--"));
+    });
+    expect(masks).toEqual(["ink--bar1", "ink--bar2", "ink--bar3", "ink--bar4", "ink--bar1"]);
+  });
+
+  it("clamps values above 1", () => {
+    const { container } = render(<PaintedBar value={1.5} tone="chart-1" />);
+    expect(barWidth(container)).toBe("100%");
+  });
+
+  it.each([0, -0.2])("draws a hairline instead of a stroke for %d", (value) => {
     const { container } = render(<PaintedBar value={value} tone="chart-1" />);
-    expect(barWidth(container)).toBe(width);
+    expect(stroke(container)).toBeNull();
+    expect(container.querySelector('[data-paint-layer="hairline"]')).not.toBeNull();
   });
 
   it("is hidden from assistive tech (its value is shown as text next to it)", () => {

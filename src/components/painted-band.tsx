@@ -3,12 +3,13 @@ import type { ElementType, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The system's signature: two layers of the same ink, each broken by an SVG
- * displacement filter (defined once in <Paper />), instead of a rectangle.
- * See design/brand.md and design/components/painted-band.html.
+ * The system's signature: a dry-brush stroke of ink behind a title. The stroke
+ * is a div with a background color and a PNG mask (public/brush/), so the same
+ * shape works in ink for a title and in a leader's color for a bar.
+ * See design/README.md ("Las pinceladas") and design/components/PaintedBand.md.
  *
- * Rules: never add border-radius to a band (its shape comes from the filter);
- * both layers always share one color; content sits above the sharp layer.
+ * Rules: never border-radius, box-shadow or filter on the ink layer (its shape
+ * is the mask); text always sits above the ink, on its solid part.
  */
 
 export type PaintTone =
@@ -24,34 +25,16 @@ export type PaintTone =
   | "chart-7"
   | "chart-8";
 
-function PaintLayers({ tone }: { tone: PaintTone }) {
-  const background = `var(--${tone})`;
-  return (
-    <>
-      {/* Diffuse, larger, faint pass: pigment bleeding into the paper. */}
-      <span
-        aria-hidden
-        data-paint-layer="bleed"
-        className="pointer-events-none absolute -inset-x-[30px] -inset-y-[14px] opacity-26 [filter:url(#paint-rough-blur)]"
-        style={{ background }}
-      />
-      {/* Sharp pass. */}
-      <span
-        aria-hidden
-        data-paint-layer="stroke"
-        className="pointer-events-none absolute -inset-x-[9px] -inset-y-[3px] [filter:url(#paint-rough)]"
-        style={{ background }}
-      />
-    </>
-  );
-}
-
 type PaintedBandProps = {
   children: ReactNode;
-  /** "page": edge-to-edge masthead. "section": a section title, as wide as its column. */
+  /** "page": a page's title. "section": a section title, as wide as its column. */
   size?: "page" | "section";
-  /** Secondary text at the far end of the band, e.g. "28 expediciones registradas". */
+  /** Secondary text, e.g. "28 expediciones registradas", or a control on the band. */
   trailing?: ReactNode;
+  /** Which of the two band strokes; alternate them between sections of a page. */
+  variant?: 1 | 2;
+  /** Mirrors the stroke (never the text), so two titles in a row differ. */
+  flip?: boolean;
   as?: ElementType;
   className?: string;
 };
@@ -60,68 +43,74 @@ export function PaintedBand({
   children,
   size = "section",
   trailing,
+  variant = 1,
+  flip = false,
   as: Tag = "h2",
   className,
 }: PaintedBandProps) {
   return (
-    <div
-      data-painted-band={size}
-      className={cn(
-        "relative text-band-text",
-        size === "page" ? "px-6 py-5 sm:px-14" : "px-[26px] py-[13px]",
-        className,
-      )}
-    >
-      <PaintLayers tone="ink" />
-      {/* Always above the sharp layer, never on the faint one: keeps text contrast.
-          When title and trailing don't fit side by side (phones), the trailing
-          part wraps below instead of squeezing the title onto several lines. */}
-      <div className="relative z-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-        <Tag
+    <div data-painted-band={size} className={cn("flex flex-col items-center gap-2", className)}>
+      <div
+        className={cn(
+          "relative flex min-h-[46px] items-center gap-x-4 text-band-text notebook:min-h-[50px]",
+          // A page title hugs its text (no edge-to-edge header); a section title fills its column.
+          size === "page" ? "mt-6 px-10" : "w-full px-2",
+          trailing && size === "section" ? "justify-between" : "justify-center",
+        )}
+      >
+        <div
+          aria-hidden
+          data-paint-layer="stroke"
           className={cn(
-            size === "page"
-              ? // band-lg, scaled down on phones so a name fits on one line.
-                "font-display text-[20px] leading-[26px] font-bold tracking-[0.14em] uppercase sm:text-[26px] sm:leading-[30px]"
-              : "type-band-md",
-            "m-0",
+            "ink -inset-x-[18px] -inset-y-[11px] bg-ink notebook:-inset-x-[26px] notebook:-inset-y-[12px]",
+            variant === 1 ? "ink--band1" : "ink--band2",
+            flip && "-scale-x-100",
           )}
-        >
+        />
+        <Tag className={cn("relative z-2 m-0 text-center", size === "page" ? "type-ink-button" : "type-band-md")}>
           {children}
         </Tag>
-        {trailing && (
-          <span className="type-band-sm shrink-0 text-band-text-muted">{trailing}</span>
-        )}
+        {/* On a section band, a control (e.g. a sort order) sits at its far end. */}
+        {trailing && size === "section" && <div className="relative z-2 shrink-0">{trailing}</div>}
       </div>
+      {/* A page title's secondary text reads below the stroke, on the paper. */}
+      {trailing && size === "page" && <p className="type-caption m-0 text-ink-muted">{trailing}</p>}
     </div>
   );
 }
+
+const BAR_MASKS = ["ink--bar1", "ink--bar2", "ink--bar3", "ink--bar4"] as const;
 
 type PaintedBarProps = {
   /** Share of the full width, from 0 to 1. Values outside are clamped. */
   value: number;
   /** A categorical color, or ink-muted for data without its own color. */
   tone: Exclude<PaintTone, "ink">;
+  /** The bar's position in its list: bars alternate the four strokes (i % 4). */
+  index?: number;
   className?: string;
 };
 
 /**
- * A ranking bar: the same brush stroke in a categorical color, cut where the
- * value ends. Decorative: always show the name and value as text next to it.
+ * A value bar: a brush stroke in a categorical color, as wide as the value.
+ * Zero gets a hairline instead of a stroke. Decorative: always show the name
+ * and value as text next to it.
  */
-export function PaintedBar({ value, tone, className }: PaintedBarProps) {
+export function PaintedBar({ value, tone, index = 0, className }: PaintedBarProps) {
   const percent = Math.min(Math.max(value, 0), 1) * 100;
   return (
-    <div
-      aria-hidden
-      data-painted-bar={tone}
-      className={cn(
-        "relative h-6 after:absolute after:inset-x-0 after:bottom-[3px] after:h-px after:bg-hairline/30",
-        className,
+    <div aria-hidden data-painted-bar={tone} className={cn("relative h-[15px] notebook:h-[18px]", className)}>
+      {percent === 0 ? (
+        <div data-paint-layer="hairline" className="absolute inset-x-0 top-1/2 h-px bg-hairline/18" />
+      ) : (
+        <div className="absolute inset-y-0 left-0" style={{ width: `${percent}%` }}>
+          <div
+            data-paint-layer="stroke"
+            className={cn("ink inset-x-0 -inset-y-[5px] notebook:-inset-y-[6px]", BAR_MASKS[index % 4])}
+            style={{ background: `var(--${tone})` }}
+          />
+        </div>
       )}
-    >
-      <div className="absolute inset-y-0 left-0" style={{ width: `${percent}%` }}>
-        <PaintLayers tone={tone} />
-      </div>
     </div>
   );
 }
