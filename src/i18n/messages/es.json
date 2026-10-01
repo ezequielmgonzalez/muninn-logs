@@ -93,7 +93,13 @@
       "alreadyFriends": "Ya son amigos.",
       "alreadyRequested": "Ya le mandaste una solicitud.",
       "generic": "Algo salió mal. Probá de nuevo."
-    }
+    },
+    "addTitle": "Agregar amigo",
+    "usernamePlaceholder": "@usuario",
+    "compare": "Comparar",
+    "compareWith": "Comparar con {name}",
+    "guestsTitle": "Invitados",
+    "guestsText": "Los jugadores sin cuenta que cargaste en tus partidas. Si alguno se crea una cuenta, podés vincularlo para que se lleve su historial."
   },
   "LogMatch": {
     "title": "Nueva partida",

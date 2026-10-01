@@ -1,7 +1,7 @@
 import { type Browser, expect, test } from "@playwright/test";
 
 import { formError, signUp } from "./helpers/auth";
-import { sendFriendRequest } from "./helpers/friends";
+import { befriend, sendFriendRequest } from "./helpers/friends";
 
 /** A second user in their own browser session. */
 async function otherUser(browser: Browser, request: Parameters<typeof signUp>[1], name: string) {
@@ -87,4 +87,16 @@ test("explains why a request can't be sent", async ({ page, request, browser }) 
 test("friends requires signing in", async ({ page }) => {
   await page.goto("/es/friends");
   await expect(page).toHaveURL("/es/login");
+});
+
+test("each friend has a link to compare with them", async ({ page, request, browser }) => {
+  await signUp(page, request, "Ana");
+  const beto = await browser.newPage();
+  const { username } = await signUp(beto, request, "Beto");
+  await befriend(page, "Ana", beto, username);
+  await beto.close();
+
+  await page.goto("/es/friends");
+  await page.getByRole("link", { name: "Comparar con Beto" }).click();
+  await expect(page).toHaveURL(`/es/compare?with=${username}`);
 });

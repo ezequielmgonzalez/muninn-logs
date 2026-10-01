@@ -32,7 +32,7 @@ test("a friend's profile shows their stats, and comparing marks who does better"
 
   // From Ana's friends list to Beto's profile.
   await page.goto("/es/friends");
-  await page.getByRole("link", { name: "Beto" }).click();
+  await page.getByRole("link", { name: "Beto", exact: true }).click();
   await expect(page).toHaveURL(`/es/friends/${betoUsername}`);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Beto");
   await expect(page.getByText("2 expediciones registradas").filter({ visible: true })).toBeVisible();
