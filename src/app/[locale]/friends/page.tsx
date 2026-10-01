@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { acceptFriendRequest, removeFriendship } from "@/features/friends/actions";
 import { AddFriendForm } from "@/features/friends/add-friend-form";

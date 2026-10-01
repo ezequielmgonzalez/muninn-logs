@@ -3,7 +3,7 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { PaintedBand, PaintedBar } from "@/components/painted-band";
+import { PaintedBand, BrushBar } from "@/components/notebook/painted-band";
 import { ARNAK_LEADER_STYLES } from "@/games/arnak";
 
 import { LEADER_METRICS, type LeaderMetric, rankLeaders } from "./leader-metrics";
@@ -71,7 +71,7 @@ export function LeaderRanking({ leaders }: { leaders: LeaderStats[] }) {
                     <span className="type-stat-lg shrink-0">{display(value)}</span>
                   </span>
                   {/* A sliver even for the weakest, so every row keeps its stroke. */}
-                  <PaintedBar value={Math.max(bar, 0.08)} tone={style.tone} index={i} />
+                  <BrushBar value={Math.max(bar, 0.08)} tone={style.tone} index={i} />
                 </div>
               </li>
             );

@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { LoginForm } from "@/features/auth/login-form";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";

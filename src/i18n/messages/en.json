@@ -16,6 +16,16 @@
     "noMatches": "There are no games in your journal yet. Log the first one after you play.",
     "games": "Games"
   },
+  "Nav": {
+    "sections": "Sections",
+    "home": "Home",
+    "matches": "Games",
+    "stats": "Stats",
+    "friends": "Friends",
+    "logMatch": "Log a game",
+    "logShort": "Log",
+    "diaryOf": "Journal of"
+  },
   "Auth": {
     "title": "Sign in",
     "description": "We'll email you a code. If it's your first time, we'll create your account.",

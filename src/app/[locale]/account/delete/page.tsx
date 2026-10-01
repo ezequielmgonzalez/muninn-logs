@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { DeleteAccountForm } from "@/features/account/delete-account-form";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";

@@ -16,6 +16,16 @@
     "noMatches": "Todavía no hay partidas en tu diario. Cargá la primera después de jugar.",
     "games": "Partidas"
   },
+  "Nav": {
+    "sections": "Secciones",
+    "home": "Inicio",
+    "matches": "Partidas",
+    "stats": "Estadísticas",
+    "friends": "Amigos",
+    "logMatch": "Cargar partida",
+    "logShort": "Cargar",
+    "diaryOf": "Diario de"
+  },
   "Auth": {
     "title": "Iniciar sesión",
     "description": "Te mandamos un código a tu email. Si es tu primera vez, se crea tu cuenta.",

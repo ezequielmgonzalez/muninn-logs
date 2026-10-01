@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
-import { PaintedBand, PaintedBar } from "@/components/painted-band";
+import { PaintedBand, BrushBar } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { DeleteMatch } from "@/features/matches/delete-match";
 import { playedOnDate } from "@/features/matches/format";
@@ -78,7 +78,7 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
                       {p.total}
                     </span>
                   </span>
-                  <PaintedBar
+                  <BrushBar
                     value={best > 0 ? Math.max(p.total, 0) / best : 0}
                     tone={p.leader ? ARNAK_LEADER_STYLES[p.leader].tone : "ink-muted"}
                     index={i}

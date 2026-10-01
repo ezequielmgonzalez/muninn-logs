@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
+import { NativeSelect } from "@/components/notebook/native-select";
 import { Button } from "@/components/ui/button";
 
 import { type RequestLinkState, requestGuestLink } from "./actions";
@@ -26,12 +27,12 @@ export function LinkGuestForm({
     <form action={action} className="flex flex-col gap-2">
       <input type="hidden" name="guestId" value={guest.id} />
       <div className="flex gap-2">
-        <select
+        <NativeSelect
           name="friendId"
           aria-label={t("whoIs", { name: guest.name })}
           defaultValue=""
           required
-          className="h-10 min-w-0 flex-1 rounded-md border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="min-w-0 flex-1"
         >
           <option value="" disabled>
             {t("chooseFriend")}
@@ -41,7 +42,7 @@ export function LinkGuestForm({
               {f.display_name}
             </option>
           ))}
-        </select>
+        </NativeSelect>
         <Button type="submit" variant="outline" className="h-10" disabled={pending}>
           {t("send")}
         </Button>

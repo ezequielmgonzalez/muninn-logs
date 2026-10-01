@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";

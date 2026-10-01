@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { ImportForm } from "@/features/import/import-form";
 import { ARNAK_LEADERS, type ArnakLeader } from "@/games/arnak";
 import { routing } from "@/i18n/routing";

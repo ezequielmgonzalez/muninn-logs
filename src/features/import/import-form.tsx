@@ -3,7 +3,8 @@
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useActionState, useMemo, useState } from "react";
 
-import { PaintedBand } from "@/components/painted-band";
+import { NativeSelect } from "@/components/notebook/native-select";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { playedOnDate } from "@/features/matches/format";
@@ -121,9 +122,8 @@ export function ImportForm({
                 return (
                   <li key={name} className="flex flex-col gap-2">
                     <Label htmlFor={id}>{name}</Label>
-                    <select
+                    <NativeSelect
                       id={id}
-                      className="h-11 w-full rounded-md border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                       value={choices[nameKey(name)] ?? NEW_GUEST}
                       onChange={(e) => setChoices((c) => ({ ...c, [nameKey(name)]: e.target.value }))}
                     >
@@ -137,7 +137,7 @@ export function ImportForm({
                               : p.name}
                         </option>
                       ))}
-                    </select>
+                    </NativeSelect>
                   </li>
                 );
               })}

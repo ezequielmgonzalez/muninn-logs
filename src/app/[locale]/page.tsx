@@ -1,7 +1,7 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
-import { PaintedBand } from "@/components/painted-band";
+import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/features/auth/actions";
 import { countIncomingRequests } from "@/features/friends/queries";

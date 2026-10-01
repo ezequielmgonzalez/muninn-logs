@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { z } from "zod";
 
 import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
@@ -27,10 +28,13 @@ const statsSchema = z.object({
 export type PlayerStats = z.infer<typeof statsSchema>;
 export type LeaderStats = PlayerStats["leaders"][number];
 
-/** Arnak stats for the user or one of their friends (the database enforces who). */
-export async function getPlayerStats(userId: string): Promise<PlayerStats> {
+/**
+ * Arnak stats for the user or one of their friends (the database enforces who).
+ * Cached per request: the notebook shell counts the user's games with it too.
+ */
+export const getPlayerStats = cache(async (userId: string): Promise<PlayerStats> => {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_player_stats", { target_user_id: userId });
   if (error) throw error;
   return statsSchema.parse(data);
-}
+});
