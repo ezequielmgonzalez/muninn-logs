@@ -2,20 +2,19 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
-import { PaintedBand } from "@/components/notebook/painted-band";
+import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { type FormPlayer, LogMatchForm } from "@/features/matches/log-match-form";
 import { getMatch } from "@/features/matches/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function EditMatchPage({ params }: PageProps<"/[locale]/matches/[id]/edit">) {
-  const [profile, locale, t, tHome] = await Promise.all([
+  const [profile, locale, t] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("LogMatch"),
-    getTranslations("HomePage"),
   ]);
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
@@ -53,24 +52,20 @@ export default async function EditMatchPage({ params }: PageProps<"/[locale]/mat
     });
 
   return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">{tHome("journal", { name: profile.display_name })}</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 px-6 py-11">
-        <PaintedBand as="h1">{t("editTitle")}</PaintedBand>
-        <LogMatchForm
-          addable={addable}
-          initial={{
-            matchId: match.id,
-            playedOn: match.playedOn ?? "",
-            boardSide: match.boardSide,
-            durationMinutes: match.durationMinutes,
-            players,
-            tiebreakKey: match.players.find((p) => p.wonTiebreak)?.playerId ?? null,
-          }}
-        />
-      </main>
-    </>
+    // The form brings its own save bar on phones, in place of the tab bar.
+    <NotebookShell bottomBar={null}>
+      <LogMatchForm
+        title={t("editTitle")}
+        addable={addable}
+        initial={{
+          matchId: match.id,
+          playedOn: match.playedOn ?? "",
+          boardSide: match.boardSide,
+          durationMinutes: match.durationMinutes,
+          players,
+          tiebreakKey: match.players.find((p) => p.wonTiebreak)?.playerId ?? null,
+        }}
+      />
+    </NotebookShell>
   );
 }

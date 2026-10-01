@@ -102,7 +102,7 @@
     "bird": "Pájaro",
     "snake": "Serpiente",
     "notRecorded": "Sin registrar",
-    "duration": "Duración en minutos (opcional)",
+    "duration": "Duración",
     "playersSection": "Jugadores",
     "turn": "Turno {n}",
     "you": "vos",
@@ -134,7 +134,19 @@
       "generic": "Algo salió mal. Probá de nuevo."
     },
     "editTitle": "Editar partida",
-    "dateHint": "Opcional: dejala vacía si no la sabés."
+    "dateHint": "Opcional: dejala vacía si no la sabés.",
+    "optional": "(opcional)",
+    "durationUnit": "min",
+    "searchPlaceholder": "Amigo o invitado",
+    "suggestions": "Sugerencias",
+    "groupFriends": "Amigos",
+    "groupYourGuests": "Tus invitados",
+    "groupOtherGuests": "Jugaron con vos",
+    "tableSection": "En la mesa",
+    "totalFor": "Total de {name}",
+    "summaryPlayers": "{count, plural, one {# jugador} other {# jugadores}}",
+    "summaryLeading": "{players} · va ganando {name} con {points}",
+    "summaryTied": "{players} · empate en {points}"
   },
   "Matches": {
     "title": "Partidas",

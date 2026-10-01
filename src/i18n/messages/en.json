@@ -102,7 +102,7 @@
     "bird": "Bird",
     "snake": "Snake",
     "notRecorded": "Not recorded",
-    "duration": "Duration in minutes (optional)",
+    "duration": "Duration",
     "playersSection": "Players",
     "turn": "Turn {n}",
     "you": "you",
@@ -134,7 +134,19 @@
       "generic": "Something went wrong. Try again."
     },
     "editTitle": "Edit game",
-    "dateHint": "Optional: leave it empty if you don't know it."
+    "dateHint": "Optional: leave it empty if you don't know it.",
+    "optional": "(optional)",
+    "durationUnit": "min",
+    "searchPlaceholder": "Friend or guest",
+    "suggestions": "Suggestions",
+    "groupFriends": "Friends",
+    "groupYourGuests": "Your guests",
+    "groupOtherGuests": "Played with you",
+    "tableSection": "At the table",
+    "totalFor": "{name}'s total",
+    "summaryPlayers": "{count, plural, one {# player} other {# players}}",
+    "summaryLeading": "{players} · {name} leads with {points}",
+    "summaryTied": "{players} · tied at {points}"
   },
   "Matches": {
     "title": "Games",

@@ -23,7 +23,8 @@ test("logs a match with guests, leaders and a tiebreak", async ({ page, request 
   // Ana 10+6+9+5+14-2 = 42; Jessi 12+6+9+5+12-2 = 42: a tie.
   await fillScores(page, "Ana", [10, 6, 9, 5, 14, 2]);
   await fillScores(page, "Jessi", [12, 6, 9, 5, 12, 2]);
-  await expect(page.getByRole("cell", { name: "42" })).toHaveCount(2);
+  await expect(page.getByLabel("Total de Ana")).toHaveText("42");
+  await expect(page.getByLabel("Total de Jessi")).toHaveText("42");
 
   await expect(page.getByText("Empate en 42 puntos.")).toBeVisible();
   await page.getByRole("radio", { name: "Jessi" }).check();

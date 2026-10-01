@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 import { CompassRose } from "./icons";
 import { type NotebookSection, SideNav, TabBar } from "./navigation";
+import { NotebookPage } from "./notebook-page";
 import { SpineRings, TopSpirals } from "./rings";
 
 // Every signed-in screen is a notebook (design/components/NotebookShell.md):
@@ -74,16 +75,24 @@ async function Insert({ active }: { active?: NotebookSection }) {
 type NotebookShellProps = {
   /** The section marked as current in the navigation. */
   active?: NotebookSection;
-  left: ReactNode;
+  left?: ReactNode;
   right?: ReactNode;
+  /** Instead of left/right: <NotebookPage>s rendered by one component, e.g. a form spanning both pages. */
+  children?: ReactNode;
   /** On phones the pages stack left, then right, unless the screen says otherwise. */
   mobileOrder?: "left-first" | "right-first";
-  /** Replaces the phone's tab bar, e.g. the save bar while logging a match. */
+  /** Replaces the phone's tab bar; null for none (a screen with its own bar, like the save bar). */
   bottomBar?: ReactNode;
 };
 
-export async function NotebookShell({ active, left, right, mobileOrder = "left-first", bottomBar }: NotebookShellProps) {
-  const page = "notebook:h-full notebook:w-[462px] notebook:shrink-0 notebook:overflow-y-auto notebook:pb-6";
+export async function NotebookShell({
+  active,
+  left,
+  right,
+  children,
+  mobileOrder = "left-first",
+  bottomBar,
+}: NotebookShellProps) {
   return (
     <div
       data-notebook
@@ -132,34 +141,24 @@ export async function NotebookShell({ active, left, right, mobileOrder = "left-f
               "notebook:absolute notebook:top-[46px] notebook:left-[290px] notebook:h-[908px] notebook:w-[948px] notebook:flex-row notebook:gap-6 notebook:p-0",
             )}
           >
-            <section
-              data-page="left"
-              className={cn(
-                page,
-                "notebook:order-none notebook:pt-[54px] notebook:pr-[50px] notebook:pl-[46px]",
-                mobileOrder === "right-first" && "order-2",
-              )}
-            >
-              {left}
-            </section>
-            {right && (
-              <section
-                data-page="right"
-                className={cn(
-                  page,
-                  "notebook:order-none notebook:pt-[54px] notebook:pr-[46px] notebook:pl-[50px]",
-                  mobileOrder === "right-first" && "order-1",
+            {children ?? (
+              <>
+                <NotebookPage side="left" order={mobileOrder === "right-first" ? 2 : undefined}>
+                  {left}
+                </NotebookPage>
+                {right && (
+                  <NotebookPage side="right" order={mobileOrder === "right-first" ? 1 : undefined}>
+                    {right}
+                  </NotebookPage>
                 )}
-              >
-                {right}
-              </section>
+              </>
             )}
             <LegalLinks className="order-3 justify-center notebook:hidden" />
           </main>
         </div>
       </div>
 
-      {bottomBar ?? <TabBar active={active} />}
+      {bottomBar === undefined ? <TabBar active={active} /> : bottomBar}
     </div>
   );
 }
