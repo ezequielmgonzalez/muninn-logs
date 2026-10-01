@@ -62,6 +62,13 @@ describe("BrushBar", () => {
     expect(masks).toEqual(["ink--bar1", "ink--bar2", "ink--bar3", "ink--bar4", "ink--bar1"]);
   });
 
+  it("comes thin, in a player's color, for grouped bars", () => {
+    const { container } = render(<BrushBar value={0.5} tone="player-2" size="thin" />);
+    expect(container.querySelector("[data-brush-bar]")).toHaveClass("h-[9px]");
+    expect(stroke(container)!.style.background).toBe("var(--player-2)");
+    expect(stroke(container)).toHaveClass("-inset-y-[3px]");
+  });
+
   it("clamps values above 1", () => {
     const { container } = render(<BrushBar value={1.5} tone="chart-1" />);
     expect(barWidth(container)).toBe("100%");

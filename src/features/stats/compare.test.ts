@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { compareStats } from "./compare";
+import { categoryBars, compareStats } from "./compare";
 import type { PlayerStats } from "./queries";
 
 function stats(overrides: Partial<PlayerStats>, categories: Record<string, number | null> = {}): PlayerStats {
@@ -50,5 +50,25 @@ describe("compareStats", () => {
     const rows = compareStats([stats({ avg_place: 2 }), empty, stats({ avg_place: 1 })]);
     expect(row(rows, "avgPlace").best).toEqual([false, false, true]);
     expect(row(compareStats([stats({}), empty]), "avgPlace").best).toEqual([false, false]);
+  });
+});
+
+describe("categoryBars", () => {
+  it("scales each category to its best player, and leaves fear out", () => {
+    const bars = categoryBars([stats({}, { research: 10, temple: 4 }), stats({}, { research: 20, temple: 8 })]);
+    expect(bars.map((b) => b.slug)).toEqual(["research", "temple", "idols", "guardians", "cards"]);
+    expect(bars[0].players).toEqual([
+      { value: 10, bar: 0.5 },
+      { value: 20, bar: 1 },
+    ]);
+  });
+
+  it("draws nothing for a missing average or an all-zero category", () => {
+    const bars = categoryBars([stats({}, { research: null, temple: 0 }), stats({}, { research: 6, temple: 0 })]);
+    expect(bars[0].players).toEqual([
+      { value: null, bar: 0 },
+      { value: 6, bar: 1 },
+    ]);
+    expect(bars[1].players.map((p) => p.bar)).toEqual([0, 0]);
   });
 });

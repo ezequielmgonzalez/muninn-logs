@@ -51,4 +51,10 @@ test("compares you with several friends at once, marking who does best", async (
   await expect(cells(/^Investigación/).nth(1)).toContainText("12");
   await expect(cells(/^Investigación/).nth(1)).toContainText("el mejor");
   await expect(cells(/^Investigación/).nth(2)).not.toContainText("el mejor");
+
+  // The same averages as grouped bars, each named with its value for screen readers.
+  await expect(page.getByRole("heading", { name: "Puntos por categoría" })).toBeVisible();
+  const research = page.getByRole("listitem").filter({ has: page.getByText("Investigación", { exact: true }) });
+  await expect(research).toContainText("Beto: 12");
+  await expect(research).toContainText("Vos: 2");
 });
