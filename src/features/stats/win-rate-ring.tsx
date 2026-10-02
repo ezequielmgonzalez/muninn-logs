@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 /** The bronze progress ring (design/screens/estadisticas-*.html): the win rate inside. */
 export function WinRateRing({ rate, label, caption }: { rate: number; label: string; caption: string }) {
   const radius = 74;
@@ -16,6 +18,9 @@ export function WinRateRing({ rate, label, caption }: { rate: number; label: str
         strokeDasharray={circumference}
         strokeDashoffset={circumference * (1 - rate)}
         transform="rotate(-90 88 88)"
+        // Fills from empty when the screen appears.
+        className="ring-fill"
+        style={{ "--ring-from": circumference } as CSSProperties}
       />
       <text x="88" y="86" textAnchor="middle" className="type-stat-hero fill-ink-body">
         {label}

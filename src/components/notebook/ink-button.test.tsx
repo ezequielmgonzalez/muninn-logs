@@ -17,9 +17,15 @@ describe("InkButton", () => {
     expect(button.className).not.toMatch(/(^|\s)(rounded|shadow|border)(-|\s|$)/);
   });
 
-  it("uses the second stroke on the insert", () => {
+  it("paints a screen's main action in with the screen", () => {
+    render(<InkButton>Guardar partida</InkButton>);
+    expect(screen.getByRole("button")).toHaveClass("before:paint-in");
+  });
+
+  it("uses the second stroke on the insert, which doesn't repaint on every screen", () => {
     render(<InkButton variant="insert">Cargar partida</InkButton>);
     expect(screen.getByRole("button")).toHaveClass("before:ink--band2", "h-12");
+    expect(screen.getByRole("button")).not.toHaveClass("before:paint-in");
   });
 
   it("renders its child instead with asChild, e.g. a link", () => {
