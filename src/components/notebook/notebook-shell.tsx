@@ -33,7 +33,7 @@ export async function DiaryIdentity({ className }: { className?: string }) {
   ]);
   return (
     <div className={className}>
-      <p className="type-caption m-0 text-sm text-ink-muted">{t("diaryOf")}</p>
+      <p className="type-caption m-0 text-base text-ink-muted">{t("diaryOf")}</p>
       <p className="type-diary-name m-0 leading-[1.15] text-ink">{profile.display_name}</p>
       <p className="type-caption m-0 mt-1 text-ink-muted">{tStats("expeditions", { count: stats.games })}</p>
     </div>
