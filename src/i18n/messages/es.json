@@ -156,7 +156,11 @@
     "totalFor": "Total de {name}",
     "summaryPlayers": "{count, plural, one {# jugador} other {# jugadores}}",
     "summaryLeading": "{players} · va ganando {name} con {points}",
-    "summaryTied": "{players} · empate en {points}"
+    "summaryTied": "{players} · empate en {points}",
+    "turnOrder": "Orden de turnos",
+    "turnOrderKnown": "Como en la mesa",
+    "turnOrderKnownHint": "El primero de «En la mesa» empezó la partida: ordenalos con las flechas.",
+    "turnOrderUnknownHint": "Para partidas copiadas de hojas viejas: no se inventa un orden, y no cuenta en estadísticas por turno."
   },
   "Matches": {
     "title": "Partidas",
@@ -355,12 +359,12 @@
     "link": "Importar partidas",
     "description": "Cargá muchas partidas de una vez desde un CSV, por ejemplo las de viejas hojas de puntaje.",
     "formatSection": "El archivo",
-    "formatRows": "Una fila por jugador en cada partida, en orden de turno. Las filas de una misma partida llevan el mismo número en «partida».",
+    "formatRows": "Una fila por jugador en cada partida. Las filas de una misma partida llevan el mismo número en «partida»; su orden no importa.",
     "formatRequired": "Obligatorias: partida, jugador, investigacion, templo, idolos, guardianes, cartas y miedo (la cantidad de cartas de miedo).",
-    "formatOptional": "Opcionales: fecha (DD/MM/AAAA), lider, total (para verificar la suma), desempate (una x), tablero (pájaro, serpiente, cascada, árbol, mono o lagarto) y duracion en minutos.",
+    "formatOptional": "Opcionales: fecha (DD/MM/AAAA), turno (1 para quien empezó, 2 para el siguiente…; si no sabés el orden, dejalo vacío en toda la partida), lider, total (para verificar la suma), desempate (una x), tablero (pájaro, serpiente, cascada, árbol, mono o lagarto) y duracion en minutos.",
     "template": "Descargar plantilla",
     "templateFile": "plantilla-partidas.csv",
-    "templateCsv": "partida,fecha,jugador,lider,investigacion,templo,idolos,guardianes,cartas,miedo,total,desempate,tablero,duracion\n1,15/03/2025,Ana,Cetrera,12,10,8,6,14,2,48,,pájaro,95\n1,,Bob,Místico,10,8,9,5,12,1,43,,,\n2,,Ana,,9,4,6,3,10,3,29,x,serpiente,\n2,,Jessi,Capitán,8,5,6,3,7,0,29,,,\n",
+    "templateCsv": "partida,fecha,turno,jugador,lider,investigacion,templo,idolos,guardianes,cartas,miedo,total,desempate,tablero,duracion\n1,15/03/2025,1,Ana,Cetrera,12,10,8,6,14,2,48,,cascada,95\n1,,2,Bob,Místico,10,8,9,5,12,1,43,,,\n2,02/04/2025,,Ana,,9,4,6,3,10,3,29,x,serpiente,\n2,,,Jessi,Capitán,8,5,6,3,7,0,29,,,\n",
     "file": "Archivo CSV",
     "issuesTitle": "No se puede importar. Corregí el archivo y volvé a elegirlo:",
     "moreIssues": "{count, plural, one {y # problema más.} other {y # problemas más.}}",
@@ -396,13 +400,17 @@
       "multipleTiebreaks": "Partida {game}: más de un jugador ganó el desempate.",
       "tiebreakNotTied": "Partida {game}: {name} ganó el desempate, pero no empató en el primer puesto.",
       "conflict": "Partida {game}: sus filas no coinciden en {column}.",
-      "samePlayer": "Partida {game}: dos nombres del archivo son {name}."
+      "samePlayer": "Partida {game}: dos nombres del archivo son {name}.",
+      "invalidTurn": "Fila {row}: el turno es un número de 1 a 4, no «{value}».",
+      "partialTurns": "Partida {game}: algunas filas tienen turno y otras no. Completalo en todas o dejalo vacío en todas.",
+      "badTurns": "Partida {game}: los turnos tienen que ir de 1 a {count}, sin repetir."
     },
     "errors": {
       "invalid": "Revisá los datos de las partidas.",
       "notAllowed": "No podés agregar a uno de los jugadores (puede que ya no sean amigos), o tu cuenta no tiene permisos de administración.",
       "generic": "Algo salió mal. No se importó nada: probá de nuevo."
-    }
+    },
+    "noTurnOrder": "orden de turnos sin registrar"
   },
   "DeleteAccount": {
     "link": "Eliminar cuenta",

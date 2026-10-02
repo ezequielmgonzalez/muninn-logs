@@ -68,6 +68,30 @@ test("turn order follows the list, and players can be moved", async ({ page, req
   await expect(page.getByRole("button", { name: "Guardar partida" })).toBeDisabled();
 });
 
+test("a game copied from an old score pad can leave its turn order unrecorded", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await page.goto("/es/matches/new");
+  await addGuest(page, "Jessi");
+  const turnOrder = page.getByRole("group", { name: "Orden de turnos" });
+  await expect(turnOrder.getByRole("button", { name: "Como en la mesa" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("Turno 2")).toBeVisible();
+
+  // Unrecorded: no turns, and nothing to reorder.
+  await turnOrder.getByRole("button", { name: "Sin registrar" }).click();
+  await expect(page.getByText("Turno 1")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Subir a Jessi" })).toHaveCount(0);
+  await fillScores(page, "Ana", [10, 6, 9, 5, 14, 2]);
+  await fillScores(page, "Jessi", [5, 2, 3, 0, 10, 0]);
+  await saveMatch(page);
+
+  // Editing keeps it unrecorded.
+  await page.getByRole("link", { name: "Editar partida" }).click();
+  await expect(
+    page.getByRole("group", { name: "Orden de turnos" }).getByRole("button", { name: "Sin registrar" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("Turno 1")).toHaveCount(0);
+});
+
 test("shows an error instead of losing the match when saving fails", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   await page.goto("/es/matches/new");

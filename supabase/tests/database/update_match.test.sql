@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(12);
 
 set constraints all immediate;
 
@@ -109,6 +109,33 @@ select throws_ok(
   $$ select public.update_match('00000000-0000-4000-8000-000000000000', '2026-09-03', '[]') $$,
   '42501', 'match not found, or not logged by you',
   'an unknown match can''t be edited'
+);
+
+-- The turn order turns out to be unknown, then known again.
+select public.update_match((select id from the_match), '2026-09-02', $json$[
+       {"player_id": "f0000000-0000-0000-0000-000000000001",
+        "scores": {"research": 5, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}},
+       {"player_id": "f0000000-0000-0000-0000-000000000002",
+        "scores": {"research": 6, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}}
+     ]$json$, turn_order_known => false);
+
+select results_eq(
+  $$ select turn_order from public.match_players where match_id = (select id from the_match) $$,
+  $$ values (null::smallint), (null::smallint) $$,
+  'an edit can mark the turn order unknown'
+);
+
+select public.update_match((select id from the_match), '2026-09-02', $json$[
+       {"player_id": "f0000000-0000-0000-0000-000000000001",
+        "scores": {"research": 5, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}},
+       {"player_id": "f0000000-0000-0000-0000-000000000002",
+        "scores": {"research": 6, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}}
+     ]$json$);
+
+select results_eq(
+  $$ select turn_order from public.match_players where match_id = (select id from the_match) order by turn_order $$,
+  $$ values (1::smallint), (2::smallint) $$,
+  'and known again: the list''s order is the turn order'
 );
 
 -- Bob played in the match but didn't log it.

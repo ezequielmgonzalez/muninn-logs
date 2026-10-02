@@ -12,6 +12,10 @@ import { parseCsv } from "./csv";
 // Turns an imported CSV into games: one row per player per game, rows of the
 // same game share its "partida" value. Checks everything the match form and
 // log_match() would, and reports every problem at once by row or by game.
+//
+// The rows' order is never taken as the turn order: old score pads rarely
+// list players in it. A game's turn order comes from its "turno" column, set
+// on every one of its rows or on none (then it's unknown).
 
 /** Keeps one import well under the Server Action body limit (1 MB). */
 export const MAX_IMPORT_GAMES = 500;
@@ -22,6 +26,7 @@ const MAX_NAME_LENGTH = 50;
 type Column =
   | "game"
   | "date"
+  | "turn"
   | "player"
   | "leader"
   | ArnakScoreCategory
@@ -34,6 +39,7 @@ type Column =
 const HEADERS: Record<Column, string[]> = {
   game: ["partida", "game", "match"],
   date: ["fecha", "date"],
+  turn: ["turno", "orden", "ordendeturno", "ordendeturnos", "turn", "turnorder", "seat"],
   player: ["jugador", "jugadora", "nombre", "player", "name"],
   leader: ["lider", "leader"],
   research: ["investigacion", "research"],
@@ -83,7 +89,9 @@ export type ImportedGame = {
   playedOn: string | null;
   boardSide: ArnakBoardSide | null;
   durationMinutes: number | null;
-  /** In turn order: the order of their rows. */
+  /** Whether every row had a "turno": then `players` is in turn order. */
+  turnOrderKnown: boolean;
+  /** In turn order when it's known; otherwise in the order of their rows. */
   players: ImportedPlayer[];
 };
 
@@ -102,13 +110,16 @@ export type ImportIssue =
   | { code: "invalidDate"; row: number; value: string }
   | { code: "invalidBoard"; row: number; value: string }
   | { code: "invalidTiebreak"; row: number; value: string }
+  | { code: "invalidTurn"; row: number; value: string }
   | { code: "totalMismatch"; row: number; written: number; computed: number }
   | { code: "playerCount"; game: string; count: number }
   | { code: "duplicatePlayer"; game: string; name: string }
   | { code: "duplicateLeader"; game: string; leader: ArnakLeader }
   | { code: "multipleTiebreaks"; game: string }
   | { code: "tiebreakNotTied"; game: string; name: string }
-  | { code: "conflict"; game: string; column: string };
+  | { code: "conflict"; game: string; column: string }
+  | { code: "partialTurns"; game: string }
+  | { code: "badTurns"; game: string; count: number };
 
 export type ImportResult = { games: ImportedGame[]; issues: ImportIssue[] };
 
@@ -166,6 +177,8 @@ function parseWhole(value: string, min: number, max: number): number | undefined
 
 type GameDraft = ImportedGame & {
   rows: number[];
+  /** Each player's "turno", in row order; null where it's empty. */
+  turns: (number | null)[];
   /** Per-game values may sit on any of its rows, but must agree. */
   given: Partial<Record<"date" | "board" | "duration", string>>;
   conflicts: Set<string>;
@@ -228,8 +241,10 @@ export function parseImport(text: string, leaders: Map<string, ArnakLeader>): Im
         playedOn: null,
         boardSide: null,
         durationMinutes: null,
+        turnOrderKnown: false,
         players: [],
         rows: [],
+        turns: [],
         given: {},
         conflicts: new Set(),
         hasRowIssues: false,
@@ -270,6 +285,13 @@ export function parseImport(text: string, leaders: Map<string, ArnakLeader>): Im
       else rowIssue({ code: "unknownLeader", row, value: cell("leader") });
     }
 
+    let turn: number | null = null;
+    if (cell("turn") !== "") {
+      const parsed = parseWhole(cell("turn"), 1, 4);
+      if (parsed === undefined) rowIssue({ code: "invalidTurn", row, value: cell("turn") });
+      else turn = parsed;
+    }
+
     const tiebreak = fold(cell("tiebreak"));
     const wonTiebreak = YES.has(tiebreak);
     if (!wonTiebreak && !NO.has(tiebreak)) rowIssue({ code: "invalidTiebreak", row, value: cell("tiebreak") });
@@ -306,12 +328,29 @@ export function parseImport(text: string, leaders: Map<string, ArnakLeader>): Im
     });
 
     game.hasRowIssues ||= rowHasIssues;
-    if (name) game.players.push({ name, leader, scores, wonTiebreak });
+    if (name) {
+      game.players.push({ name, leader, scores, wonTiebreak });
+      game.turns.push(turn);
+    }
   }
 
   // Whole-game checks, like the match form's.
   for (const game of games.values()) {
-    const { label, players } = game;
+    const { label, turns } = game;
+
+    // Turns: on every row or none, and then 1 to N without repeats.
+    const given = turns.filter((t) => t !== null);
+    if (given.length > 0 && !game.hasRowIssues) {
+      if (given.length < turns.length) issues.push({ code: "partialTurns", game: label });
+      else if ([...given].sort((a, b) => a - b).some((t, i) => t !== i + 1)) {
+        issues.push({ code: "badTurns", game: label, count: turns.length });
+      } else {
+        game.players = game.players.map((p, i) => ({ p, turn: turns[i]! })).sort((a, b) => a.turn - b.turn).map(({ p }) => p);
+        game.turnOrderKnown = true;
+      }
+    }
+
+    const { players } = game;
     if (players.length < 2 || players.length > 4) issues.push({ code: "playerCount", game: label, count: players.length });
 
     const seen = new Set<string>();
@@ -338,11 +377,12 @@ export function parseImport(text: string, leaders: Map<string, ArnakLeader>): Im
   if (games.size > MAX_IMPORT_GAMES) issues.push({ code: "tooManyGames", max: MAX_IMPORT_GAMES });
 
   return {
-    games: [...games.values()].map(({ label, playedOn, boardSide, durationMinutes, players }) => ({
+    games: [...games.values()].map(({ label, playedOn, boardSide, durationMinutes, turnOrderKnown, players }) => ({
       label,
       playedOn,
       boardSide,
       durationMinutes,
+      turnOrderKnown,
       players,
     })),
     issues,

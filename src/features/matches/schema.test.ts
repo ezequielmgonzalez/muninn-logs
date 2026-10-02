@@ -7,7 +7,7 @@ const ana = "11111111-1111-4111-8111-111111111111";
 const bob = "22222222-2222-4222-8222-222222222222";
 
 function match(players: unknown[], extra: Record<string, unknown> = {}) {
-  return { playedOn: "2026-09-20", boardSide: null, durationMinutes: null, players, ...extra };
+  return { playedOn: "2026-09-20", boardSide: null, durationMinutes: null, turnOrderKnown: true, players, ...extra };
 }
 
 function player(extra: Record<string, unknown>) {
@@ -29,6 +29,15 @@ describe("logMatchSchema", () => {
 
   it("rejects an unknown board side", () => {
     expect(logMatchSchema.safeParse(match([player({ playerId: ana }), player({ playerId: bob })], { boardSide: "volcano" })).success).toBe(false);
+  });
+
+  it("says whether the players are in turn order", () => {
+    const players = [player({ playerId: ana }), player({ playerId: bob })];
+    const unknown = logMatchSchema.parse(match(players, { turnOrderKnown: false }));
+    expect(toLogMatchArgs(unknown).turn_order_known).toBe(false);
+    expect(toLogMatchArgs(logMatchSchema.parse(match(players))).turn_order_known).toBe(true);
+    // Never left out: a missing flag must not fall back to "known".
+    expect(logMatchSchema.safeParse(match(players, { turnOrderKnown: undefined })).success).toBe(false);
   });
 
   it("accepts a game without a date", () => {
@@ -76,6 +85,7 @@ describe("toLogMatchArgs", () => {
       played_on: "2026-09-20",
       duration_minutes: 90,
       setup: { board_side: "snake" },
+      turn_order_known: true,
       players: [
         {
           player_id: ana,

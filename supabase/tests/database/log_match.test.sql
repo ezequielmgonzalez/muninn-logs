@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(24);
 
 set constraints all immediate;
 
@@ -268,6 +268,35 @@ select throws_ok(
   $$ select public.log_match('chess', '2026-09-23', '[]') $$,
   '22023', 'unknown game "chess"',
   'an unknown game is rejected'
+);
+
+-- ---------------------------------------------------------------------------
+-- Turn order unknown (e.g. copied from an old score pad)
+-- ---------------------------------------------------------------------------
+
+create temporary table unordered as
+select public.log_match('arnak', '2026-09-25', $json$[
+       {"player_id": "f0000000-0000-0000-0000-000000000001",
+        "scores": {"research": 7, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}},
+       {"player_id": "f0000000-0000-0000-0000-000000000002",
+        "scores": {"research": 8, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}}
+     ]$json$, turn_order_known => false) as id;
+
+select results_eq(
+  $$ select turn_order from public.match_players where match_id = (select id from unordered) $$,
+  $$ values (null::smallint), (null::smallint) $$,
+  'with turn_order_known false, no player gets a turn: none is made up'
+);
+
+select throws_ok(
+  $$ select public.log_match('arnak', '2026-09-25', $json$[
+       {"player_id": "f0000000-0000-0000-0000-000000000001",
+        "scores": {"research": 1, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}},
+       {"player_id": "f0000000-0000-0000-0000-000000000002",
+        "scores": {"research": 2, "temple": 0, "idols": 0, "guardians": 0, "cards": 0, "fear": 0}}
+     ]$json$, turn_order_known => null) $$,
+  '22023', 'turn_order_known must be true or false',
+  'turn_order_known can''t be null'
 );
 
 -- ---------------------------------------------------------------------------

@@ -126,13 +126,13 @@ isOneToOne: false
                   ]
                 },"match_players": {
                   Row: {
-                    "character_id": string | null,"match_id": string,"player_id": string,"turn_order": number,"won_tiebreak": boolean
+                    "character_id": string | null,"match_id": string,"player_id": string,"turn_order": number | null,"won_tiebreak": boolean
                   }
                   Insert: {
-                    "character_id"?: string | null,"match_id": string,"player_id": string,"turn_order": number,"won_tiebreak"?: boolean
+                    "character_id"?: string | null,"match_id": string,"player_id": string,"turn_order"?: number | null,"won_tiebreak"?: boolean
                   }
                   Update: {
-                    "character_id"?: string | null,"match_id"?: string,"player_id"?: string,"turn_order"?: number,"won_tiebreak"?: boolean
+                    "character_id"?: string | null,"match_id"?: string,"player_id"?: string,"turn_order"?: number | null,"won_tiebreak"?: boolean
                   }
                   Relationships: [
                     {
@@ -301,10 +301,10 @@ isOneToOne: false
             }[]
                            },
 "log_match":
-{ Args: { "duration_minutes"?: number,"game_slug": string,"played_on": string,"players": Json,"setup"?: Json }; Returns: string
+{ Args: { "duration_minutes"?: number,"game_slug": string,"played_on": string,"players": Json,"setup"?: Json,"turn_order_known"?: boolean }; Returns: string
                            },
 "update_match":
-{ Args: { "duration_minutes"?: number,"match_id": string,"played_on": string,"players": Json,"setup"?: Json }; Returns: string
+{ Args: { "duration_minutes"?: number,"match_id": string,"played_on": string,"players": Json,"setup"?: Json,"turn_order_known"?: boolean }; Returns: string
                            }
           }
           Enums: {

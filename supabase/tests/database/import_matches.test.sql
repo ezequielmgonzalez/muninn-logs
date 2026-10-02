@@ -5,7 +5,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(12);
 
 set constraints all immediate;
 
@@ -142,6 +142,29 @@ select throws_ok(
          jsonb_build_object('player_id', 'f0000000-0000-0000-0000-000000000003', 'character', null, 'scores', pg_temp.scores(2)))))) $$,
   '42501', null,
   'admins still only add who they could add by hand: Carla isn''t Ana''s friend'
+);
+
+-- ---------------------------------------------------------------------------
+-- Turn order unknown
+-- ---------------------------------------------------------------------------
+
+select lives_ok(
+  $$ select public.import_matches(jsonb_build_array(jsonb_build_object(
+       'game_slug', 'arnak', 'played_on', '2025-04-01', 'turn_order_known', false,
+       'players', jsonb_build_array(
+         jsonb_build_object('player_id', 'f0000000-0000-0000-0000-000000000001', 'character', null, 'scores', pg_temp.scores(3)),
+         jsonb_build_object('new_guest_name', 'Imp Paper', 'character', null, 'scores', pg_temp.scores(4)))))) $$,
+  'a game whose turn order is unknown imports'
+);
+
+select results_eq(
+  $$ select mp.turn_order from public.match_players mp
+     where mp.match_id = (
+       select mp2.match_id from public.match_players mp2
+       join public.players p on p.id = mp2.player_id
+       where p.name = 'Imp Paper') $$,
+  $$ values (null::smallint), (null::smallint) $$,
+  'with no turn for any player'
 );
 
 select * from finish();
