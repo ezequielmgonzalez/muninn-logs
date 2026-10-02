@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { Button } from "@/components/ui/button";
 import { getFriendships } from "@/features/friends/queries";
 import { removeGuestLinkRequest } from "@/features/guests/actions";
@@ -40,7 +41,16 @@ export default async function GuestsPage() {
                     >
                       {guest.name.charAt(0).toUpperCase()}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-base font-semibold">{guest.name}</span>
+                    {/* Their Estadísticas. */}
+                    <span className="min-w-0 flex-1 truncate">
+                      <TurnLink
+                        href={`/guests/${guest.id}`}
+                        direction="forward"
+                        className="text-base font-semibold text-ink-body underline decoration-ink-body/35 decoration-1 underline-offset-4 hover:decoration-bronze"
+                      >
+                        {guest.name}
+                      </TurnLink>
+                    </span>
                     <span className="shrink-0 text-sm text-ink-muted">{t("matches", { count: guest.matches })}</span>
                   </span>
                   {guest.claim ? (

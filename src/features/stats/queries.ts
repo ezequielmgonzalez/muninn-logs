@@ -50,6 +50,20 @@ export const getPlayerStats = cache(async (userId: string, players: PlayerCount 
   return statsSchema.parse(data);
 });
 
+/**
+ * A guest's Arnak stats, from the games of theirs the user can see (the
+ * database lets their owner and anyone who played with them ask).
+ */
+export async function getGuestStats(guestId: string, players: PlayerCount | null = null): Promise<PlayerStats> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_guest_stats", {
+    guest_id: guestId,
+    ...(players ? { player_count: players } : {}),
+  });
+  if (error) throw error;
+  return statsSchema.parse(data);
+}
+
 const sharedStatsSchema = z.array(statsSchema.omit({ leaders: true }));
 
 /**

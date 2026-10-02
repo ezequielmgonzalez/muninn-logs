@@ -235,6 +235,12 @@
     "compare": "Compararme",
     "empty": "{name} todavía no tiene partidas registradas."
   },
+  "GuestProfile": {
+    "guest": "Invitado",
+    "backToGuests": "Tus invitados",
+    "backToMatches": "Partidas",
+    "empty": "Todavía no hay partidas de {name} que puedas ver."
+  },
   "Compare": {
     "title": "Vos vs. {names}",
     "you": "Vos",

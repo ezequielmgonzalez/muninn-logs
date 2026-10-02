@@ -38,14 +38,17 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
   ]);
   if (!match) notFound();
 
-  // A player's name opens their Estadísticas: yours, or an accepted friend's (only friends can see them).
+  // A player's name opens their Estadísticas: yours, an accepted friend's (only friends can see
+  // them), or a guest's (anyone who played with them can).
   const friendUsernames = new Set(friendships.friends.map((f) => f.username));
   const statsOf = (p: (typeof match.players)[number]) =>
     p.isMe
       ? ({ href: "/profile", section: "stats" } as const)
       : p.username && friendUsernames.has(p.username)
         ? ({ href: `/friends/${p.username}`, section: "friends" } as const)
-        : null;
+        : p.isGuest
+          ? ({ href: `/guests/${p.playerId}`, section: "friends" } as const)
+          : null;
   const results = match.players.map((p) => ({ ...p, stats: statsOf(p) }));
 
   const best = Math.max(...match.players.map((p) => p.total), 0);

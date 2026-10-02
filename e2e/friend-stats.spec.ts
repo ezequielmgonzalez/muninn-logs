@@ -24,11 +24,11 @@ test("a friend's profile shows their stats, and comparing marks who does better"
   await fillScores(page, "Lola", [1, 0, 0, 0, 0, 0]);
   await saveMatch(page);
 
-  // In the match's results, a friend's name opens their Estadísticas, and yours your own. A guest has none.
+  // In the match's results, a friend's name opens their Estadísticas, and yours your own (a guest's too: guest-stats.spec.ts).
   const results = page.getByRole("list").filter({ hasText: "Lola" });
   await expect(results.getByRole("link", { name: "Beto", exact: true })).toHaveAttribute("href", `/es/friends/${betoUsername}`);
   await expect(results.getByRole("link", { name: "Ana", exact: true })).toHaveAttribute("href", "/es/profile");
-  await expect(results.getByRole("link", { name: "Lola" })).toHaveCount(0);
+  await expect(results.getByRole("link", { name: "Lola" })).toHaveAttribute("href", /^\/es\/guests\/[0-9a-f-]{36}$/);
   const matchUrl = page.url();
 
   // Beto wins a game of his own: Beto 2 games, 1 win.

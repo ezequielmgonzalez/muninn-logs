@@ -12,6 +12,7 @@ describe("sectionOf", () => {
     ["/friends/beto", "friends"],
     ["/compare", "friends"],
     ["/guests", "friends"],
+    ["/guests/9f1c", "friends"],
   ])("marks %s as %s", (path, section) => {
     expect(sectionOf(path)).toBe(section);
   });
@@ -26,7 +27,7 @@ describe("sectionOf", () => {
 
 describe("hasPlayerFilter", () => {
   it("is on the screens with stats or lists of games", () => {
-    for (const path of ["/", "/matches", "/profile", "/compare", "/friends/beto"]) expect(hasPlayerFilter(path)).toBe(true);
+    for (const path of ["/", "/matches", "/profile", "/compare", "/friends/beto", "/guests/9f1c"]) expect(hasPlayerFilter(path)).toBe(true);
     for (const path of ["/friends", "/matches/new", "/matches/2b4c", "/profile/edit", "/guests"]) expect(hasPlayerFilter(path)).toBe(false);
   });
 });

@@ -12,13 +12,13 @@ export function sectionOf(path: string): NotebookSection | undefined {
   if (MATCH_FORM.test(path)) return undefined;
   if (path === "/matches" || path.startsWith("/matches/")) return "matches";
   if (path === "/profile") return "stats";
-  if (path === "/friends" || path.startsWith("/friends/") || path === "/compare" || path === "/guests") return "friends";
+  if (["/friends", "/compare", "/guests"].includes(path) || /^\/(friends|guests)\//.test(path)) return "friends";
   return undefined;
 }
 
 /** Screens with stats or lists of games, which the player count filters. */
 export function hasPlayerFilter(path: string): boolean {
-  return ["/", "/matches", "/profile", "/compare"].includes(path) || /^\/friends\/[^/]+$/.test(path);
+  return ["/", "/matches", "/profile", "/compare"].includes(path) || /^\/(friends|guests)\/[^/]+$/.test(path);
 }
 
 /** The match form brings its own save bar on phones, in place of the tab bar. */
