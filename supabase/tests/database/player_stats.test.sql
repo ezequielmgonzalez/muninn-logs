@@ -9,7 +9,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(12);
+select plan(15);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'ana@example.com'),
@@ -84,11 +84,20 @@ select results_eq(
 
 select results_eq(
   $$ select l ->> 'slug', (l ->> 'games')::int, (l ->> 'wins')::int, (l ->> 'avg_place')::numeric,
-            (l ->> 'avg_points')::numeric, (l ->> 'avg_research')::numeric
+            (l -> 'total' ->> 'average')::numeric, (l -> 'total' ->> 'min')::int, (l -> 'total' ->> 'max')::int
      from ana_stats, jsonb_array_elements(s -> 'leaders') l $$,
-  $$ values ('captain', 2, 1, 1.50::numeric, 40.00::numeric, 8.00::numeric),
-            ('mystic', 1, 1, 1.00, 40.00, 8.00) $$,
-  'per leader she played, most played first'
+  $$ values ('captain', 2, 1, 1.50::numeric, 40.00::numeric, 30, 50),
+            ('mystic', 1, 1, 1.00, 40.00, 40, 40) $$,
+  'per leader she played, most played first, with her average, lowest and highest total'
+);
+
+select results_eq(
+  $$ select c ->> 'slug', (c ->> 'average')::numeric, (c ->> 'min')::int, (c ->> 'max')::int
+     from ana_stats, jsonb_array_elements(s -> 'leaders') l, jsonb_array_elements(l -> 'categories') c
+     where l ->> 'slug' = 'captain' $$,
+  $$ values ('research', 8.00::numeric, 6, 10), ('temple', 0, 0, 0), ('idols', 0, 0, 0),
+            ('guardians', 0, 0, 0), ('cards', 32, 24, 40), ('fear', 0, 0, 0) $$,
+  'and per category, in score sheet order: m1 and m2 with the captain'
 );
 
 select is(
@@ -122,6 +131,15 @@ select results_eq(
   'Bob''s own stats count only his matches'
 );
 
+select results_eq(
+  $$ select l ->> 'slug', (l ->> 'games')::int, (l ->> 'wins')::int, (l -> 'total' ->> 'max')::int,
+            jsonb_array_length(l -> 'categories')
+     from (select public.get_player_stats('22222222-2222-2222-2222-222222222222') as s) own,
+       jsonb_array_elements(s -> 'leaders') l $$,
+  $$ values ('falconer', 1, 0, 40, 6), (null, 1, 1, 45, 6) $$,
+  'a match without a leader (m2) gets its own entry, slug null, after the leaders'
+);
+
 set local request.jwt.claims = '{"sub": "33333333-3333-3333-3333-333333333333", "role": "authenticated"}';
 
 select throws_ok(
@@ -138,6 +156,11 @@ select results_eq(
      from (select public.get_player_stats('44444444-4444-4444-4444-444444444444') as s) own $$,
   $$ values (0, null::text, 0, 6) $$,
   'someone who never played gets zeros, no averages, and every category listed'
+);
+
+select ok(
+  has_function_privilege('authenticated', 'public.get_player_stats(uuid, text)', 'execute'),
+  'signed-in users can still call it after the new version'
 );
 
 select throws_ok(

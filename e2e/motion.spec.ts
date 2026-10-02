@@ -79,7 +79,7 @@ test("changing the leaders' order repaints every bar, top to bottom", async ({ p
   await page.goto("/es/profile");
   await page.waitForTimeout(2500);
 
-  await page.getByLabel("Ordenar por").selectOption("avgPoints");
+  await page.getByLabel("Ordenar por").selectOption("total.average");
   const bars = await page.locator('[data-brush-bar] [data-paint-layer="stroke"]').evaluateAll((els) =>
     els.map((el) => {
       const [paint] = el.getAnimations();

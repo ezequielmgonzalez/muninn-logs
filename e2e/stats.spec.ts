@@ -45,7 +45,7 @@ test("the profile shows how you play, per category and per leader", async ({ pag
   await expect(leaders.getByRole("listitem").first()).toContainText(/100\s%/);
 
   // By research the Captain also leads (10 vs 4); by average points too.
-  await page.getByLabel("Ordenar por").selectOption("avgResearch");
+  await page.getByLabel("Ordenar por").selectOption("research.average");
   await expect(leaders.getByRole("listitem").first()).toContainText("Capitán");
   await expect(leaders.getByRole("listitem").nth(1)).toContainText("4");
 });
@@ -56,4 +56,31 @@ test("the profile invites a new player to log their first game", async ({ page, 
   await expect(page.getByText("Todavía no hay partidas tuyas registradas.")).toBeVisible();
   await page.getByRole("link", { name: "Cargar partida" }).click();
   await expect(page).toHaveURL("/es/matches/new");
+});
+
+test("leaders rank by any category's average, highest or lowest, games without a leader included", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  // Research 10 and 2 with the Captain, 6 without a leader.
+  for (const [leader, research] of [["captain", 10], ["captain", 2], [null, 6]] as const) {
+    await page.goto("/es/matches/new");
+    await addGuest(page, `Rival ${research}`);
+    if (leader) await page.getByLabel("Líder de Ana").selectOption(leader);
+    await fillScores(page, "Ana", [research, 0, 0, 0, 0, 0]);
+    await fillScores(page, `Rival ${research}`, [1, 0, 0, 0, 0, 0]);
+    await saveMatch(page);
+  }
+  await page.goto("/es/profile");
+  const sort = page.getByLabel("Ordenar por");
+  const rows = page.getByRole("list").filter({ hasText: "Sin líder" }).getByRole("listitem");
+
+  await sort.selectOption({ label: "Investigación: máximo" });
+  await expect(rows.nth(0)).toContainText("Capitán");
+  await expect(rows.nth(0)).toContainText("10");
+  await expect(rows.nth(1)).toContainText("Sin líder");
+
+  await sort.selectOption({ label: "Investigación: mínimo" });
+  await expect(rows.nth(0)).toContainText("Sin líder");
+  await expect(rows.nth(0)).toContainText("6");
+  await expect(rows.nth(1)).toContainText("Capitán");
+  await expect(rows.nth(1)).toContainText("2");
 });
