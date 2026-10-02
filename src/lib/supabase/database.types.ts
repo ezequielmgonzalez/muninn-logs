@@ -284,6 +284,9 @@ isOneToOne: false
               "display_name": string,"id": string,"username": string
             }[]
                            },
+"get_guest_stats":
+{ Args: { "game_slug"?: string,"guest_id": string,"player_count"?: number }; Returns: Json
+                           },
 "get_player_stats":
 { Args: { "game_slug"?: string,"player_count"?: number,"target_user_id": string }; Returns: Json
                            },

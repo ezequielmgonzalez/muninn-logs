@@ -1,5 +1,7 @@
 import "server-only";
 
+import { z } from "zod";
+
 import { createClient } from "@/lib/supabase/server";
 
 export type OwnGuest = {
@@ -36,6 +38,22 @@ export async function listOwnGuests(myId: string): Promise<OwnGuest[]> {
       claim: claim ? { id: claim.id, friendName: claim.friend?.display_name ?? "?" } : null,
     };
   });
+}
+
+/**
+ * A guest the user can see (theirs, or one they've played with: RLS decides),
+ * or null for anyone else, a user, or an id that isn't one.
+ */
+export async function getGuest(id: string, myId: string) {
+  if (!z.uuid().safeParse(id).success) return null;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("players")
+    .select("id, name, owner_id")
+    .eq("id", id)
+    .is("user_id", null)
+    .maybeSingle();
+  return data ? { id: data.id, name: data.name ?? "?", isMine: data.owner_id === myId } : null;
 }
 
 /** Requests others sent the user: "are you this guest?". */

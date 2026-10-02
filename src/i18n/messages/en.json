@@ -235,6 +235,12 @@
     "compare": "Compare with me",
     "empty": "{name} has no logged games yet."
   },
+  "GuestProfile": {
+    "guest": "Guest",
+    "backToGuests": "Your guests",
+    "backToMatches": "Matches",
+    "empty": "No games with {name} that you can see yet."
+  },
   "Compare": {
     "title": "You vs. {names}",
     "you": "You",
