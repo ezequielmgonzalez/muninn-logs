@@ -11,6 +11,8 @@ import { CompassRose } from "./icons";
 import { LegalLinks } from "./legal-links";
 import { type NotebookSection, SideNav, TabBar } from "./navigation";
 import { NotebookPage } from "./notebook-page";
+import { ClearPendingSection } from "./page-turn";
+import { IdentitySketch } from "./sketch";
 import { SpineRings, TopSpirals } from "./rings";
 
 // Every signed-in screen is a notebook (design/components/NotebookShell.md):
@@ -43,12 +45,20 @@ export async function DiaryIdentity({ className }: { className?: string }) {
 }
 
 /** Desktop only: the loose sheet tucked under the left page, with the navigation. */
-async function Insert({ active, playerFilter }: { active?: NotebookSection; playerFilter?: ReactNode }) {
+async function Insert({
+  active,
+  playerFilter,
+  loading,
+}: {
+  active?: NotebookSection;
+  playerFilter?: ReactNode;
+  loading?: boolean;
+}) {
   return (
     <div className="absolute top-[104px] left-6 z-2 hidden h-[790px] w-[300px] origin-[80%_50%] -rotate-[1.2deg] notebook:block">
       <div aria-hidden className={cn(SHEET, "inset-0 bg-[url(/paper/page-insert.webp)] drop-shadow-[0_10px_16px_rgba(48,30,12,0.45)]")} />
       <div className="relative z-2 flex h-full flex-col pt-[60px] pb-[26px]">
-        <DiaryIdentity className="pl-[38px]" />
+        {loading ? <IdentitySketch className="pl-[38px]" /> : <DiaryIdentity className="pl-[38px]" />}
         {playerFilter && <div className="mt-3.5 pl-[38px]">{playerFilter}</div>}
         <div aria-hidden className="mt-[26px] mr-[60px] mb-5 ml-[38px] h-px bg-ink-body/22" />
         <SideNav active={active} />
@@ -74,6 +84,11 @@ type NotebookShellProps = {
   bottomBar?: ReactNode;
   /** Screens with stats or lists of games: shows "Jugadores: Todas / 2 / 3 / 4", which filters them. */
   playerFilter?: boolean;
+  /**
+   * A screen still loading (loading.tsx): the identity is sketched instead of
+   * read from the database, so this renders at once.
+   */
+  loading?: boolean;
 };
 
 export async function NotebookShell({
@@ -84,6 +99,7 @@ export async function NotebookShell({
   mobileOrder = "left-first",
   bottomBar,
   playerFilter = false,
+  loading = false,
 }: NotebookShellProps) {
   const filter = playerFilter ? <PlayerCountFilter value={await getPlayerCount()} /> : null;
   return (
@@ -106,7 +122,9 @@ export async function NotebookShell({
           )}
         />
 
-        <Insert active={active} playerFilter={filter} />
+        <Insert active={active} playerFilter={filter} loading={loading} />
+        {/* The real navigation has arrived: a section clicked before is no longer pending. */}
+        {!loading && <ClearPendingSection />}
 
         {/* Desktop pages, with their thickness: two darker copies offset 3px and 6px. */}
         <div aria-hidden className="hidden notebook:block">

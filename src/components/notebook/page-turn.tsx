@@ -1,7 +1,7 @@
 "use client";
 
 import gsap from "gsap";
-import { type ComponentProps, createContext, type MouseEvent, type ReactNode, useCallback, useContext, useRef } from "react";
+import { type ComponentProps, createContext, type MouseEvent, type ReactNode, useCallback, useContext, useEffect, useRef } from "react";
 
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
@@ -99,16 +99,35 @@ function turnAway(el: Element | null) {
   if (el?.isConnected) el.setAttribute("data-turned-away", "");
 }
 
-function restore() {
+/**
+ * After a turn: shows again whatever is still hidden. If the navigation went
+ * nowhere, the clicked section isn't pending any more either. If it went
+ * ahead, the screen may still be loading: its real navigation clears that.
+ */
+function restore(wentNowhere: boolean) {
   for (const el of document.querySelectorAll("[data-turned-away]")) el.removeAttribute("data-turned-away");
+  if (!wentNowhere) return;
   for (const el of document.querySelectorAll("[data-pending]")) el.removeAttribute("data-pending");
+  document.documentElement.removeAttribute("data-pending-section");
 }
 
-/** Paints a section in the navigation the moment it's clicked, before its screen arrives (globals.css). */
+/**
+ * Paints a section in the navigation the moment it's clicked, before its
+ * screen arrives (globals.css): the clicked links paint their stroke in, and
+ * the page root keeps the mark through the loading notebook until the next
+ * screen's navigation clears it (ClearPendingSection).
+ */
 function paintNavItem(section: NotebookSection) {
   for (const el of document.querySelectorAll(`[data-nav-item][data-section="${section}"]`)) {
     el.setAttribute("data-pending", "");
   }
+  document.documentElement.setAttribute("data-pending-section", section);
+}
+
+/** In a screen's real navigation: its section has arrived, so nothing is pending any more. */
+export function ClearPendingSection() {
+  useEffect(() => document.documentElement.removeAttribute("data-pending-section"), []);
+  return null;
 }
 
 /** The two-page notebook: the right page turns over the spine to the left, or back. */
@@ -262,7 +281,8 @@ export function PageTurnProvider({ children }: { children: ReactNode }) {
         // screen is still there, hidden: show it again once it's clear.
         const started = performance.now();
         const check = () => {
-          if (window.location.href !== startUrl || performance.now() - started > 4000) restore();
+          if (window.location.href !== startUrl) restore(false);
+          else if (performance.now() - started > 4000) restore(true);
           else requestAnimationFrame(check);
         };
         check();

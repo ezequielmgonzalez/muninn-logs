@@ -72,6 +72,15 @@ export function formError(page: Page) {
   return page.locator("p[role=alert]").filter({ visible: true });
 }
 
+/**
+ * The app's "not found" sheet: what a page shows for something that doesn't
+ * exist or isn't yours to see. (Its HTTP status is 200 once the page has
+ * started streaming its loading state, so tests check what's shown.)
+ */
+export function notFoundSheet(page: Page) {
+  return page.getByRole("heading", { level: 1, name: "Página no encontrada" });
+}
+
 /** Creates a signed-in user with a username, starting from a fresh page. */
 export async function signUp(
   page: Page,

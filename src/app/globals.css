@@ -317,30 +317,61 @@ html[data-turning] .ring-fill {
 
 /*
  * Navigation strokes: on the current section, and on a section the moment
- * it's clicked (TurnLink marks it [data-pending]), before its screen arrives;
- * meanwhile the old one steps back. Only the clicked one is painted in: the
- * next screen's navigation then has it already there.
+ * it's clicked, before its screen arrives. TurnLink marks the page root
+ * (html[data-pending-section]), so the mark outlives the loading notebook in
+ * between; the next screen's navigation clears it (ClearPendingSection).
+ * Meanwhile the old section steps back. Only the clicked link ([data-pending])
+ * paints its stroke in; the navigations after it show the stroke as it is.
  */
 [data-nav-stroke] {
   display: none;
 }
-[aria-current="page"] > [data-nav-stroke],
-[data-pending] > [data-nav-stroke] {
+[aria-current="page"] > [data-nav-stroke] {
   display: block;
 }
-[data-nav-item][data-pending] {
-  color: var(--color-band-text);
-}
-:has(> [data-nav-item][data-pending]) > [aria-current="page"]:not([data-pending]) {
+html[data-pending-section] [data-nav-item][aria-current="page"] {
   color: var(--color-ink-body);
 }
-:has(> [data-nav-item][data-pending]) > [aria-current="page"]:not([data-pending]) > [data-nav-stroke] {
+html[data-pending-section] [data-nav-item][aria-current="page"] > [data-nav-stroke] {
   display: none;
+}
+html[data-pending-section="home"] [data-nav-item][data-section="home"],
+html[data-pending-section="matches"] [data-nav-item][data-section="matches"],
+html[data-pending-section="stats"] [data-nav-item][data-section="stats"],
+html[data-pending-section="friends"] [data-nav-item][data-section="friends"] {
+  color: var(--color-band-text);
+}
+html[data-pending-section="home"] [data-nav-item][data-section="home"] > [data-nav-stroke],
+html[data-pending-section="matches"] [data-nav-item][data-section="matches"] > [data-nav-stroke],
+html[data-pending-section="stats"] [data-nav-item][data-section="stats"] > [data-nav-stroke],
+html[data-pending-section="friends"] [data-nav-item][data-section="friends"] > [data-nav-stroke] {
+  display: block;
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-pending] > [data-nav-stroke] {
     animation: paint-in 450ms var(--ease-brush) backwards;
   }
+}
+
+/*
+ * Loading: the notebook with its content sketched in faint ink, gently
+ * pulsing, while a screen's data arrives (loading.tsx). And while the player
+ * filter reloads a screen (PlayerCountFilter), its pages fade back.
+ */
+@keyframes sketch-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+@utility sketch {
+  background: color-mix(in srgb, var(--ink-body) 9%, transparent);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: sketch-pulse 1.6s ease-in-out infinite;
+  }
+}
+html[data-refreshing] [data-page] {
+  opacity: 0.45;
+  transition: opacity 200ms ease-out;
 }
 
 /* Type styles (design/tokens.json "type"). Display (Cinzel) is only for text

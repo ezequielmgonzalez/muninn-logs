@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useId, useTransition } from "react";
+import { useEffect, useId, useTransition } from "react";
 
 import { NativeSelect } from "@/components/notebook/native-select";
 import { useRouter } from "@/i18n/navigation";
@@ -16,9 +16,17 @@ import { PLAYER_COUNT_COOKIE, PLAYER_COUNTS, type PlayerCount } from "./options"
  */
 export function PlayerCountFilter({ value, className }: { value: PlayerCount | null; className?: string }) {
   const t = useTranslations("PlayerCount");
+  const tLoading = useTranslations("Loading");
   const id = useId();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+
+  // While the screen reloads, its pages fade back (globals.css), so it never looks frozen.
+  useEffect(() => {
+    if (!pending) return;
+    document.documentElement.setAttribute("data-refreshing", "");
+    return () => document.documentElement.removeAttribute("data-refreshing");
+  }, [pending]);
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -47,6 +55,11 @@ export function PlayerCountFilter({ value, className }: { value: PlayerCount | n
           </option>
         ))}
       </NativeSelect>
+      {pending && (
+        <span role="status" className="type-caption animate-pulse text-ink-muted motion-reduce:animate-none">
+          {tLoading("label")}
+        </span>
+      )}
     </div>
   );
 }
