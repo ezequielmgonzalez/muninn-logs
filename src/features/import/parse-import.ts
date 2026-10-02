@@ -54,7 +54,9 @@ const HEADERS: Record<Column, string[]> = {
   duration: ["duracion", "minutos", "duration", "minutes"],
 };
 
-const REQUIRED: Column[] = ["game", "player", ...ARNAK_SCORE_CATEGORIES];
+// Scores are optional: an empty cell, or a missing column, is 0 points (as
+// on a score pad, and in the match form).
+const REQUIRED: Column[] = ["game", "player"];
 
 const YES = new Set(["x", "si", "s", "yes", "y", "true", "1"]);
 const NO = new Set(["", "no", "n", "false", "0"]);
@@ -104,7 +106,6 @@ export type ImportIssue =
   | { code: "missingGame"; row: number }
   | { code: "missingPlayer"; row: number }
   | { code: "nameTooLong"; row: number; max: number }
-  | { code: "missingNumber"; row: number; column: string }
   | { code: "invalidNumber"; row: number; column: string; value: string }
   | { code: "unknownLeader"; row: number; value: string }
   | { code: "invalidDate"; row: number; value: string }
@@ -261,10 +262,9 @@ export function parseImport(text: string, leaders: Map<string, ArnakLeader>): Im
     for (const category of ARNAK_SCORE_CATEGORIES) {
       const raw = cell(category);
       // Fear may be written as on the score pad (-2) or as a card count (2).
-      const value = category === "fear" ? parseWhole(raw, -999, 999) : parseWhole(raw, 0, 999);
+      const value = raw === "" ? 0 : category === "fear" ? parseWhole(raw, -999, 999) : parseWhole(raw, 0, 999);
       if (value === undefined) {
-        const column = headerText.get(category)!;
-        rowIssue(raw === "" ? { code: "missingNumber", row, column } : { code: "invalidNumber", row, column, value: raw });
+        rowIssue({ code: "invalidNumber", row, column: headerText.get(category)!, value: raw });
         scores[category] = 0;
       } else scores[category] = Math.abs(value);
     }
