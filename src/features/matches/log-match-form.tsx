@@ -12,10 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  ARNAK_BOARD_SIDES,
   ARNAK_CATEGORY_TONES,
   ARNAK_LEADER_STYLES,
   ARNAK_LEADERS,
   ARNAK_SCORE_CATEGORIES,
+  type ArnakBoardSide,
   type ArnakLeader,
   type ArnakScoreCategory,
 } from "@/games/arnak";
@@ -51,7 +53,7 @@ export type FormPlayer = {
 export type InitialMatch = {
   matchId: string;
   playedOn: string;
-  boardSide: "bird" | "snake" | null;
+  boardSide: ArnakBoardSide | null;
   durationMinutes: number | null;
   players: FormPlayer[];
   tiebreakKey: string | null;
@@ -108,7 +110,7 @@ export function LogMatchForm({
     () => initial?.players ?? (me ? [fromAddable(me)] : []),
   );
   const [playedOn, setPlayedOn] = useState(initial?.playedOn ?? "");
-  const [boardSide, setBoardSide] = useState<"bird" | "snake" | null>(initial?.boardSide ?? null);
+  const [boardSide, setBoardSide] = useState<ArnakBoardSide | null>(initial?.boardSide ?? null);
   const [duration, setDuration] = useState(initial?.durationMinutes?.toString() ?? "");
   const [tiebreakKey, setTiebreakKey] = useState<string | null>(initial?.tiebreakKey ?? null);
 
@@ -208,7 +210,7 @@ export function LogMatchForm({
               {t("boardSide")}
             </p>
             <div role="group" aria-labelledby="board-side" className="grid grid-cols-3 gap-2.5">
-              {([null, "bird", "snake"] as const).map((side) => (
+              {[null, ...ARNAK_BOARD_SIDES].map((side) => (
                 <BrushToggle key={side ?? "none"} pressed={boardSide === side} onClick={() => setBoardSide(side)}>
                   {side ? t(side) : t("notRecorded")}
                 </BrushToggle>

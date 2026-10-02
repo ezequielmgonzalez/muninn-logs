@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES, ARNAK_SLUG } from "@/games/arnak";
+import { ARNAK_BOARD_SIDES, ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES, ARNAK_SLUG } from "@/games/arnak";
 
 // What the match form submits (as JSON), and its translation into the
 // payload of the log_match() database function.
@@ -31,7 +31,7 @@ export const logMatchSchema = z
   .object({
     /** Optional: games logged long after (e.g. from old score pads) may have no date. */
     playedOn: z.iso.date().nullable(),
-    boardSide: z.enum(["bird", "snake"]).nullable(),
+    boardSide: z.enum(ARNAK_BOARD_SIDES).nullable(),
     durationMinutes: z.number().int().min(1).max(1440).nullable(),
     // Arnak without the solo mode: 2 to 4 players, in turn order.
     players: z.array(playerSchema).min(2).max(4),

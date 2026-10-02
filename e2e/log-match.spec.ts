@@ -103,3 +103,13 @@ test("a game can be logged without a date", async ({ page, request }) => {
   await page.goto("/es/matches");
   await expect(page.getByRole("link", { name: /Sin fecha/ })).toBeVisible();
 });
+
+test("the board can be any of Arnak's temples", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await page.goto("/es/matches/new");
+  await addGuest(page, "Jessi");
+  await page.getByRole("button", { name: "Cascada" }).click();
+  await expect(page.getByRole("button", { name: "Cascada" })).toHaveAttribute("aria-pressed", "true");
+  await saveMatch(page);
+  await expect(page.getByText("Cascada")).toBeVisible();
+});

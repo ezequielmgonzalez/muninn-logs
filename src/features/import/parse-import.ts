@@ -1,5 +1,11 @@
 import { type ScoreEntries, tiedForFirst, total } from "@/features/matches/scoring";
-import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES, type ArnakLeader, type ArnakScoreCategory } from "@/games/arnak";
+import {
+  ARNAK_LEADERS,
+  ARNAK_SCORE_CATEGORIES,
+  type ArnakBoardSide,
+  type ArnakLeader,
+  type ArnakScoreCategory,
+} from "@/games/arnak";
 
 import { parseCsv } from "./csv";
 
@@ -46,12 +52,21 @@ const REQUIRED: Column[] = ["game", "player", ...ARNAK_SCORE_CATEGORIES];
 
 const YES = new Set(["x", "si", "s", "yes", "y", "true", "1"]);
 const NO = new Set(["", "no", "n", "false", "0"]);
-const BOARD_SIDES: Record<string, "bird" | "snake"> = {
+/** Board sides by their Spanish or English name (accents and a plural "s" ignored). */
+const BOARD_SIDES: Record<string, ArnakBoardSide> = {
   pajaro: "bird",
   ave: "bird",
   bird: "bird",
   serpiente: "snake",
   snake: "snake",
+  cascada: "waterfall",
+  waterfall: "waterfall",
+  arbol: "tree",
+  tree: "tree",
+  mono: "monkey",
+  monkey: "monkey",
+  lagarto: "lizard",
+  lizard: "lizard",
 };
 
 export type ImportedPlayer = {
@@ -66,7 +81,7 @@ export type ImportedGame = {
   /** The "partida" value, e.g. "12". */
   label: string;
   playedOn: string | null;
-  boardSide: "bird" | "snake" | null;
+  boardSide: ArnakBoardSide | null;
   durationMinutes: number | null;
   /** In turn order: the order of their rows. */
   players: ImportedPlayer[];

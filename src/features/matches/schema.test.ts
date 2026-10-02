@@ -23,6 +23,14 @@ describe("logMatchSchema", () => {
     expect(result.data?.players[1].newGuestName).toBe("Jessi");
   });
 
+  it.each(["waterfall", "tree", "monkey", "lizard"])("accepts the %s board side", (side) => {
+    expect(logMatchSchema.safeParse(match([player({ playerId: ana }), player({ playerId: bob })], { boardSide: side })).success).toBe(true);
+  });
+
+  it("rejects an unknown board side", () => {
+    expect(logMatchSchema.safeParse(match([player({ playerId: ana }), player({ playerId: bob })], { boardSide: "volcano" })).success).toBe(false);
+  });
+
   it("accepts a game without a date", () => {
     expect(logMatchSchema.safeParse(match([player({ playerId: ana }), player({ playerId: bob })], { playedOn: null })).success).toBe(true);
   });

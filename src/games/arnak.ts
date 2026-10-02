@@ -28,7 +28,15 @@ export const ARNAK_SCORE_CATEGORIES = [
   "fear", // Stored negative.
 ] as const;
 
+/**
+ * The temple the board was set up with (setup.board_side). Not in the
+ * database's catalog: it's per-match setup, validated by the match schema.
+ * Labels live in the messages under LogMatch.
+ */
+export const ARNAK_BOARD_SIDES = ["bird", "snake", "waterfall", "tree", "monkey", "lizard"] as const;
+
 export type ArnakLeader = (typeof ARNAK_LEADERS)[number];
+export type ArnakBoardSide = (typeof ARNAK_BOARD_SIDES)[number];
 export type ArnakScoreCategory = (typeof ARNAK_SCORE_CATEGORIES)[number];
 
 /**
