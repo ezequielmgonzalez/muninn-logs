@@ -9,7 +9,7 @@ describe("NativeSelect", () => {
       <>
         <label htmlFor="leader">Líder</label>
         <NativeSelect id="leader" defaultValue="mystic" className="flex-1">
-          <option value="">Sin líder</option>
+          <option value="">Sin especificar</option>
           <option value="mystic">Místico</option>
         </NativeSelect>
       </>,
