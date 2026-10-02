@@ -6,7 +6,7 @@ import { Slot } from "radix-ui"
 import { inkButtonVariants } from "@/components/notebook/ink-button"
 
 // Restyled for the v3 notebook (design/components/InkButton.md): the default
-// variant is the ink stroke; there are no boxed or grey buttons, so outline,
+// variant is the ink button, a box drawn in pen; there are no grey buttons, so outline,
 // secondary and ghost are a line or plain text, and link is underlined.
 const buttonVariants = cva(
   "group/button relative isolate inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-none border-0 bg-transparent text-[15px] whitespace-nowrap transition-colors outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze disabled:cursor-not-allowed aria-disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",

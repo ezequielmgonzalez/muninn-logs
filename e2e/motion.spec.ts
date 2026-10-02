@@ -122,3 +122,21 @@ test("a new player count repaints every bar, keeping the leaders' order", async 
   expect(painting.filter(Boolean).length).toBeGreaterThan(0);
   await expect(page.getByLabel("Ordenar por")).toHaveValue("total.average");
 });
+
+test("a picked option is circled in pen, drawn around it, and only that one", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/es/matches/new");
+  const serpent = page.getByRole("button", { name: "Serpiente" });
+  await serpent.click();
+  await expect(serpent).toHaveAttribute("aria-pressed", "true");
+  const circle = serpent.locator("[data-pen-circle]");
+  expect(await circle.evaluate((el) => getComputedStyle(el).animationName)).toBe("pen-draw");
+  // The option before it isn't circled any more.
+  await expect(page.locator("[aria-pressed] [data-pen-circle]")).toHaveCount(2); // the board side, and the turn order
+  await expect(page.getByRole("button", { name: "Sin registrar" }).first().locator("[data-pen-circle]")).toHaveCount(0);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.getByRole("button", { name: "Pájaro" }).click();
+  expect(await page.getByRole("button", { name: "Pájaro" }).locator("[data-pen-circle]").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+});

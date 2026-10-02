@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { InkButton } from "@/components/notebook/ink-button";
 import { NotebookPage } from "@/components/notebook/notebook-page";
 import { BrushBar, PaintedBand, PLAYER_TONES } from "@/components/notebook/painted-band";
+import { PenCircle } from "@/components/notebook/pen-circle";
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
 import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
 import { NativeSelect } from "@/components/notebook/native-select";
@@ -87,7 +88,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
               .map((f) => (
                 <label
                   key={f.id}
-                  className="group relative inline-flex h-10 cursor-pointer items-center border-b-[1.5px] border-ink-body/30 px-4 text-[15px] text-ink-body has-checked:border-transparent has-checked:text-band-text has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-bronze"
+                  className="group relative inline-flex h-10 cursor-pointer items-center border-b-[1.5px] border-ink-body/30 px-4 text-[15px] text-ink-body has-checked:border-transparent has-checked:font-semibold has-checked:text-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-bronze"
                 >
                   <input
                     type="checkbox"
@@ -96,7 +97,8 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
                     defaultChecked={chosen.some((c) => c.id === f.id)}
                     className="peer sr-only"
                   />
-                  <span aria-hidden className="ink ink--tab paint-in -inset-x-1.5 -inset-y-1 hidden bg-ink peer-checked:block" />
+                  {/* Picked: circled in pen. */}
+                  <PenCircle className="inset-x-0.5 -inset-y-0.5 hidden peer-checked:block" />
                   <span className="relative z-2">{f.display_name}</span>
                 </label>
               ))}

@@ -6,7 +6,7 @@ Esta es la **versión 3** de la dirección visual ("cuaderno de campo"). Reempla
 
 ## La idea en una frase
 
-Todo lo que es **acento** (títulos, selección, barras de datos, el botón principal) es una **pincelada de tinta**; todo lo que es **superficie** es **papel** dentro de un **cuaderno**. Nada de rectángulos con borde y esquinas redondeadas como contenedores.
+Todo lo que es **acento** (títulos, la sección actual, barras de datos) es una **pincelada de tinta**; lo que se toca (botones, opciones elegidas) se dibuja con **pluma**: una caja a mano alzada, un círculo alrededor de lo elegido; todo lo que es **superficie** es **papel** dentro de un **cuaderno**. Nada de rectángulos con borde y esquinas redondeadas como contenedores.
 
 ## El cuaderno: la estructura de cada pantalla
 
@@ -51,15 +51,15 @@ Cada acento es un `div` con `background-color` y una **máscara PNG** de pincel 
 
 | Máscara | Proporción | Uso | Capa de tinta |
 | --- | --- | --- | --- |
-| `brush-band-1.png`, `brush-band-2.png` | 6,5 : 1, ambos extremos secos | Títulos de sección (y el botón de tinta) | `inset: -12px -26px` (escritorio), `-11px -18px` (celular) |
+| `brush-band-1.png`, `brush-band-2.png` | 6,5 : 1, ambos extremos secos | Títulos de sección | `inset: -12px -26px` (escritorio), `-11px -18px` (celular) |
 | `brush-sweep-in.png` | 8 : 1, cuerpo sólido y cola larga | Ítem activo de la navegación del separador | `left: 12px; right: 34px; top/bottom: -12px` |
-| `brush-tab.png` | 1,4 : 1, compacta | Pestaña activa de la barra inferior, opción elegida de un selector, chip elegido | `inset: 2px -2px` (pestaña), `-3px -6px` (selector) |
+| `brush-tab.png` | 1,4 : 1, compacta | Pestaña activa de la barra inferior | `inset: 2px -2px` (pestaña), `-3px -6px` (selector) |
 | `ink-blot.png` | círculo | Botón **Cargar** de la barra inferior | `inset: -4px` sobre un círculo de 62 px |
 | `brush-bar-1…4.png` | 20 : 1, cola seca corta (~7 %) | Barras de valor | `inset: -6px 0` sobre una barra de 18 px (15 px en celular) |
 
 Reglas:
 
-- **Seleccionado = pintado.** Toda selección (navegación, pestaña, selector, chip) se marca con una pincelada de tinta y el texto pasa a `band-text`. No hay otro estilo de "activo".
+- **Seleccionado = marcado a mano.** La sección actual (navegación, pestaña) se pinta con una pincelada y el texto pasa a `band-text`. Una opción elegida (selector, chip) se encierra en un círculo de pluma (`public/pen/pen-circle.svg`) y el texto queda en tinta, en 600. No hay otro estilo de "activo".
 - **Las barras alternan** las 4 variantes (`i % 4`) para que no se vean idénticas. El ancho del contenedor es el valor; la cola seca es corta para no exagerar el dato. Un valor 0 no lleva barra: lleva una línea `hairline` al 18 %.
 - **Variedad en los títulos:** alternar `band-1` y `band-2`, y espejar con `transform: scaleX(-1)` en la capa de tinta (nunca en el texto).
 - **El texto va siempre encima de la tinta** (`z-index: 2`), sobre la parte sólida del trazo. No hay texto encima de la cola seca.
@@ -96,7 +96,7 @@ Un solo tema, **Cuaderno**. No hay tema oscuro todavía (ver Preguntas abiertas)
 
 ## Tipografía
 
-- **Display — Cinzel** (600/700): todo texto sobre una pincelada (mayúsculas, `letter-spacing: 0.14em`), el nombre del diario, los botones de tinta y las etiquetas chicas de turno.
+- **Display — Cinzel** (600/700): todo texto sobre una pincelada (mayúsculas, `letter-spacing: 0.14em`), el nombre del diario, los botones y las etiquetas chicas de turno.
 - **Body — Spectral** (400–700, itálica): todo lo demás, incluidos los números. Las aclaraciones y textos de ayuda van en itálica `ink-muted`.
 
 Nunca Cinzel para un número de dato, ni Spectral en mayúsculas dentro de una pincelada.
@@ -110,7 +110,7 @@ Nunca Cinzel para un número de dato, ni Spectral en mayúsculas dentro de una p
 
 ## Formularios
 
-Se escribe sobre la línea, como en un cuaderno: los campos no son cajas, son una línea inferior (`1.5px`, `ink-body` al 45 %) que pasa a `bronze` con el foco. Etiqueta en Spectral 600, ayuda en itálica debajo. Los selectores de pocas opciones (lado del tablero) y los chips (amigos a comparar) se marcan con la pincelada `brush-tab`. Los desplegables y buscadores abren un panel `surface-pop` con `shadow-pop`. Ver `components/FormFields`.
+Se escribe sobre la línea, como en un cuaderno: los campos no son cajas, son una línea inferior (`1.5px`, `ink-body` al 45 %) que pasa a `bronze` con el foco. Etiqueta en Spectral 600, ayuda en itálica debajo. Los selectores de pocas opciones (lado del tablero, orden de turnos) y los chips (amigos a comparar) encierran la opción elegida en un círculo de pluma. Los desplegables y buscadores abren un panel `surface-pop` con `shadow-pop`. Ver `components/FormFields`.
 
 ## Iconografía
 
@@ -135,7 +135,7 @@ En celular, Amigos muestra primero "Tus amigos" y después "Agregar amigo".
 
 - El texto sobre tinta (`band-text` sobre `ink`) siempre sobre la parte sólida del trazo; el contraste es > 12:1.
 - Cada barra lleva su nombre y su valor como texto; el color nunca es la única señal. El mejor valor de la comparativa va en negrita además del punto de bronce.
-- Controles reales: `<a>` para navegar, `<button>` para acciones, `<input>`/`<select>` con `<label>`. La selección se comunica con `aria-current="page"` (navegación) y `aria-pressed` (selectores y chips), no solo con la pincelada.
+- Controles reales: `<a>` para navegar, `<button>` para acciones, `<input>`/`<select>` con `<label>`. La selección se comunica con `aria-current="page"` (navegación) y `aria-pressed` (selectores y chips), no solo con la pincelada o el círculo.
 - Áreas táctiles de 44 px mínimo en celular (pestañas, opciones, botones de turno).
 
 ## Archivos

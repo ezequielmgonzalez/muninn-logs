@@ -8,7 +8,7 @@ Campos para escribir en el cuaderno: se escribe sobre una línea, no dentro de u
 
 ## Selector de pocas opciones (lado del tablero)
 
-- Grilla de 3 botones de 44 px con `aria-pressed`. Sin elegir: texto sobre una línea al 30 %. Elegido: pincelada `brush-tab.png` (`inset: -3px -6px`) y texto `band-text`.
+- Grilla de 3 botones de 44 px con `aria-pressed`. Sin elegir: texto sobre una línea al 30 %. Elegido: la palabra encerrada en un círculo de pluma (`pen-circle.svg`, `inset: -8px -14px`, trazo de 1,8 px que no se estira) que se dibuja alrededor en 420 ms; texto `ink` en 600, sin la línea.
 - Mismo patrón para los **chips** de amigos a comparar (40 px, ancho según el nombre).
 
 ## Buscador de jugadores (combobox)
