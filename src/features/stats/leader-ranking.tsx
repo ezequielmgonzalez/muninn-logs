@@ -50,7 +50,8 @@ export function LeaderRanking({ leaders }: { leaders: LeaderStats[] }) {
               ))}
             </NativeSelect>
           </div>
-          <ol className="flex flex-col gap-[13px] notebook:gap-[15px]">
+          {/* A new order repaints every bar, top to bottom. */}
+          <ol key={metric} className="flex flex-col gap-[13px] notebook:gap-[15px]">
             {ranked.map(({ leader, value, bar }, i) => {
               const style = ARNAK_LEADER_STYLES[leader.slug];
               return (

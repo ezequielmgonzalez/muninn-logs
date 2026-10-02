@@ -3,7 +3,7 @@ import { Fragment } from "react";
 
 import { CrownIcon } from "@/components/notebook/icons";
 import { ARNAK_LEADER_STYLES } from "@/games/arnak";
-import { Link } from "@/i18n/navigation";
+import { TurnLink } from "@/components/notebook/page-turn";
 
 import { playedOnDate } from "./format";
 import type { MatchSummary } from "./queries";
@@ -23,8 +23,9 @@ export async function MatchList({ matches }: { matches: MatchSummary[] }) {
         const me = match.players.find((p) => p.isMe);
         return (
           <li key={match.id} className="border-b border-ink-body/14 last:border-b-0">
-            <Link
+            <TurnLink
               href={`/matches/${match.id}`}
+              direction="forward"
               className="flex flex-col pt-3.5 pb-[13px] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bronze"
             >
               <span className="flex items-baseline justify-between gap-3">
@@ -60,7 +61,7 @@ export async function MatchList({ matches }: { matches: MatchSummary[] }) {
                   </Fragment>
                 ))}
               </span>
-            </Link>
+            </TurnLink>
           </li>
         );
       })}

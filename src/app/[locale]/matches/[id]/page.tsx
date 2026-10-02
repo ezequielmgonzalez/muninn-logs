@@ -7,11 +7,12 @@ import { InkButton } from "@/components/notebook/ink-button";
 import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { BrushBar, PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { DeleteMatch } from "@/features/matches/delete-match";
 import { playedOnDate } from "@/features/matches/format";
 import { getMatch } from "@/features/matches/queries";
 import { ARNAK_CATEGORY_TONES, ARNAK_LEADER_STYLES, ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function MatchPage({ params, searchParams }: PageProps<"/[locale]/matches/[id]">) {
@@ -92,7 +93,9 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
       {/* At the end, so the date's band lines up with the right page's. */}
       <p className="mt-8.5">
         <Button asChild variant="link">
-          <Link href="/matches">← {t("allMatches")}</Link>
+          <TurnLink href="/matches" direction="backward" section="matches">
+            ← {t("allMatches")}
+          </TurnLink>
         </Button>
       </p>
     </>
@@ -156,7 +159,9 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
       {match.loggedByMe && (
         <div className="mt-11 flex flex-col gap-5">
           <InkButton asChild>
-            <Link href={`/matches/${match.id}/edit`}>{t("edit")}</Link>
+            <TurnLink href={`/matches/${match.id}/edit`} direction="forward">
+              {t("edit")}
+            </TurnLink>
           </InkButton>
           <DeleteMatch matchId={match.id} />
         </div>

@@ -49,7 +49,9 @@ export function PaintedBand({
           aria-hidden
           data-paint-layer="stroke"
           className={cn(
-            "ink paint-in -inset-x-[18px] -inset-y-[11px] bg-ink notebook:-inset-x-[26px] notebook:-inset-y-[12px]",
+            // Painted first and quickly: what follows the title waits for it (enter-stagger).
+            "ink paint-in [--paint-duration:480ms] [--paint-start:40ms]",
+            "-inset-x-[18px] -inset-y-[11px] bg-ink notebook:-inset-x-[26px] notebook:-inset-y-[12px]",
             variant === 1 ? "ink--band1" : "ink--band2",
             flip && "-scale-x-100",
           )}
@@ -100,11 +102,7 @@ export function BrushBar({ value, tone, index = 0, size = "default", order = ind
       {percent === 0 ? (
         <div data-paint-layer="hairline" className="absolute inset-x-0 top-1/2 h-px bg-hairline/18" />
       ) : (
-        // A new value (e.g. re-sorting a ranking) slides to its width.
-        <div
-          className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-out motion-reduce:transition-none"
-          style={{ width: `${percent}%` }}
-        >
+        <div className="absolute inset-y-0 left-0" style={{ width: `${percent}%` }}>
           <div
             data-paint-layer="stroke"
             className={cn(

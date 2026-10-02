@@ -7,6 +7,7 @@ import { DiaryIdentity, NotebookShell } from "@/components/notebook/notebook-she
 import { BrushBar, PaintedBand } from "@/components/notebook/painted-band";
 import { PaperSheet } from "@/components/notebook/paper-sheet";
 import { Button } from "@/components/ui/button";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { signOut } from "@/features/auth/actions";
 import { countIncomingRequests } from "@/features/friends/queries";
 import { listReceivedClaims } from "@/features/guests/queries";
@@ -89,7 +90,9 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
             </dl>
             <p className="mt-5.5 flex justify-end">
               <Button asChild variant="link">
-                <Link href="/profile">{t("seeStats")} →</Link>
+                <TurnLink href="/profile" direction="forward" section="stats">
+                  {t("seeStats")} →
+                </TurnLink>
               </Button>
             </p>
           </>
@@ -141,7 +144,9 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       {incomingRequests > 0 && (
         <p className="mb-8 text-center">
           <Button asChild variant="link">
-            <Link href="/friends">{t("pendingRequests", { count: incomingRequests })} →</Link>
+            <TurnLink href="/friends" direction="forward" section="friends">
+              {t("pendingRequests", { count: incomingRequests })} →
+            </TurnLink>
           </Button>
         </p>
       )}
@@ -153,7 +158,9 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
           </div>
           <p className="mt-[18px] flex justify-end">
             <Button asChild variant="link">
-              <Link href="/matches">{t("seeAllMatches")} →</Link>
+              <TurnLink href="/matches" direction="forward" section="matches">
+                {t("seeAllMatches")} →
+              </TurnLink>
             </Button>
           </p>
         </section>
@@ -163,16 +170,22 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       <nav aria-label={t("account")} className="mt-11 flex flex-col items-center gap-3 text-sm">
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/profile/edit">{tEdit("link")}</Link>
+            <TurnLink href="/profile/edit" direction="forward">
+              {tEdit("link")}
+            </TurnLink>
           </Button>
           {admin && (
             <Button asChild variant="ghost" size="sm">
-              <Link href="/admin/guests">{tAdmin("link")}</Link>
+              <TurnLink href="/admin/guests" direction="forward">
+                {tAdmin("link")}
+              </TurnLink>
             </Button>
           )}
           {admin && (
             <Button asChild variant="ghost" size="sm">
-              <Link href="/admin/import">{tImport("link")}</Link>
+              <TurnLink href="/admin/import" direction="forward">
+                {tImport("link")}
+              </TurnLink>
             </Button>
           )}
           <form action={signOut}>

@@ -3,8 +3,9 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { ProfileForm } from "@/features/auth/profile-form";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function EditProfilePage() {
@@ -31,7 +32,9 @@ export default async function EditProfilePage() {
           />
           <p className="mt-11 flex justify-center">
             <Button asChild variant="destructive">
-              <Link href="/account/delete">{tDelete("link")}</Link>
+              <TurnLink href="/account/delete" direction="forward">
+                {tDelete("link")}
+              </TurnLink>
             </Button>
           </p>
         </>
