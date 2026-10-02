@@ -15,6 +15,8 @@ const idle: SignInState = { status: "idle" };
 
 type LoginFormProps = {
   googleEnabled: boolean;
+  /** An emailed code (everywhere but production; see signInMethods). */
+  emailEnabled: boolean;
   oauthError: boolean;
 };
 
@@ -32,6 +34,7 @@ export function LoginForm(props: LoginFormProps) {
 
 function LoginSteps({
   googleEnabled,
+  emailEnabled,
   oauthError,
   onReset,
 }: LoginFormProps & { onReset: () => void }) {
@@ -89,6 +92,22 @@ function LoginSteps({
   }
 
   const error = oauthError || googleError ? "oauth" : sendState.status === "error" ? sendState.error : null;
+
+  // Production: Google is the one way in, so it's the sheet's main action.
+  if (!emailEnabled) {
+    return (
+      <div className="flex flex-col gap-5.5">
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {t(`errors.${error}`)}
+          </p>
+        )}
+        <InkButton type="button" className="mt-2" onClick={signInWithGoogle}>
+          {t("continueWithGoogle")}
+        </InkButton>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5.5">

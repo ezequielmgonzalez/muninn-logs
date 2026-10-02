@@ -49,8 +49,10 @@
       "invalidCode": "El código es incorrecto o venció. Pedí uno nuevo si hace falta.",
       "rateLimited": "Pediste demasiados códigos. Esperá un momento y probá de nuevo.",
       "oauth": "No pudimos iniciar sesión con Google. Probá de nuevo.",
-      "generic": "Algo salió mal. Probá de nuevo."
-    }
+      "generic": "Algo salió mal. Probá de nuevo.",
+      "emailDisabled": "Iniciá sesión con Google."
+    },
+    "descriptionGoogle": "Entrá con tu cuenta de Google. Si es tu primera vez, se crea tu cuenta."
   },
   "Onboarding": {
     "title": "Elegí tu nombre de usuario",
