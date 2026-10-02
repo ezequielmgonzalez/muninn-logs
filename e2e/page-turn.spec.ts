@@ -50,8 +50,11 @@ test("a clicked section is painted at once, and a sketched notebook shows until 
     if (!route.request().headers()["next-router-prefetch"]) await new Promise((resolve) => setTimeout(resolve, 2000));
     await route.continue();
   });
+  // Next prefetches the loading state of links on screen (in a few requests);
+  // let them all finish, as they would have before anyone clicked.
   await page.goto("/es");
   await expect(page.getByRole("heading", { name: "Tu resumen" })).toBeVisible();
+  await page.waitForLoadState("networkidle");
   const nav = page.getByRole("navigation", { name: "Secciones" }).filter({ visible: true });
   const stroke = (name: string) =>
     nav.getByRole("link", { name, exact: true }).locator("[data-nav-stroke]").evaluate((el) => getComputedStyle(el).display);
