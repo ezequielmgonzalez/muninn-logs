@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
+import { PlayerCountFilter } from "@/features/player-count/player-count-filter";
+import { getPlayerCount } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { getCurrentProfile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -41,12 +43,13 @@ export async function DiaryIdentity({ className }: { className?: string }) {
 }
 
 /** Desktop only: the loose sheet tucked under the left page, with the navigation. */
-async function Insert({ active }: { active?: NotebookSection }) {
+async function Insert({ active, playerFilter }: { active?: NotebookSection; playerFilter?: ReactNode }) {
   return (
     <div className="absolute top-[104px] left-6 z-2 hidden h-[790px] w-[300px] origin-[80%_50%] -rotate-[1.2deg] notebook:block">
       <div aria-hidden className={cn(SHEET, "inset-0 bg-[url(/paper/page-insert.webp)] drop-shadow-[0_10px_16px_rgba(48,30,12,0.45)]")} />
       <div className="relative z-2 flex h-full flex-col pt-[60px] pb-[26px]">
         <DiaryIdentity className="pl-[38px]" />
+        {playerFilter && <div className="mt-3.5 pl-[38px]">{playerFilter}</div>}
         <div aria-hidden className="mt-[26px] mr-[60px] mb-5 ml-[38px] h-px bg-ink-body/22" />
         <SideNav active={active} />
         <div className="mt-auto pl-[70px]">
@@ -69,6 +72,8 @@ type NotebookShellProps = {
   mobileOrder?: "left-first" | "right-first";
   /** Replaces the phone's tab bar; null for none (a screen with its own bar, like the save bar). */
   bottomBar?: ReactNode;
+  /** Screens with stats or lists of games: shows "Jugadores: Todas / 2 / 3 / 4", which filters them. */
+  playerFilter?: boolean;
 };
 
 export async function NotebookShell({
@@ -78,7 +83,9 @@ export async function NotebookShell({
   children,
   mobileOrder = "left-first",
   bottomBar,
+  playerFilter = false,
 }: NotebookShellProps) {
+  const filter = playerFilter ? <PlayerCountFilter value={await getPlayerCount()} /> : null;
   return (
     <div
       data-notebook
@@ -99,7 +106,7 @@ export async function NotebookShell({
           )}
         />
 
-        <Insert active={active} />
+        <Insert active={active} playerFilter={filter} />
 
         {/* Desktop pages, with their thickness: two darker copies offset 3px and 6px. */}
         <div aria-hidden className="hidden notebook:block">
@@ -131,6 +138,8 @@ export async function NotebookShell({
               "notebook:absolute notebook:top-[46px] notebook:left-[290px] notebook:h-[908px] notebook:w-[948px] notebook:flex-row notebook:gap-6 notebook:p-0",
             )}
           >
+            {/* Phones: the player filter opens the page. */}
+            {filter && <div className="order-first -mb-5 flex justify-end notebook:hidden">{filter}</div>}
             {children ?? (
               <>
                 <NotebookPage side="left" order={mobileOrder === "right-first" ? 2 : undefined}>

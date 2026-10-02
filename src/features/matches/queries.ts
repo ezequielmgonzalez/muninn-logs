@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { PlayerCount } from "@/features/player-count/options";
 import { ARNAK_BOARD_SIDES, type ArnakBoardSide, type ArnakLeader, type ArnakScoreCategory } from "@/games/arnak";
 import { createClient } from "@/lib/supabase/server";
 
@@ -104,11 +105,12 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
 }
 
 /** The user's most recent matches, newest first. */
-export async function listMatches(limit = 50): Promise<MatchSummary[]> {
+/** The newest matches, optionally only those of that many players (player_count, a computed field). */
+export async function listMatches(limit = 50, players: PlayerCount | null = null): Promise<MatchSummary[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("matches")
-    .select(MATCH_COLUMNS)
+  let query = supabase.from("matches").select(MATCH_COLUMNS);
+  if (players) query = query.eq("player_count", players);
+  const { data, error } = await query
     .order("played_on", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
     .limit(limit);

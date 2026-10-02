@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { z } from "zod";
 
+import type { PlayerCount } from "@/features/player-count/options";
 import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { createClient } from "@/lib/supabase/server";
 
@@ -35,12 +36,16 @@ export type ComparableStats = Omit<PlayerStats, "leaders">;
 export type LeaderStats = PlayerStats["leaders"][number];
 
 /**
- * Arnak stats for the user or one of their friends (the database enforces who).
- * Cached per request: the notebook shell counts the user's games with it too.
+ * Arnak stats for the user or one of their friends (the database enforces who),
+ * from their games of that many players or all of them. Cached per request:
+ * the notebook shell counts the user's games with it too.
  */
-export const getPlayerStats = cache(async (userId: string): Promise<PlayerStats> => {
+export const getPlayerStats = cache(async (userId: string, players: PlayerCount | null = null): Promise<PlayerStats> => {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_player_stats", { target_user_id: userId });
+  const { data, error } = await supabase.rpc("get_player_stats", {
+    target_user_id: userId,
+    ...(players ? { player_count: players } : {}),
+  });
   if (error) throw error;
   return statsSchema.parse(data);
 });
@@ -52,9 +57,12 @@ const sharedStatsSchema = z.array(statsSchema.omit({ leaders: true }));
  * played together: the user first, then the friends in this order. The
  * database refuses anyone who isn't an accepted friend.
  */
-export async function getSharedStats(friendIds: string[]): Promise<ComparableStats[]> {
+export async function getSharedStats(friendIds: string[], players: PlayerCount | null = null): Promise<ComparableStats[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_shared_stats", { friend_ids: friendIds });
+  const { data, error } = await supabase.rpc("get_shared_stats", {
+    friend_ids: friendIds,
+    ...(players ? { player_count: players } : {}),
+  });
   if (error) throw error;
   return sharedStatsSchema.parse(data);
 }

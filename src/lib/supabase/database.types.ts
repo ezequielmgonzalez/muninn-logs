@@ -157,7 +157,7 @@ isOneToOne: false
                   ]
                 },"matches": {
                   Row: {
-                    "created_at": string,"created_by": string,"duration_minutes": number | null,"game_id": string,"id": string,"played_on": string | null,"setup": NonNullable<Json>,"updated_at": string
+                    "created_at": string,"created_by": string,"duration_minutes": number | null,"game_id": string,"id": string,"played_on": string | null,"setup": NonNullable<Json>,"updated_at": string,"player_count": number | null
                   }
                   Insert: {
                     "created_at"?: string,"created_by"?: string,"duration_minutes"?: number | null,"game_id": string,"id"?: string,"played_on"?: string | null,"setup"?: NonNullable<Json>,"updated_at"?: string
@@ -285,10 +285,10 @@ isOneToOne: false
             }[]
                            },
 "get_player_stats":
-{ Args: { "game_slug"?: string,"target_user_id": string }; Returns: Json
+{ Args: { "game_slug"?: string,"player_count"?: number,"target_user_id": string }; Returns: Json
                            },
 "get_shared_stats":
-{ Args: { "friend_ids": (string)[],"game_slug"?: string }; Returns: Json
+{ Args: { "friend_ids": (string)[],"game_slug"?: string,"player_count"?: number }; Returns: Json
                            },
 "import_matches":
 { Args: { "games": Json }; Returns: number
@@ -305,6 +305,9 @@ isOneToOne: false
                            },
 "log_match":
 { Args: { "duration_minutes"?: number,"game_slug": string,"played_on": string,"players": Json,"setup"?: Json,"turn_order_known"?: boolean }; Returns: string
+                           },
+"player_count":
+{ Args: { "": Database["public"]['Tables']["matches"]['Row'] }; Returns: { error: true } & "the function public.player_count with parameter or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache"
                            },
 "update_match":
 { Args: { "duration_minutes"?: number,"match_id": string,"played_on": string,"players": Json,"setup"?: Json,"turn_order_known"?: boolean }; Returns: string

@@ -8,7 +8,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(15);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'shared-ana@example.com'),
@@ -105,6 +105,47 @@ select results_eq(
   'a friend she never played with: zeros, no averages, every category listed'
 );
 
+-- By number of players: m1 and m3 had 2, m2 had 3.
+select results_eq(
+  $$ select public.player_count(m) from public.matches m
+     where m.id in ('e0000000-0000-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000002')
+     order by m.id $$,
+  $$ values (2), (3) $$,
+  'player_count() counts a match''s players'
+);
+
+select results_eq(
+  $$ select (p ->> 'games')::int, (p ->> 'wins')::int
+     from jsonb_array_elements(public.get_shared_stats(array['22222222-2222-2222-2222-222222222222'::uuid], 'arnak', 2))
+       with ordinality as e(p, ord)
+     order by ord $$,
+  $$ values (1, 1), (1, 0) $$,
+  'together with Bob in 2-player games: only m1, which Ana won'
+);
+
+select results_eq(
+  $$ select (p ->> 'games')::int, (p ->> 'wins')::int
+     from jsonb_array_elements(public.get_shared_stats(array['22222222-2222-2222-2222-222222222222'::uuid], 'arnak', 3))
+       with ordinality as e(p, ord)
+     order by ord $$,
+  $$ values (1, 0), (1, 1) $$,
+  'and in 3-player games: only m2, which Bob won'
+);
+
+select results_eq(
+  $$ select (s ->> 'games')::int, (s ->> 'wins')::int, jsonb_array_length(s -> 'leaders')
+     from (select public.get_player_stats('11111111-1111-1111-1111-111111111111', 'arnak', 2) as s) own $$,
+  $$ values (2, 2, 1) $$,
+  'Ana''s own stats in 2-player games: m1 and m3, both won, and their one leader entry (none)'
+);
+
+select results_eq(
+  $$ select (s ->> 'games')::int, s ->> 'avg_points'
+     from (select public.get_player_stats('11111111-1111-1111-1111-111111111111', 'arnak', 4) as s) own $$,
+  $$ values (0, null::text) $$,
+  'no 4-player games: zeros and no averages'
+);
+
 select throws_ok(
   $$ select public.get_shared_stats(array['44444444-4444-4444-4444-444444444444'::uuid]) $$,
   '42501', 'you can only compare with your friends',
@@ -139,7 +180,7 @@ select throws_ok(
 );
 
 select ok(
-  not has_function_privilege('anon', 'public.get_shared_stats(uuid[], text)', 'execute'),
+  not has_function_privilege('anon', 'public.get_shared_stats(uuid[], text, integer)', 'execute'),
   'anon can''t even call the function'
 );
 

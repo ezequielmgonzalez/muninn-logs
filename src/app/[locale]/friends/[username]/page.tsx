@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { getFriendByUsername } from "@/features/friends/queries";
 import { LeaderRanking } from "@/features/stats/leader-ranking";
+import { getPlayerCount } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { CategoriesSection, WinRateSection } from "@/features/stats/stats-view";
 import { redirect } from "@/i18n/navigation";
@@ -29,7 +30,8 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
   // Not a friend (or not a user at all): to the viewer, there's nothing here.
   if (!friend) notFound();
 
-  const stats = await getPlayerStats(friend.id);
+  const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
+  const stats = await getPlayerStats(friend.id, players);
 
   const left = (
     <>
@@ -48,7 +50,9 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
         </Button>
       </p>
       {stats.games === 0 ? (
-        <p className="type-caption mt-8.5 text-ink-muted">{t("empty", { name: friend.display_name })}</p>
+        <p className="type-caption mt-8.5 text-ink-muted">
+          {players ? tCount("none", { count: players }) : t("empty", { name: friend.display_name })}
+        </p>
       ) : (
         <div className="mt-8.5">
           <WinRateSection stats={stats} />
@@ -67,5 +71,5 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
       </>
     );
 
-  return <NotebookShell active="friends" left={left} right={right} />;
+  return <NotebookShell active="friends" left={left} right={right} playerFilter />;
 }

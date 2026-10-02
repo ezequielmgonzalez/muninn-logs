@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { LeaderRanking } from "@/features/stats/leader-ranking";
+import { getPlayerCount } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { CategoriesSection, WinRateSection } from "@/features/stats/stats-view";
 import { redirect } from "@/i18n/navigation";
@@ -18,19 +19,21 @@ export default async function ProfilePage() {
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const stats = await getPlayerStats(profile.id);
+  const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
+  const stats = await getPlayerStats(profile.id, players);
   const title = <h1 className="sr-only">{tHome("journal", { name: profile.display_name })}</h1>;
 
   if (stats.games === 0) {
     // Nothing to show yet: the insert and the tab bar offer "Cargar partida".
     return (
       <NotebookShell
+        playerFilter
         active="stats"
         left={
           <>
             {title}
             <PaintedBand>{t("winRate")}</PaintedBand>
-            <p className="type-caption mt-5.5 text-ink-muted">{t("empty")}</p>
+            <p className="type-caption mt-5.5 text-ink-muted">{players ? tCount("none", { count: players }) : t("empty")}</p>
           </>
         }
       />
@@ -39,6 +42,7 @@ export default async function ProfilePage() {
 
   return (
     <NotebookShell
+      playerFilter
       active="stats"
       left={
         <>
