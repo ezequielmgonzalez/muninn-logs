@@ -39,7 +39,7 @@ export async function SideNav({ active }: { active?: NotebookSection }) {
               FOCUS,
             )}
           >
-            {key === active && <span aria-hidden className="ink ink--sweep top-[-12px] right-[34px] bottom-[-12px] left-3 bg-ink" />}
+            {key === active && <span aria-hidden className="ink ink--sweep paint-in top-[-12px] right-[34px] bottom-[-12px] left-3 bg-ink" />}
             <DiamondIcon className="relative z-2" />
             <span className="relative z-2">{t(key)}</span>
           </Link>
@@ -70,7 +70,7 @@ export async function TabBar({ active }: { active?: NotebookSection }) {
         FOCUS,
       )}
     >
-      {key === active && <span aria-hidden className="ink ink--tab inset-x-[-2px] inset-y-0.5 bg-ink" />}
+      {key === active && <span aria-hidden className="ink ink--tab paint-in inset-x-[-2px] inset-y-0.5 bg-ink" />}
       <Icon className="relative z-2" />
       <span className="relative z-2 max-w-full truncate">{t(key)}</span>
     </Link>

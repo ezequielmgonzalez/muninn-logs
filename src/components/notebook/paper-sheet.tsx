@@ -37,7 +37,7 @@ export function PaperSheet({
           <div className={cn(SHEET, "inset-[3px_-2px_-3px_2px] brightness-[0.84]")} />
           <div className={cn(SHEET, "inset-0 drop-shadow-[0_10px_16px_rgba(48,30,12,0.45)]")} />
         </div>
-        <main className="relative z-5 flex flex-col px-[26px] pt-11 pb-8 sm:px-[46px] sm:pt-[54px] sm:pb-10">
+        <main className="enter-stagger relative z-5 flex flex-col px-[26px] pt-11 pb-8 sm:px-[46px] sm:pt-[54px] sm:pb-10">
           {brand && (
             <p className="mb-8.5 text-center">
               <Link href="/" className="type-diary-name text-ink outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze">

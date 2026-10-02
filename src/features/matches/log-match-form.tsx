@@ -354,7 +354,7 @@ function BrushToggle({ pressed, onClick, children }: { pressed: boolean; onClick
       onClick={onClick}
       className="relative flex h-11 cursor-pointer items-center justify-center border-b-[1.5px] border-ink-body/30 text-[15px] text-ink-body outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze aria-pressed:border-transparent aria-pressed:text-band-text"
     >
-      {pressed && <span aria-hidden className="ink ink--tab -inset-x-1.5 -inset-y-[3px] bg-ink" />}
+      {pressed && <span aria-hidden className="ink ink--tab paint-in -inset-x-1.5 -inset-y-[3px] bg-ink" />}
       <span className="relative z-2">{children}</span>
     </button>
   );

@@ -80,7 +80,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
                     defaultChecked={chosen.some((c) => c.id === f.id)}
                     className="peer sr-only"
                   />
-                  <span aria-hidden className="ink ink--tab -inset-x-1.5 -inset-y-1 hidden bg-ink peer-checked:block" />
+                  <span aria-hidden className="ink ink--tab paint-in -inset-x-1.5 -inset-y-1 hidden bg-ink peer-checked:block" />
                   <span className="relative z-2">{f.display_name}</span>
                 </label>
               ))}
@@ -115,7 +115,14 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
                   <span className="sr-only">
                     {t("chartValue", { name: names[i], value: display(category.slug, player.value) })}
                   </span>
-                  <BrushBar value={player.bar} tone={PLAYER_TONES[i]} size="thin" index={i + bars.indexOf(category)} />
+                  <BrushBar
+                    value={player.bar}
+                    tone={PLAYER_TONES[i]}
+                    size="thin"
+                    index={i + bars.indexOf(category)}
+                    // Top to bottom, at half the usual step: up to 25 bars.
+                    order={(bars.indexOf(category) * category.players.length + i) / 2}
+                  />
                 </li>
               ))}
             </ul>

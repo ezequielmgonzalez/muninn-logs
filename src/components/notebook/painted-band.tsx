@@ -1,4 +1,4 @@
-import type { ElementType, ReactNode } from "react";
+import type { CSSProperties, ElementType, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -49,7 +49,7 @@ export function PaintedBand({
           aria-hidden
           data-paint-layer="stroke"
           className={cn(
-            "ink -inset-x-[18px] -inset-y-[11px] bg-ink notebook:-inset-x-[26px] notebook:-inset-y-[12px]",
+            "ink paint-in -inset-x-[18px] -inset-y-[11px] bg-ink notebook:-inset-x-[26px] notebook:-inset-y-[12px]",
             variant === 1 ? "ink--band1" : "ink--band2",
             flip && "-scale-x-100",
           )}
@@ -75,6 +75,11 @@ type BrushBarProps = {
   index?: number;
   /** "thin": 9px, for grouped bars (one per player in a category). */
   size?: "default" | "thin";
+  /**
+   * When it's painted, as its place top to bottom (defaults to `index`):
+   * bars in a list start one after another, 60ms apart.
+   */
+  order?: number;
   className?: string;
 };
 
@@ -83,7 +88,7 @@ type BrushBarProps = {
  * Zero gets a hairline instead of a stroke. Decorative: always show the name
  * and value as text next to it.
  */
-export function BrushBar({ value, tone, index = 0, size = "default", className }: BrushBarProps) {
+export function BrushBar({ value, tone, index = 0, size = "default", order = index, className }: BrushBarProps) {
   const percent = Math.min(Math.max(value, 0), 1) * 100;
   const thin = size === "thin";
   return (
@@ -95,15 +100,19 @@ export function BrushBar({ value, tone, index = 0, size = "default", className }
       {percent === 0 ? (
         <div data-paint-layer="hairline" className="absolute inset-x-0 top-1/2 h-px bg-hairline/18" />
       ) : (
-        <div className="absolute inset-y-0 left-0" style={{ width: `${percent}%` }}>
+        // A new value (e.g. re-sorting a ranking) slides to its width.
+        <div
+          className="absolute inset-y-0 left-0 transition-[width] duration-500 ease-out motion-reduce:transition-none"
+          style={{ width: `${percent}%` }}
+        >
           <div
             data-paint-layer="stroke"
             className={cn(
-              "ink inset-x-0",
+              "ink paint-in inset-x-0",
               thin ? "-inset-y-[3px]" : "-inset-y-[5px] notebook:-inset-y-[6px]",
               BAR_MASKS[index % 4],
             )}
-            style={{ background: `var(--${tone})` }}
+            style={{ background: `var(--${tone})`, "--paint-delay": `${100 + order * 60}ms` } as CSSProperties}
           />
         </div>
       )}

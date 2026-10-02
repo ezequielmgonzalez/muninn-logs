@@ -188,6 +188,83 @@
   mask-image: url(/brush/brush-bar-4.png);
 }
 
+/*
+ * Motion: when a screen appears, its blocks rise in one after another and
+ * every brush stroke is painted left to right, once and quickly. Only for
+ * people who haven't asked their system for reduced motion; for them
+ * everything is simply there.
+ *
+ * Fill mode "backwards" holds the start state during a delay, then hands back
+ * to the element's own styles (e.g. its own translate) when it ends.
+ */
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+/* Painting reveals the stroke instead of stretching it, so the brush texture never distorts. */
+@keyframes paint-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+@keyframes ring-fill {
+  from {
+    stroke-dashoffset: var(--ring-from);
+  }
+}
+
+/*
+ * On a page or sheet: each direct child rises in 55ms after the previous one.
+ * Children set --enter-delay, so strokes inside them (paint-in) wait for
+ * their block. --enter-base delays a whole page (the right page follows the left).
+ */
+@utility enter-stagger {
+  @media (prefers-reduced-motion: no-preference) {
+    & > * {
+      --enter-step: 0;
+      --enter-delay: calc(var(--enter-base, 0ms) + var(--enter-step) * 55ms);
+      animation: enter-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+      animation-delay: var(--enter-delay);
+    }
+    & > :nth-child(2) {
+      --enter-step: 1;
+    }
+    & > :nth-child(3) {
+      --enter-step: 2;
+    }
+    & > :nth-child(4) {
+      --enter-step: 3;
+    }
+    & > :nth-child(5) {
+      --enter-step: 4;
+    }
+    & > :nth-child(6) {
+      --enter-step: 5;
+    }
+    & > :nth-child(n + 7) {
+      --enter-step: 6;
+    }
+  }
+}
+
+/* A stroke painted left to right, after its block has risen in, plus --paint-delay (e.g. a bar's place in its list). */
+@utility paint-in {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: paint-in 650ms cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+    animation-delay: calc(var(--enter-delay, 0ms) + 120ms + var(--paint-delay, 0ms));
+  }
+}
+
+/* The win-rate ring fills from empty; --ring-from is its circumference. */
+@utility ring-fill {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: ring-fill 900ms cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+    animation-delay: calc(var(--enter-delay, 0ms) + 150ms);
+  }
+}
+
 /* Type styles (design/tokens.json "type"). Display (Cinzel) is only for text
  * on a brush stroke and small labels; numbers always use the body face. */
 @utility type-diary-name {

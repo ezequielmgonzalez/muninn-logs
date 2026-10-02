@@ -32,6 +32,8 @@ describe("SideNav", () => {
     // Selected = painted: one sweep stroke, on the current item only.
     expect(nav.querySelectorAll(".ink--sweep")).toHaveLength(1);
     expect(current.querySelector(".ink--sweep")).not.toBeNull();
+    // Arriving at a section paints its stroke in.
+    expect(current.querySelector(".ink--sweep")).toHaveClass("paint-in");
   });
 
   it("ends with the ink button to log a match", async () => {

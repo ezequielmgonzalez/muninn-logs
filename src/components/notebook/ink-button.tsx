@@ -25,8 +25,9 @@ export const inkButtonVariants = cva(
     variants: {
       variant: {
         /** A screen's main action: full column width. */
-        primary: "type-ink-button h-[52px] w-full before:ink--band1",
-        /** "Cargar partida" on the desktop insert. */
+        // Painted in with its screen's other strokes.
+        primary: "type-ink-button h-[52px] w-full before:ink--band1 before:paint-in",
+        /** "Cargar partida" on the desktop insert: part of the notebook, so it doesn't repaint on every screen. */
         insert: "type-ink-button h-12 w-full text-[13px] before:ink--band2",
       },
       tone: {
