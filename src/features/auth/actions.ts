@@ -11,6 +11,7 @@ import {
   localeSchema,
   usernameSchema,
 } from "./schemas";
+import { signInMethods } from "./sign-in-methods";
 
 // Actions return error codes; the forms translate them (Auth.errors.*).
 // Errors echo the submitted values back because React resets a form's fields
@@ -20,7 +21,7 @@ export type SignInState =
   | { status: "code-sent"; email: string }
   | {
       status: "error";
-      error: "invalidEmail" | "invalidCode" | "rateLimited" | "generic";
+      error: "invalidEmail" | "invalidCode" | "rateLimited" | "emailDisabled" | "generic";
       email: string;
     };
 
@@ -38,6 +39,8 @@ export async function sendCode(
   formData: FormData,
 ): Promise<SignInState> {
   const submittedEmail = String(formData.get("email") ?? "");
+  // Production signs in with Google only: refuse here too, not just in the form.
+  if (!signInMethods().email) return { status: "error", error: "emailDisabled", email: submittedEmail };
   const email = emailSchema.safeParse(submittedEmail);
   if (!email.success) return { status: "error", error: "invalidEmail", email: submittedEmail };
 
@@ -61,6 +64,9 @@ export async function verifyCode(
   _state: SignInState,
   formData: FormData,
 ): Promise<SignInState> {
+  if (!signInMethods().email) {
+    return { status: "error", error: "emailDisabled", email: String(formData.get("email") ?? "") };
+  }
   const email = emailSchema.safeParse(formData.get("email"));
   const code = codeSchema.safeParse(formData.get("code"));
   const locale = localeSchema.parse(formData.get("locale"));
