@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 
 import { PageTurnProvider } from "@/components/notebook/page-turn";
 import { sceneScaleScript } from "@/components/notebook/scene-scale";
+import { SceneScale } from "@/components/notebook/scene-scale-sync";
 import { routing } from "@/i18n/routing";
 
 import "../globals.css";
@@ -70,6 +71,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider>
             {/* Outlives each screen, so a turning page can cover the navigation between them. */}
             <PageTurnProvider>{children}</PageTurnProvider>
+            <SceneScale />
           </NextIntlClientProvider>
         </div>
       </body>
