@@ -218,7 +218,7 @@ export function LogMatchForm({
             </div>
           </div>
           <div>
-            <Label htmlFor="duration" className="gap-0">
+            <Label htmlFor="duration" className="gap-1.5">
               {t("duration")} <span className="font-normal text-ink-muted">{t("optional")}</span>
             </Label>
             <div className="relative">
