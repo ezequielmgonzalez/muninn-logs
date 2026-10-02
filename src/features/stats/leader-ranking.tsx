@@ -28,7 +28,7 @@ const keyOf = (leader: LeaderStats) => leader.slug ?? "none";
 
 /**
  * "Which leader am I best with?": the design's ranking card, re-sorted by the
- * chosen stat. Games played without a leader rank as "Sin líder". Tapping a
+ * chosen stat. Games with no leader recorded rank as "Sin especificar". Tapping a
  * leader opens their own numbers (LeaderDetail), with a way back.
  */
 export function LeaderRanking({ leaders }: { leaders: LeaderStats[] }) {

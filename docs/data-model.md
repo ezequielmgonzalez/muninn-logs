@@ -81,7 +81,7 @@ Catalog rows are inserted by migrations/seeds, never by users. They store slugs 
 | `match_id`     | uuid     | → `matches`, cascade delete. PK with `player_id`             |
 | `player_id`    | uuid     | → `players`                                                  |
 | `turn_order`   | smallint | 1..N, unique per match; or null for every player when the match's turn order is unknown (e.g. copied from an old score pad). Stats by turn order must only count matches where it's known |
-| `character_id` | uuid     | → `game_characters`. **Optional**: null = played without the leaders expansion |
+| `character_id` | uuid     | → `game_characters`. **Optional**: null = not recorded (shown as "Sin especificar": the leader may be unknown, or the game played without the leaders expansion) |
 | `won_tiebreak` | boolean  | Default false. See [Winner](#winner)                         |
 
 - Unique (`match_id`, `character_id`): a leader can be played by only one player per match. Nulls don't collide, so any number of players can have no leader.

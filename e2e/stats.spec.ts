@@ -71,15 +71,15 @@ test("leaders rank by any category's average, highest or lowest, games without a
   }
   await page.goto("/es/profile");
   const sort = page.getByLabel("Ordenar por");
-  const rows = page.getByRole("list").filter({ hasText: "Sin líder" }).getByRole("listitem");
+  const rows = page.getByRole("list").filter({ hasText: "Sin especificar" }).getByRole("listitem");
 
   await sort.selectOption({ label: "Investigación: máximo" });
   await expect(rows.nth(0)).toContainText("Capitán");
   await expect(rows.nth(0)).toContainText("10");
-  await expect(rows.nth(1)).toContainText("Sin líder");
+  await expect(rows.nth(1)).toContainText("Sin especificar");
 
   await sort.selectOption({ label: "Investigación: mínimo" });
-  await expect(rows.nth(0)).toContainText("Sin líder");
+  await expect(rows.nth(0)).toContainText("Sin especificar");
   await expect(rows.nth(0)).toContainText("6");
   await expect(rows.nth(1)).toContainText("Capitán");
   await expect(rows.nth(1)).toContainText("2");
