@@ -1,18 +1,20 @@
 import { getTranslations } from "next-intl/server";
 import type { ComponentType, SVGProps } from "react";
 
-import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 import { BarsIcon, BookIcon, DiamondIcon, PeopleIcon, PlusIcon, SheetIcon } from "./icons";
 import { InkButton, LoadMatchFab } from "./ink-button";
+import { TurnLink } from "./page-turn";
+import { type NotebookSection, sectionTurn } from "./turn-direction";
 
 // The main navigation (design/components/Navigation.md): the insert's list on
 // desktop, the tab bar on phones. The current section is painted and marked
 // with aria-current. Compare and guests aren't sections: they live under
-// friends, and mark it as current.
+// friends, and mark it as current. Moving between sections turns the diary's
+// page: forward to a later one, backward to an earlier one.
 
-export type NotebookSection = "home" | "matches" | "stats" | "friends";
+export type { NotebookSection };
 
 const SECTIONS: { key: NotebookSection; href: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
   { key: "home", href: "/", Icon: BookIcon },
@@ -30,9 +32,10 @@ export async function SideNav({ active }: { active?: NotebookSection }) {
     <>
       <nav aria-label={t("sections")} className="flex flex-col gap-1.5">
         {SECTIONS.map(({ key, href }) => (
-          <Link
+          <TurnLink
             key={key}
             href={href}
+            direction={sectionTurn(active, key)}
             aria-current={key === active ? "page" : undefined}
             className={cn(
               "type-nav relative flex h-[52px] w-full items-center gap-3 pl-[38px] text-ink-body aria-[current=page]:text-band-text",
@@ -42,15 +45,15 @@ export async function SideNav({ active }: { active?: NotebookSection }) {
             {key === active && <span aria-hidden className="ink ink--sweep paint-in top-[-12px] right-[34px] bottom-[-12px] left-3 bg-ink" />}
             <DiamondIcon className="relative z-2" />
             <span className="relative z-2">{t(key)}</span>
-          </Link>
+          </TurnLink>
         ))}
       </nav>
       <div className="mt-[34px] mr-[70px] ml-11">
         <InkButton variant="insert" asChild>
-          <Link href="/matches/new">
+          <TurnLink href="/matches/new" direction="forward">
             <PlusIcon />
             {t("logMatch")}
-          </Link>
+          </TurnLink>
         </InkButton>
       </div>
     </>
@@ -61,9 +64,10 @@ export async function SideNav({ active }: { active?: NotebookSection }) {
 export async function TabBar({ active }: { active?: NotebookSection }) {
   const t = await getTranslations("Nav");
   const tab = ({ key, href, Icon }: (typeof SECTIONS)[number]) => (
-    <Link
+    <TurnLink
       key={key}
       href={href}
+      direction={sectionTurn(active, key)}
       aria-current={key === active ? "page" : undefined}
       className={cn(
         "type-tab-label relative flex h-[58px] min-w-0 flex-col items-center justify-center gap-[3px] text-ink-body aria-[current=page]:text-band-text",
@@ -73,7 +77,7 @@ export async function TabBar({ active }: { active?: NotebookSection }) {
       {key === active && <span aria-hidden className="ink ink--tab paint-in inset-x-[-2px] inset-y-0.5 bg-ink" />}
       <Icon className="relative z-2" />
       <span className="relative z-2 max-w-full truncate">{t(key)}</span>
-    </Link>
+    </TurnLink>
   );
   return (
     <nav

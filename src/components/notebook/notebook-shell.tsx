@@ -107,13 +107,17 @@ export async function NotebookShell({
           <div className={cn(SHEET, "top-[49px] left-[287px] z-3 h-[908px] w-[462px] bg-[url(/paper/page-left.webp)] brightness-[0.84]")} />
           <div className={cn(SHEET, "top-[52px] left-[782px] z-3 h-[908px] w-[462px] bg-[url(/paper/page-right.webp)] brightness-[0.68]")} />
           <div className={cn(SHEET, "top-[49px] left-[779px] z-3 h-[908px] w-[462px] bg-[url(/paper/page-right.webp)] brightness-[0.84]")} />
-          <div className={cn(SHEET, "top-[46px] left-[290px] z-4 h-[908px] w-[462px] bg-[url(/paper/page-left.webp)]")} />
-          <div className={cn(SHEET, "top-[46px] left-[776px] z-4 h-[908px] w-[462px] bg-[url(/paper/page-right.webp)]")} />
+          {/* data-sheet: where a turning page starts (PageTurnProvider). */}
+          <div data-sheet="left" className={cn(SHEET, "top-[46px] left-[290px] z-4 h-[908px] w-[462px] bg-[url(/paper/page-left.webp)]")} />
+          <div data-sheet="right" className={cn(SHEET, "top-[46px] left-[776px] z-4 h-[908px] w-[462px] bg-[url(/paper/page-right.webp)]")} />
           <SpineRings />
         </div>
 
         {/* The phone page grows with its content; on desktop this box steps aside. */}
-        <div className="relative z-2 mx-2.5 mt-[34px] min-h-[calc(100dvh-34px)] notebook:static notebook:m-0 notebook:min-h-0">
+        <div
+          data-sheet="mobile"
+          className="relative z-2 mx-2.5 mt-[34px] min-h-[calc(100dvh-34px)] notebook:static notebook:m-0 notebook:min-h-0"
+        >
           <div aria-hidden className="notebook:hidden">
             <div className={cn(SHEET, "inset-[6px_-4px_-6px_4px] bg-[url(/paper/page-mobile.webp)] brightness-[0.68]")} />
             <div className={cn(SHEET, "inset-[3px_-2px_-3px_2px] bg-[url(/paper/page-mobile.webp)] brightness-[0.84]")} />

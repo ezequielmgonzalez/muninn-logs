@@ -34,6 +34,8 @@ describe("SideNav", () => {
     expect(current.querySelector(".ink--sweep")).not.toBeNull();
     // Arriving at a section paints its stroke in.
     expect(current.querySelector(".ink--sweep")).toHaveClass("paint-in");
+    // Other sections turn the diary's page towards them; the current one doesn't.
+    expect(links.map((l) => l.getAttribute("data-turn"))).toEqual(["backward", "backward", null, "forward"]);
   });
 
   it("ends with the ink button to log a match", async () => {
@@ -41,6 +43,7 @@ describe("SideNav", () => {
     const log = screen.getByRole("link", { name: "Cargar partida" });
     expect(log).toHaveAttribute("href", "/matches/new");
     expect(log).toHaveAttribute("data-slot", "ink-button");
+    expect(log).toHaveAttribute("data-turn", "forward");
   });
 });
 
