@@ -287,6 +287,9 @@ isOneToOne: false
 "get_player_stats":
 { Args: { "game_slug"?: string,"target_user_id": string }; Returns: Json
                            },
+"get_shared_stats":
+{ Args: { "friend_ids": (string)[],"game_slug"?: string }; Returns: Json
+                           },
 "import_matches":
 { Args: { "games": Json }; Returns: number
                            },

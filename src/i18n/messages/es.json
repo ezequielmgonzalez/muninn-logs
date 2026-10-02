@@ -252,7 +252,14 @@
     "link": "Comparar con varios amigos",
     "chartTitle": "Puntos por categoría",
     "bestNote": "Mejor valor de cada fila. En lugar promedio, menos es mejor.",
-    "chartValue": "{name}: {value}"
+    "chartValue": "{name}: {value}",
+    "scopeLabel": "Partidas",
+    "scopes": {
+      "all": "Todas las de cada uno",
+      "together": "Solo las que jugaron juntos"
+    },
+    "noteTogether": "Solo {count, plural, one {la partida} other {las # partidas}} en que jugaron todos juntos.",
+    "noShared": "Todavía no jugaron todos juntos. Elegí menos amigos, o mirá todas las partidas de cada uno."
   },
   "Legal": {
     "updated": "Última actualización: 29 de septiembre de 2026",

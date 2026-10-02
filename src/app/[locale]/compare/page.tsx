@@ -6,7 +6,8 @@ import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { BrushBar, PaintedBand, PLAYER_TONES } from "@/components/notebook/painted-band";
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
 import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
-import { getPlayerStats } from "@/features/stats/queries";
+import { NativeSelect } from "@/components/notebook/native-select";
+import { type ComparableStats, getPlayerStats, getSharedStats } from "@/features/stats/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
@@ -27,7 +28,9 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   // ?with=beto&with=carla (the picker's checkboxes). Only accepted friends count.
-  const { with: withParam } = await searchParams;
+  // ?scope=together compares only the games all of them played together.
+  const { with: withParam, scope: scopeParam } = await searchParams;
+  const scope = scopeParam === "together" ? "together" : "all";
   const requested = [...new Set([withParam ?? []].flat())].slice(0, MAX_FRIENDS);
   const [{ friends }, ...found] = await Promise.all([
     getFriendships(profile.id),
@@ -35,8 +38,16 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   ]);
   const chosen = found.filter((f) => f !== null);
 
-  const stats = await Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id)));
-  const rows = chosen.length > 0 ? compareStats(stats) : [];
+  const stats: ComparableStats[] =
+    chosen.length === 0
+      ? []
+      : scope === "together"
+        ? await getSharedStats(chosen.map((f) => f.id))
+        : await Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id)));
+  // Together, everyone has the same games: none means they never all sat at one table.
+  const shared = scope === "together" ? (stats[0]?.games ?? 0) : null;
+  const comparing = chosen.length > 0 && shared !== 0;
+  const rows = comparing ? compareStats(stats) : [];
 
   const label = (key: ComparisonRow["key"]) =>
     (ARNAK_SCORE_CATEGORIES as readonly string[]).includes(key)
@@ -51,7 +62,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   };
 
   const names = [t("you"), ...chosen.map((f) => f.display_name)];
-  const bars = chosen.length > 0 ? categoryBars(stats) : [];
+  const bars = comparing ? categoryBars(stats) : [];
   const dot = (i: number) => (
     <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ background: `var(--${PLAYER_TONES[i]})` }} />
   );
@@ -86,6 +97,15 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
               ))}
           </div>
         </fieldset>
+        <div className="mt-5.5">
+          <label htmlFor="compare-scope" className="type-label">
+            {t("scopeLabel")}
+          </label>
+          <NativeSelect id="compare-scope" name="scope" defaultValue={scope}>
+            <option value="all">{t("scopes.all")}</option>
+            <option value="together">{t("scopes.together")}</option>
+          </NativeSelect>
+        </div>
         <InkButton type="submit" className="mt-5.5 notebook:mt-[26px]">
           {t("submit")}
         </InkButton>
@@ -184,7 +204,9 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
         <span aria-hidden className="mr-1.5 inline-block size-[7px] rounded-full bg-bronze align-[2px]" />
         {t("bestNote")}
       </p>
-      <p className="type-caption mt-2 text-ink-muted">{t("note")}</p>
+      <p className="type-caption mt-2 text-ink-muted">
+        {shared === null ? t("note") : t("noteTogether", { count: shared })}
+      </p>
     </>
   );
 
@@ -192,14 +214,19 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
     // Amigos stays current: comparing is reached from there.
     <NotebookShell active="friends">
       {/* On phones the left page dissolves so the table can sit between the chips and the chart. */}
-      <NotebookPage side="left" className={chosen.length > 0 ? "max-notebook:contents" : undefined}>
+      <NotebookPage side="left" className={comparing ? "max-notebook:contents" : undefined}>
         <section className="order-1">
-          <PaintedBand as={chosen.length > 0 ? "h2" : "h1"}>{t("pickTitle")}</PaintedBand>
+          <PaintedBand as={comparing ? "h2" : "h1"}>{t("pickTitle")}</PaintedBand>
           {picker}
         </section>
-        {chosen.length > 0 && <div className="mt-11 max-notebook:mt-0 max-notebook:contents">{chart}</div>}
+        {comparing && <div className="mt-11 max-notebook:mt-0 max-notebook:contents">{chart}</div>}
+        {chosen.length > 0 && !comparing && (
+          <p role="status" className="type-body-strong mt-8.5 text-ink-body">
+            {t("noShared")}
+          </p>
+        )}
       </NotebookPage>
-      {chosen.length > 0 && (
+      {comparing && (
         <NotebookPage side="right" order={2}>
           {table}
         </NotebookPage>
