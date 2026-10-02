@@ -29,19 +29,25 @@ export const inkButtonVariants = cva(
         /** "Cargar partida" on the desktop insert. */
         insert: "type-ink-button h-12 w-full text-[13px] before:ink--band2",
       },
+      tone: {
+        ink: "",
+        /** Irreversible actions (deleting a game, the account): red ink. */
+        danger: "before:bg-destructive",
+      },
     },
-    defaultVariants: { variant: "primary" },
+    defaultVariants: { variant: "primary", tone: "ink" },
   },
 );
 
 export function InkButton({
   variant,
+  tone,
   asChild = false,
   className,
   ...props
 }: ComponentProps<"button"> & VariantProps<typeof inkButtonVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot.Root : "button";
-  return <Comp data-slot="ink-button" className={cn(inkButtonVariants({ variant }), className)} {...props} />;
+  return <Comp data-slot="ink-button" className={cn(inkButtonVariants({ variant, tone }), className)} {...props} />;
 }
 
 /**

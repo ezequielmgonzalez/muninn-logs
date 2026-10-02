@@ -31,6 +31,13 @@ describe("InkButton", () => {
     expect(screen.getByRole("link", { name: "Cargar partida" })).toHaveClass("before:ink--band1");
   });
 
+  it("paints irreversible actions in red ink", () => {
+    render(<InkButton tone="danger">Eliminar mi cuenta</InkButton>);
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("before:bg-destructive");
+    expect(button).not.toHaveClass("before:bg-ink");
+  });
+
   it("fades the ink when disabled", () => {
     render(<InkButton disabled>Guardar partida</InkButton>);
     expect(screen.getByRole("button")).toBeDisabled();

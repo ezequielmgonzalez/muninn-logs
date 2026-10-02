@@ -3,13 +3,11 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { ARNAK_CATEGORY_TONES } from "@/games/arnak";
 
-import { LeaderRanking } from "./leader-ranking";
 import type { PlayerStats } from "./queries";
 import { WinRateRing } from "./win-rate-ring";
 
 // A player's stats (design/screens/estadisticas-*.html), in pieces so the
-// notebook can put them on its pages: win rate and categories on the left,
-// the leader ranking on the right. All need games > 0.
+// notebook can put them on its pages, with LeaderRanking. All need games > 0.
 
 async function getStatsFormat() {
   const [t, tGame, format] = await Promise.all([
@@ -80,18 +78,5 @@ export async function CategoriesSection({ stats, className }: { stats: PlayerSta
         </p>
       </div>
     </section>
-  );
-}
-
-/** Everything in one column, for screens not yet split across the notebook's pages. */
-export async function StatsView({ stats }: { stats: PlayerStats }) {
-  return (
-    <div className="grid gap-11 md:grid-cols-[minmax(0,22.5rem)_1fr]">
-      <div className="flex flex-col gap-11">
-        <WinRateSection stats={stats} />
-        <CategoriesSection stats={stats} />
-      </div>
-      <LeaderRanking leaders={stats.leaders} />
-    </div>
   );
 }

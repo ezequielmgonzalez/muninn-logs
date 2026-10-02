@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { ImportForm } from "@/features/import/import-form";
 import { ARNAK_LEADERS, type ArnakLeader } from "@/games/arnak";
@@ -10,12 +11,11 @@ import { getCurrentProfile, isAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminImportPage({ searchParams }: PageProps<"/[locale]/admin/import">) {
-  const [profile, locale, admin, t, tHome] = await Promise.all([
+  const [profile, locale, admin, t] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     isAdmin(),
     getTranslations("AdminImport"),
-    getTranslations("HomePage"),
   ]);
   if (!profile) return redirect({ href: "/login", locale });
   // For everyone else, this page doesn't exist (the database refuses anyway).
@@ -36,23 +36,22 @@ export default async function AdminImportPage({ searchParams }: PageProps<"/[loc
   if (error) throw error;
 
   return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">{tHome("journal", { name: profile.display_name })}</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 px-6 py-11">
-        <PaintedBand as="h1">{t("title")}</PaintedBand>
-        {typeof imported === "string" && (
-          <p role="status" className="type-body-strong text-ink-body">
-            {t("imported", { count: Number(imported) })}{" "}
-            <Link href="/matches" className="font-normal underline underline-offset-4">
-              {t("seeMatches")}
-            </Link>
-          </p>
-        )}
-        <p className="text-ink-muted">{t("description")}</p>
-        <ImportForm addable={addable} leaderLabels={leaderLabels} />
-      </main>
-    </>
+    <NotebookShell
+      left={
+        <>
+          <PaintedBand as="h1">{t("title")}</PaintedBand>
+          {typeof imported === "string" && (
+            <p role="status" className="type-body-strong mt-4 text-ink-body">
+              {t("imported", { count: Number(imported) })}{" "}
+              <Link href="/matches" className="font-normal underline underline-offset-4">
+                {t("seeMatches")}
+              </Link>
+            </p>
+          )}
+          <p className="mt-5.5 mb-11 text-ink-body">{t("description")}</p>
+          <ImportForm addable={addable} leaderLabels={leaderLabels} />
+        </>
+      }
+    />
   );
 }

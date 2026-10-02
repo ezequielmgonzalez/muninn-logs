@@ -3,6 +3,7 @@
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useActionState, useMemo, useState } from "react";
 
+import { InkButton } from "@/components/notebook/ink-button";
 import { NativeSelect } from "@/components/notebook/native-select";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
@@ -77,18 +78,20 @@ export function ImportForm({
           <li>{t("formatRequired")}</li>
           <li>{t("formatOptional")}</li>
         </ul>
-        <Button asChild variant="outline" className="h-11 text-base">
-          <a href={templateHref} download={t("templateFile")}>
-            {t("template")}
-          </a>
-        </Button>
+        <p className="flex">
+          <Button asChild variant="link">
+            <a href={templateHref} download={t("templateFile")}>
+              {t("template")} ↓
+            </a>
+          </Button>
+        </p>
         <div className="flex flex-col gap-2">
           <Label htmlFor="import-file">{t("file")}</Label>
           <input
             id="import-file"
             type="file"
             accept=".csv,text/csv"
-            className="text-base file:mr-3 file:h-11 file:cursor-pointer file:rounded-md file:border file:border-input file:bg-transparent file:px-4"
+            className="min-h-11 w-full border-b-[1.5px] border-input pb-1 text-base text-ink-body file:mr-3 file:h-11 file:cursor-pointer file:border-0 file:bg-transparent file:px-0 file:font-semibold file:text-ink-body file:underline file:underline-offset-4"
             // Choosing the same file again (after fixing it) must read it again.
             onClick={(e) => {
               e.currentTarget.value = "";
@@ -181,9 +184,9 @@ export function ImportForm({
                 {t(`errors.${state.error}`)}
               </p>
             )}
-            <Button type="submit" className="h-11 text-base" disabled={pending || samePlayer.length > 0}>
+            <InkButton type="submit" className="mt-2" disabled={pending || samePlayer.length > 0}>
               {t("submit", { count: matches.length })}
-            </Button>
+            </InkButton>
           </div>
         </>
       )}
