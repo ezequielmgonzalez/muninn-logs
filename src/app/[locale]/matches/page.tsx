@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { groupByMonth, type MonthGroup, spreadOf } from "@/features/matches/group-by-month";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";
+import { getPlayerCount } from "@/features/player-count/server";
 import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
@@ -24,18 +25,22 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   // A group's whole history fits in one read; months are paged here.
-  const matches = await listMatches(1000);
+  const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
+  const matches = await listMatches(1000, players);
   const title = <h1 className="sr-only">{t("title")}</h1>;
 
   if (matches.length === 0) {
     return (
       <NotebookShell
+        playerFilter
         active="matches"
         left={
           <>
             {title}
             <PaintedBand>{t("title")}</PaintedBand>
-            <p className="type-caption mt-5.5 mb-8 text-ink-muted">{t("empty")}</p>
+            <p className="type-caption mt-5.5 mb-8 text-ink-muted">
+              {players ? tCount("none", { count: players }) : t("empty")}
+            </p>
             <InkButton asChild>
               <TurnLink href="/matches/new" direction="forward">
                 {t("logFirst")}
@@ -91,6 +96,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
 
   return (
     <NotebookShell
+      playerFilter
       active="matches"
       left={
         <>

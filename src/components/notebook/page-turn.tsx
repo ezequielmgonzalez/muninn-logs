@@ -62,10 +62,20 @@ function face(paper: string, content: HTMLElement | null, back: boolean) {
 /**
  * A copy of a page, painted rather than written: its text is drawn by CSS
  * (globals.css, `.page-flap [data-text]`), so while the page turns nothing
- * can find, select or read it twice. (SVG and form text stays as it is.)
+ * can find, select or read it twice. Dropdowns show their chosen option the
+ * same way. (SVG text stays as it is.)
  */
 function paintedCopy(page: HTMLElement) {
   const copy = page.cloneNode(true) as HTMLElement;
+  // A dropdown becomes its chosen option, painted (its options would be text).
+  const chosen = [...page.querySelectorAll("select")].map((select) => select.selectedOptions[0]?.text ?? "");
+  copy.querySelectorAll("select").forEach((select, i) => {
+    const painted = document.createElement("span");
+    painted.className = select.className;
+    painted.style.display = "block";
+    painted.setAttribute("data-text", chosen[i]);
+    select.replaceWith(painted);
+  });
   const walker = document.createTreeWalker(copy, NodeFilter.SHOW_TEXT);
   const texts: Text[] = [];
   while (walker.nextNode()) texts.push(walker.currentNode as Text);

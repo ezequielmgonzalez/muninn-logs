@@ -489,5 +489,11 @@
     "title": "Página no encontrada",
     "description": "Esta página no existe, o no tenés acceso a ella.",
     "home": "Volver al inicio"
+  },
+  "PlayerCount": {
+    "label": "Jugadores",
+    "all": "Todas",
+    "count": "{count} jugadores",
+    "none": "No hay partidas de {count} jugadores."
   }
 }
