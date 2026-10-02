@@ -144,7 +144,32 @@ export function CrownIcon(props: IconProps) {
   );
 }
 
-/** The faint compass rose on the insert, under the navigation. */
+/**
+ * The crow (Muninn): the app's mark. A shape, not a picture: the image in
+ * public/brand/crow.png is a mask filled with the text color, so it takes
+ * any ink and opacity, like the brush strokes.
+ */
+export function CrowMark({ width = 120, className }: { width?: number; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={className}
+      style={{
+        display: "block",
+        width,
+        // The image's own proportions (312 × 294).
+        height: Math.round((width * 294) / 312),
+        background: "currentColor",
+        maskImage: "url(/brand/crow.png)",
+        maskSize: "contain",
+        maskRepeat: "no-repeat",
+        maskPosition: "center",
+      }}
+    />
+  );
+}
+
+/** The faint compass rose, on the landing sheet. */
 export function CompassRose(props: IconProps) {
   const ticks = Array.from({ length: 32 }, (_, i) => {
     const angle = (i * Math.PI) / 16;

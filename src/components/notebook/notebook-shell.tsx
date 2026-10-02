@@ -7,7 +7,7 @@ import { getPlayerStats } from "@/features/stats/queries";
 import { getCurrentProfile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
-import { CompassRose } from "./icons";
+import { CrowMark } from "./icons";
 import { LegalLinks } from "./legal-links";
 import { type NotebookSection, SideNav, TabBar } from "./navigation";
 import { NotebookPage } from "./notebook-page";
@@ -53,7 +53,8 @@ async function Insert({ active, playerFilter }: { active?: NotebookSection; play
         <div aria-hidden className="mt-[26px] mr-[60px] mb-5 ml-[38px] h-px bg-ink-body/22" />
         <SideNav active={active} />
         <div className="mt-auto pl-[70px]">
-          <CompassRose className="block opacity-16" />
+          {/* Muninn, in the same faint ink the compass had. */}
+          <CrowMark className="text-ink opacity-16" />
         </div>
         <LegalLinks className="pt-[22px] pl-[38px]" />
       </div>
