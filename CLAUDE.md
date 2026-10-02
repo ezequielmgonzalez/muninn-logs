@@ -31,7 +31,7 @@ pnpm db:types            # regenerate src/lib/supabase/database.types.ts (commit
 - Feature code lives in `src/features/<feature>/` (actions, forms, schemas, tests). `src/components/ui/` is shadcn-generated only. Game catalogs mirror the DB in `src/games/<game>.ts`.
 - Server Actions validate with Zod (schemas mirror DB check constraints) and return error *codes* that forms translate. Error states echo the submitted values back: React 19 resets form fields after an action, and forms use them as `defaultValue`.
 - Supabase: `@/lib/supabase/server` in Server Components/Actions/Route Handlers, `@/lib/supabase/client` in Client Components. Use `getClaims()` (verifies the JWT), not `getSession()`. `getCurrentProfile()` in `@/lib/auth` for the signed-in profile.
-- Next 16: middleware is `src/proxy.ts` (Supabase session refresh, then next-intl). The root layout reads the locale with `next/root-params`.
+- Next 16: middleware is `src/proxy.ts` (Supabase session refresh, then next-intl). It drops the browser's `accept-language` before next-intl, so the app starts in Spanish unless the user picked a language (next-intl's cookie). The root layout reads the locale with `next/root-params`.
 
 ## Design
 
