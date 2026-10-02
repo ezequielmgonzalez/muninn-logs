@@ -1,44 +1,41 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { Button } from "@/components/ui/button";
 import { ProfileForm } from "@/features/auth/profile-form";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function EditProfilePage() {
-  const [profile, locale, t, tHome, tDelete] = await Promise.all([
+  const [profile, locale, t, tDelete] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("EditProfile"),
-    getTranslations("HomePage"),
     getTranslations("DeleteAccount"),
   ]);
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">{tHome("journal", { name: profile.display_name })}</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-6 px-6 py-11">
-        <div className="flex flex-col gap-5">
+    <NotebookShell
+      left={
+        <>
           <PaintedBand as="h1">{t("title")}</PaintedBand>
-          <p className="text-ink-muted">{t("description")}</p>
-        </div>
-        <ProfileForm
-          mode="edit"
-          defaultDisplayName={profile.display_name}
-          defaultUsername={profile.username}
-          submitLabel={t("submit")}
-        />
-        <Link
-          href="/account/delete"
-          className="mt-6 self-center text-sm text-destructive underline-offset-4 hover:underline"
-        >
-          {tDelete("link")}
-        </Link>
-      </main>
-    </>
+          <p className="mt-5.5 mb-5.5 text-ink-body">{t("description")}</p>
+          <ProfileForm
+            mode="edit"
+            defaultDisplayName={profile.display_name}
+            defaultUsername={profile.username}
+            submitLabel={t("submit")}
+          />
+          <p className="mt-11 flex justify-center">
+            <Button asChild variant="destructive">
+              <Link href="/account/delete">{tDelete("link")}</Link>
+            </Button>
+          </p>
+        </>
+      }
+    />
   );
 }

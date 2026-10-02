@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { InkButton } from "@/components/notebook/ink-button";
 import { Button } from "@/components/ui/button";
 
 import { deleteMatch } from "./actions";
@@ -15,24 +16,24 @@ export function DeleteMatch({ matchId }: { matchId: string }) {
 
   if (!confirming) {
     return (
-      <Button type="button" variant="ghost" className="h-11 text-destructive" onClick={() => setConfirming(true)}>
+      <Button type="button" variant="destructive" className="h-11" onClick={() => setConfirming(true)}>
         {t("delete")}
       </Button>
     );
   }
 
   return (
-    <form action={deleteMatch} className="flex flex-col gap-3">
+    <form action={deleteMatch} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="matchId" value={matchId} />
       <p role="alert" className="text-ink-body">
         {t("deleteConfirm")}
       </p>
-      <div className="flex gap-2">
-        <Button type="submit" className="h-11 flex-1 bg-destructive text-base text-primary-foreground hover:bg-destructive/90">
+      <div className="flex items-center gap-6">
+        <InkButton type="submit" tone="danger" className="flex-1">
           {t("deleteYes")}
-        </Button>
-        <Button type="button" variant="outline" className="h-11 flex-1 text-base" onClick={() => setConfirming(false)}>
+        </InkButton>
+        <Button type="button" variant="ghost" className="h-11" onClick={() => setConfirming(false)}>
           {t("deleteNo")}
         </Button>
       </div>

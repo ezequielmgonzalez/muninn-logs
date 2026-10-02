@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { InkButton } from "@/components/notebook/ink-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -26,13 +26,12 @@ export function ProfileForm({ mode, defaultDisplayName, defaultUsername, submitL
   const submitted = state.status === "error" ? state : undefined;
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-5.5">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="mode" value={mode} />
-      <div className="flex flex-col gap-2">
+      <div>
         <Label htmlFor="username">{t("usernameLabel")}</Label>
         <Input
-          className="h-11"
           id="username"
           name="username"
           autoComplete="username"
@@ -43,14 +42,13 @@ export function ProfileForm({ mode, defaultDisplayName, defaultUsername, submitL
           required
           autoFocus
         />
-        <p id="username-hint" className="text-sm text-muted-foreground">
+        <p id="username-hint" className="type-caption mt-1.5 text-ink-muted">
           {t("usernameHint")}
         </p>
       </div>
-      <div className="flex flex-col gap-2">
+      <div>
         <Label htmlFor="displayName">{t("displayNameLabel")}</Label>
         <Input
-          className="h-11"
           id="displayName"
           name="displayName"
           defaultValue={submitted?.displayName ?? defaultDisplayName}
@@ -58,7 +56,7 @@ export function ProfileForm({ mode, defaultDisplayName, defaultUsername, submitL
           aria-describedby="display-name-hint"
           required
         />
-        <p id="display-name-hint" className="text-sm text-muted-foreground">
+        <p id="display-name-hint" className="type-caption mt-1.5 text-ink-muted">
           {t("displayNameHint")}
         </p>
       </div>
@@ -67,9 +65,9 @@ export function ProfileForm({ mode, defaultDisplayName, defaultUsername, submitL
           {t(`errors.${state.error}`)}
         </p>
       )}
-      <Button type="submit" className="h-11 text-base" disabled={pending}>
+      <InkButton type="submit" className="mt-2" disabled={pending}>
         {submitLabel}
-      </Button>
+      </InkButton>
     </form>
   );
 }

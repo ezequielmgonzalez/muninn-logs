@@ -1,7 +1,9 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
+import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { Button } from "@/components/ui/button";
 import { DeleteAccountForm } from "@/features/account/delete-account-form";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
@@ -16,11 +18,10 @@ const previewSchema = z.object({
 });
 
 export default async function DeleteAccountPage() {
-  const [profile, locale, t, tHome] = await Promise.all([
+  const [profile, locale, t] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("DeleteAccount"),
-    getTranslations("HomePage"),
   ]);
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
@@ -41,24 +42,25 @@ export default async function DeleteAccountPage() {
   ].filter((line): line is string => Boolean(line));
 
   return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">{tHome("journal", { name: profile.display_name })}</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-6 px-6 py-11">
-        <PaintedBand as="h1">{t("title")}</PaintedBand>
-        <p className="text-ink-body">{t("intro")}</p>
-        <ul className="flex list-disc flex-col gap-2 pl-5 text-ink-body">
-          {consequences.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-        <p className="type-body-strong text-destructive">{t("irreversible")}</p>
-        <DeleteAccountForm username={profile.username} />
-        <Link href="/profile/edit" className="self-center text-sm text-ink-muted underline-offset-4 hover:underline">
-          {t("back")}
-        </Link>
-      </main>
-    </>
+    <NotebookShell
+      left={
+        <>
+          <PaintedBand as="h1">{t("title")}</PaintedBand>
+          <p className="mt-5.5 text-ink-body">{t("intro")}</p>
+          <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 text-ink-body marker:text-bronze">
+            {consequences.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          <p className="type-body-strong mt-5.5 mb-5.5 text-destructive">{t("irreversible")}</p>
+          <DeleteAccountForm username={profile.username} />
+          <p className="mt-8.5 flex justify-center">
+            <Button asChild variant="link">
+              <Link href="/profile/edit">{t("back")}</Link>
+            </Button>
+          </p>
+        </>
+      }
+    />
   );
 }

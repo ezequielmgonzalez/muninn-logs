@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { InkButton } from "@/components/notebook/ink-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -20,14 +20,13 @@ export function DeleteAccountForm({ username }: { username: string }) {
   const matches = typed.trim().toLowerCase().replace(/^@/, "") === username;
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-5.5">
       <input type="hidden" name="locale" value={locale} />
-      <div className="flex flex-col gap-2">
+      <div>
         <Label htmlFor="confirm-username">{t("confirmLabel", { username })}</Label>
         <Input
           id="confirm-username"
           name="username"
-          className="h-11"
           autoCapitalize="none"
           autoComplete="off"
           value={typed}
@@ -40,13 +39,9 @@ export function DeleteAccountForm({ username }: { username: string }) {
           {t(`errors.${state.error}`)}
         </p>
       )}
-      <Button
-        type="submit"
-        className="h-11 bg-destructive text-base text-primary-foreground hover:bg-destructive/90"
-        disabled={!matches || pending}
-      >
+      <InkButton type="submit" tone="danger" className="mt-2" disabled={!matches || pending}>
         {t("submit")}
-      </Button>
+      </InkButton>
     </form>
   );
 }
