@@ -1,9 +1,10 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { Fragment } from "react";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { CompassRose } from "@/components/notebook/icons";
 import { InkButton } from "@/components/notebook/ink-button";
-import { DiaryIdentity, NotebookShell } from "@/components/notebook/notebook-shell";
+import { DiaryIdentity, NotebookPages } from "@/components/notebook/notebook-shell";
 import { BrushBar, PaintedBand } from "@/components/notebook/painted-band";
 import { PaperSheet } from "@/components/notebook/paper-sheet";
 import { Button } from "@/components/ui/button";
@@ -58,8 +59,10 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
     .slice(0, 3);
   const mostGames = topLeaders[0]?.games ?? 0;
 
+  // A new player count paints the screen again: every block rises, every bar fills.
+  const fresh = players ?? "all";
   const left = (
-    <>
+    <Fragment key={fresh}>
       {/* On phones the diary's name opens the page; on desktop it's on the insert. */}
       <DiaryIdentity className="mb-11 text-center notebook:hidden" />
       <h1 className="sr-only">{t("journal", { name: profile.display_name })}</h1>
@@ -143,11 +146,11 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
           <p className="type-caption mt-4 text-ink-muted">{t("leadersHint")}</p>
         </section>
       )}
-    </>
+    </Fragment>
   );
 
   const right = (
-    <>
+    <Fragment key={fresh}>
       {incomingRequests > 0 && (
         <p className="mb-8 text-center">
           <Button asChild variant="link">
@@ -204,10 +207,10 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
         </div>
         <LocaleSwitcher />
       </nav>
-    </>
+    </Fragment>
   );
 
-  return <NotebookShell active="home" left={left} right={right} playerFilter />;
+  return <NotebookPages left={left} right={right} />;
 }
 
 /** The signed-out home: what Muninn Logs is, and a way in. */

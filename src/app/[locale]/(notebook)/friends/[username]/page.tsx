@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Fragment } from "react";
 
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
@@ -33,8 +34,9 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
   const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
   const stats = await getPlayerStats(friend.id, players);
 
+  // A new player count paints the pages again. The ranking repaints its own bars, keeping its order.
   const left = (
-    <>
+    <Fragment key={players ?? "all"}>
       <PaintedBand as="h1">{tHome("journal", { name: friend.display_name })}</PaintedBand>
       <p className="type-caption mt-3 text-center text-ink-muted">{tStats("expeditions", { count: stats.games })}</p>
       <p className="mt-4 flex items-center justify-between gap-4">
@@ -58,18 +60,18 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
           <WinRateSection stats={stats} />
         </div>
       )}
-    </>
+    </Fragment>
   );
 
   const right =
     stats.games === 0 ? undefined : (
       <>
-        <CategoriesSection stats={stats} />
+        <CategoriesSection key={players ?? "all"} stats={stats} />
         <div className="mt-11">
           <LeaderRanking leaders={stats.leaders} />
         </div>
       </>
     );
 
-  return <NotebookShell active="friends" left={left} right={right} playerFilter />;
+  return <NotebookPages left={left} right={right} />;
 }

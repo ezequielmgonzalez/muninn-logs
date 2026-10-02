@@ -156,6 +156,8 @@ test("the player count filters every stat and list, and follows you between scre
 test("while the player filter reloads, the screen says so instead of freezing", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   await page.goto("/es/profile");
+  // The screen itself, not its loading sketch (revealed a moment after the load).
+  await expect(page.getByRole("heading", { name: "Win Rate" })).toBeVisible();
   // Hold the reload back, so its state can be seen.
   await page.route("**/es/profile**", async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 1500));

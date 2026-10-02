@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { CrownIcon } from "@/components/notebook/icons";
 import { InkButton } from "@/components/notebook/ink-button";
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { BrushBar, PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
@@ -169,5 +169,5 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
     </>
   );
 
-  return <NotebookShell active="matches" left={left} right={right} />;
+  return <NotebookPages left={left} right={right} />;
 }

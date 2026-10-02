@@ -1,7 +1,7 @@
 "use client";
 
 import gsap from "gsap";
-import { type ComponentProps, createContext, type MouseEvent, type ReactNode, useCallback, useContext, useEffect, useRef } from "react";
+import { type ComponentProps, createContext, type MouseEvent, type ReactNode, useCallback, useContext, useRef } from "react";
 
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
@@ -22,7 +22,7 @@ type Turn = (href: Href, direction: TurnDirection) => void;
 
 const PageTurnContext = createContext<Turn | null>(null);
 
-/** The desktop page's size in the notebook scene (NotebookShell), and half the spine between pages. */
+/** The desktop page's size in the notebook scene (NotebookFrame), and half the spine between pages. */
 const PAGE = { width: 462, height: 908, halfSpine: 12 };
 const NOTEBOOK_QUERY = "(min-width: 1200px)";
 
@@ -102,7 +102,7 @@ function turnAway(el: Element | null) {
 /**
  * After a turn: shows again whatever is still hidden. If the navigation went
  * nowhere, the clicked section isn't pending any more either. If it went
- * ahead, the screen may still be loading: its real navigation clears that.
+ * ahead, the navigation clears that once the path changes (navigation.tsx).
  */
 function restore(wentNowhere: boolean) {
   for (const el of document.querySelectorAll("[data-turned-away]")) el.removeAttribute("data-turned-away");
@@ -114,20 +114,14 @@ function restore(wentNowhere: boolean) {
 /**
  * Paints a section in the navigation the moment it's clicked, before its
  * screen arrives (globals.css): the clicked links paint their stroke in, and
- * the page root keeps the mark through the loading notebook until the next
- * screen's navigation clears it (ClearPendingSection).
+ * the page root keeps the mark until the path changes, when the navigation
+ * itself marks the section as current (navigation.tsx).
  */
 function paintNavItem(section: NotebookSection) {
   for (const el of document.querySelectorAll(`[data-nav-item][data-section="${section}"]`)) {
     el.setAttribute("data-pending", "");
   }
   document.documentElement.setAttribute("data-pending-section", section);
-}
-
-/** In a screen's real navigation: its section has arrived, so nothing is pending any more. */
-export function ClearPendingSection() {
-  useEffect(() => document.documentElement.removeAttribute("data-pending-section"), []);
-  return null;
 }
 
 /** The two-page notebook: the right page turns over the spine to the left, or back. */

@@ -32,6 +32,8 @@ test("editing the profile changes the name and the username friends search for",
   await expect(page).toHaveURL("/es?profileSaved=1");
   await expect(page.getByRole("status")).toHaveText("Perfil actualizado.");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Ana María");
+  // The notebook's own "Diario de" too, though it stayed put through the edit.
+  await expect(page.locator(".type-diary-name").filter({ visible: true })).toHaveText("Ana María");
 
   // Friends now find her by the new username, and not by the old one.
   await sendFriendRequest(beto, oldUsername);

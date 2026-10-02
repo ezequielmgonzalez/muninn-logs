@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { ImportForm } from "@/features/import/import-form";
@@ -37,7 +37,7 @@ export default async function AdminImportPage({ searchParams }: PageProps<"/[loc
   if (error) throw error;
 
   return (
-    <NotebookShell
+    <NotebookPages
       left={
         <>
           <PaintedBand as="h1">{t("title")}</PaintedBand>

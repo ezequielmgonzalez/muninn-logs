@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { Fragment } from "react";
 
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { LeaderRanking } from "@/features/stats/leader-ranking";
 import { getPlayerCount } from "@/features/player-count/server";
@@ -26,9 +27,7 @@ export default async function ProfilePage() {
   if (stats.games === 0) {
     // Nothing to show yet: the insert and the tab bar offer "Cargar partida".
     return (
-      <NotebookShell
-        playerFilter
-        active="stats"
+      <NotebookPages
         left={
           <>
             {title}
@@ -41,15 +40,14 @@ export default async function ProfilePage() {
   }
 
   return (
-    <NotebookShell
-      playerFilter
-      active="stats"
+    <NotebookPages
       left={
-        <>
+        // A new player count paints the page again. The ranking repaints its own bars, keeping its order.
+        <Fragment key={players ?? "all"}>
           {title}
           <WinRateSection stats={stats} />
           <CategoriesSection stats={stats} className="mt-8 notebook:mt-8.5" />
-        </>
+        </Fragment>
       }
       right={<LeaderRanking leaders={stats.leaders} />}
     />

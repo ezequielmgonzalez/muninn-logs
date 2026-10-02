@@ -41,14 +41,3 @@ export function PageSketch({ blocks }: { blocks: string[][] }) {
     </>
   );
 }
-
-/** The insert's "Diario de / Name / N expediciones", sketched. */
-export function IdentitySketch({ className }: { className?: string }) {
-  return (
-    <div aria-hidden className={cn("flex flex-col gap-2.5", className)}>
-      <SketchLine width="5.5rem" className="h-2.5" />
-      <SketchLine width="9.5rem" className="h-6" />
-      <SketchLine width="8rem" className="h-2.5" />
-    </div>
-  );
-}

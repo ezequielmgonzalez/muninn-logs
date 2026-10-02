@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { localeSchema } from "@/features/auth/schemas";
@@ -42,5 +43,7 @@ export async function importMatches(_state: ImportMatchesState, formData: FormDa
     return { status: "error", error: "generic" };
   }
 
+  // The notebook around every screen outlives navigation: refresh its "N expediciones".
+  revalidatePath("/", "layout");
   return redirect({ href: { pathname: "/admin/import", query: { imported: String(count) } }, locale });
 }

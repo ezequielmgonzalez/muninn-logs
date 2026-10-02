@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { getFriendships } from "@/features/friends/queries";
@@ -22,8 +22,7 @@ export default async function GuestsPage() {
   const [guests, { friends }] = await Promise.all([listOwnGuests(profile.id), getFriendships(profile.id)]);
 
   return (
-    <NotebookShell
-      active="friends"
+    <NotebookPages
       left={
         <>
           <PaintedBand as="h1">{t("title")}</PaintedBand>

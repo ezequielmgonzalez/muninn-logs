@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { CloseIcon } from "@/components/notebook/icons";
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
@@ -157,5 +157,5 @@ export default async function FriendsPage() {
   );
 
   // On phones your friends come first, then adding one.
-  return <NotebookShell active="friends" left={left} right={right} mobileOrder="right-first" />;
+  return <NotebookPages left={left} right={right} mobileOrder="right-first" />;
 }

@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
@@ -43,7 +43,7 @@ export default async function DeleteAccountPage() {
   ].filter((line): line is string => Boolean(line));
 
   return (
-    <NotebookShell
+    <NotebookPages
       left={
         <>
           <PaintedBand as="h1">{t("title")}</PaintedBand>

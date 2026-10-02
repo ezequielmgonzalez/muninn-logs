@@ -1,6 +1,6 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { localeSchema, usernameSchema } from "@/features/auth/schemas";
@@ -62,6 +62,8 @@ export async function acceptGuestLink(_state: AcceptLinkState, formData: FormDat
     logUnexpected("acceptGuestLink", error);
     return { status: "error", error: "generic" };
   }
+  // The notebook around every screen outlives navigation: refresh its "N expediciones".
+  revalidatePath("/", "layout");
   return redirect({ href: { pathname: "/", query: { linked: String(moved) } }, locale });
 }
 
@@ -108,5 +110,7 @@ export async function adminLinkGuest(_state: AdminLinkState, formData: FormData)
     logUnexpected("adminLinkGuest", error);
     return fail("generic");
   }
+  // The notebook around every screen outlives navigation: refresh its "N expediciones".
+  revalidatePath("/", "layout");
   return redirect({ href: { pathname: "/admin/guests", query: { linked: String(moved) } }, locale });
 }

@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
@@ -19,7 +19,7 @@ export default async function EditProfilePage() {
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   return (
-    <NotebookShell
+    <NotebookPages
       left={
         <>
           <PaintedBand as="h1">{t("title")}</PaintedBand>

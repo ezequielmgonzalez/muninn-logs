@@ -1,7 +1,8 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { Fragment } from "react";
 
 import { InkButton } from "@/components/notebook/ink-button";
-import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
@@ -31,9 +32,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
 
   if (matches.length === 0) {
     return (
-      <NotebookShell
-        playerFilter
-        active="matches"
+      <NotebookPages
         left={
           <>
             {title}
@@ -95,22 +94,21 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
   );
 
   return (
-    <NotebookShell
-      playerFilter
-      active="matches"
+    <NotebookPages
       left={
-        <>
+        // A new player count paints the screen again.
+        <Fragment key={players ?? "all"}>
           {title}
           {left && month(left, false)}
           {!right && pager}
-        </>
+        </Fragment>
       }
       right={
         right && (
-          <>
+          <Fragment key={players ?? "all"}>
             {month(right, true)}
             {pager}
-          </>
+          </Fragment>
         )
       }
     />

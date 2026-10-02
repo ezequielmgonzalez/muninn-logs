@@ -318,8 +318,8 @@ html[data-turning] .ring-fill {
 /*
  * Navigation strokes: on the current section, and on a section the moment
  * it's clicked, before its screen arrives. TurnLink marks the page root
- * (html[data-pending-section]), so the mark outlives the loading notebook in
- * between; the next screen's navigation clears it (ClearPendingSection).
+ * (html[data-pending-section]) until the path changes, when the navigation
+ * marks the section as current itself (navigation.tsx).
  * Meanwhile the old section steps back. Only the clicked link ([data-pending])
  * paints its stroke in; the navigations after it show the stroke as it is.
  */

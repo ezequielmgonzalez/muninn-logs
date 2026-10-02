@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { redirect } from "@/i18n/navigation";
 import { logUnexpected } from "@/lib/log";
 import { createClient } from "@/lib/supabase/server";
@@ -120,6 +122,8 @@ export async function saveProfile(_state: ProfileState, formData: FormData): Pro
     };
   }
 
+  // The notebook around every screen outlives navigation: refresh the diary's name.
+  revalidatePath("/", "layout");
   // After an edit, home confirms it; after onboarding, home is simply the next step.
   return formData.get("mode") === "edit"
     ? redirect({ href: { pathname: "/", query: { profileSaved: "1" } }, locale })

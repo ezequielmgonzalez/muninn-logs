@@ -1,8 +1,8 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { Fragment } from "react";
 
 import { InkButton } from "@/components/notebook/ink-button";
 import { NotebookPage } from "@/components/notebook/notebook-page";
-import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { BrushBar, PaintedBand, PLAYER_TONES } from "@/components/notebook/painted-band";
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
 import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
@@ -216,15 +216,20 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   );
 
   return (
-    // Amigos stays current: comparing is reached from there.
-    <NotebookShell active="friends" playerFilter>
+    // Amigos stays current (sections.ts): comparing is reached from there.
+    <>
       {/* On phones the left page dissolves so the table can sit between the chips and the chart. */}
       <NotebookPage side="left" className={comparing ? "max-notebook:contents" : undefined}>
         <section className="order-1">
           <PaintedBand as={comparing ? "h2" : "h1"}>{t("pickTitle")}</PaintedBand>
           {picker}
         </section>
-        {comparing && <div className="mt-11 max-notebook:mt-0 max-notebook:contents">{chart}</div>}
+        {/* A new player count paints the chart and the table again. */}
+        {comparing && (
+          <div key={players ?? "all"} className="mt-11 max-notebook:mt-0 max-notebook:contents">
+            {chart}
+          </div>
+        )}
         {chosen.length > 0 && !comparing && (
           <p role="status" className="type-body-strong mt-8.5 text-ink-body">
             {t("noShared")}
@@ -233,9 +238,9 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
       </NotebookPage>
       {comparing && (
         <NotebookPage side="right" order={2}>
-          {table}
+          <Fragment key={players ?? "all"}>{table}</Fragment>
         </NotebookPage>
       )}
-    </NotebookShell>
+    </>
   );
 }

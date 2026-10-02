@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
-import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { type FormPlayer, LogMatchForm } from "@/features/matches/log-match-form";
 import { getMatch } from "@/features/matches/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
@@ -52,22 +51,20 @@ export default async function EditMatchPage({ params }: PageProps<"/[locale]/mat
       };
     });
 
+  // The form brings its own save bar on phones, in place of the tab bar (sections.ts).
   return (
-    // The form brings its own save bar on phones, in place of the tab bar.
-    <NotebookShell bottomBar={null}>
-      <LogMatchForm
-        title={t("editTitle")}
-        addable={addable}
-        initial={{
-          matchId: match.id,
-          playedOn: match.playedOn ?? "",
-          boardSide: match.boardSide,
-          durationMinutes: match.durationMinutes,
-          turnOrderKnown: match.turnOrderKnown,
-          players,
-          tiebreakKey: match.players.find((p) => p.wonTiebreak)?.playerId ?? null,
-        }}
-      />
-    </NotebookShell>
+    <LogMatchForm
+      title={t("editTitle")}
+      addable={addable}
+      initial={{
+        matchId: match.id,
+        playedOn: match.playedOn ?? "",
+        boardSide: match.boardSide,
+        durationMinutes: match.durationMinutes,
+        turnOrderKnown: match.turnOrderKnown,
+        players,
+        tiebreakKey: match.players.find((p) => p.wonTiebreak)?.playerId ?? null,
+      }}
+    />
   );
 }

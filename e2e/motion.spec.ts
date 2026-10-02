@@ -90,3 +90,35 @@ test("changing the leaders' order repaints every bar, top to bottom", async ({ p
   expect(bars.every((b) => b?.running)).toBe(true);
   expect(bars[1]!.delay).toBeGreaterThan(bars[0]!.delay);
 });
+
+test("a new player count repaints every bar, keeping the leaders' order", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await logGame(page, "captain", 10);
+  await logGame(page, "mystic", 20);
+  // And a 3-player game, so the 2-player numbers differ from all of them.
+  await page.goto("/es/matches/new");
+  await addGuest(page, "Dos");
+  await addGuest(page, "Tres");
+  await page.getByLabel("Líder de Ana").selectOption("captain");
+  await fillScores(page, "Ana", [30, 1, 1, 1, 1, 0]);
+  await fillScores(page, "Dos", [1, 0, 0, 0, 0, 0]);
+  await fillScores(page, "Tres", [1, 0, 0, 0, 0, 0]);
+  await saveMatch(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/es/profile");
+  await page.getByLabel("Ordenar por").selectOption("total.average");
+
+  // Tag the leaders' bars: after the change, none of them may be left as it was.
+  const bars = page.locator("[data-brush-bar]");
+  await expect(bars).toHaveCount(2);
+  await bars.evaluateAll((els) => els.forEach((el) => el.setAttribute("data-before", "")));
+  await page.getByLabel("Jugadores").filter({ visible: true }).selectOption({ label: "2 jugadores" });
+
+  await expect(page.locator("[data-brush-bar][data-before]")).toHaveCount(0);
+  await expect(bars).toHaveCount(2);
+  const painting = await page.locator('[data-brush-bar] [data-paint-layer="stroke"]').evaluateAll((els) =>
+    els.map((el) => el.getAnimations().some((a) => a.playState === "running")),
+  );
+  expect(painting.filter(Boolean).length).toBeGreaterThan(0);
+  await expect(page.getByLabel("Ordenar por")).toHaveValue("total.average");
+});
