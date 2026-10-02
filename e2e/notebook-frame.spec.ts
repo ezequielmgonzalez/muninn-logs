@@ -76,3 +76,18 @@ test("on a big screen the notebook grows to fill it, and fits a small one", asyn
   await page.setViewportSize({ width: 1440, height: 800 });
   await expect.poll(async () => (await scene.boundingBox())?.height).toBeCloseTo(800, 0);
 });
+
+test("switching language keeps the notebook's size", async ({ page, request, isMobile }) => {
+  test.skip(isMobile, "the scaled scene is the desktop notebook's");
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await signUp(page, request, "Ana");
+  const scene = page.locator("[data-notebook] > div").first();
+  await expect.poll(async () => (await scene.boundingBox())?.height).toBeCloseTo(900, 0);
+
+  await page.getByRole("link", { name: "English" }).click();
+  await expect(page).toHaveURL("/en");
+  await expect.poll(async () => (await scene.boundingBox())?.height).toBeCloseTo(900, 0);
+  await page.getByRole("link", { name: "Español" }).click();
+  await expect(page).toHaveURL("/es");
+  await expect.poll(async () => (await scene.boundingBox())?.height).toBeCloseTo(900, 0);
+});
