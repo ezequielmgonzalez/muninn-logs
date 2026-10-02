@@ -8,6 +8,7 @@ import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { BrushBar, PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
+import { getFriendships } from "@/features/friends/queries";
 import { DeleteMatch } from "@/features/matches/delete-match";
 import { playedOnDate } from "@/features/matches/format";
 import { getMatch } from "@/features/matches/queries";
@@ -31,8 +32,21 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
   const { saved } = await searchParams;
   // Not a UUID, not visible to this user, or deleted: all look the same.
   const matchId = z.uuid().safeParse(id);
-  const match = matchId.success ? await getMatch(matchId.data) : null;
+  const [match, friendships] = await Promise.all([
+    matchId.success ? getMatch(matchId.data) : null,
+    getFriendships(profile.id),
+  ]);
   if (!match) notFound();
+
+  // A player's name opens their Estadísticas: yours, or an accepted friend's (only friends can see them).
+  const friendUsernames = new Set(friendships.friends.map((f) => f.username));
+  const statsOf = (p: (typeof match.players)[number]) =>
+    p.isMe
+      ? ({ href: "/profile", section: "stats" } as const)
+      : p.username && friendUsernames.has(p.username)
+        ? ({ href: `/friends/${p.username}`, section: "friends" } as const)
+        : null;
+  const results = match.players.map((p) => ({ ...p, stats: statsOf(p) }));
 
   const best = Math.max(...match.players.map((p) => p.total), 0);
   const details = [
@@ -59,7 +73,7 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
           {t("results")}
         </PaintedBand>
         <ol className="mt-5.5 flex flex-col gap-4">
-          {match.players.map((p, i) => (
+          {results.map((p, i) => (
             <li key={p.playerId} className="flex items-center gap-3.5">
               <span className="type-stat-lg w-6 shrink-0 text-center text-ink-muted">{p.rank}</span>
               <div className="min-w-0 flex-1">
@@ -68,7 +82,18 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
                     {p.isWinner && <CrownIcon className="shrink-0" />}
                     <span className="truncate">
                       {p.leader && <span aria-hidden>{ARNAK_LEADER_STYLES[p.leader].emoji} </span>}
-                      <b className="font-semibold">{p.name}</b>
+                      {p.stats ? (
+                        <TurnLink
+                          href={p.stats.href}
+                          section={p.stats.section}
+                          direction="forward"
+                          className="font-semibold underline decoration-ink-body/35 decoration-1 underline-offset-4 hover:decoration-bronze"
+                        >
+                          {p.name}
+                        </TurnLink>
+                      ) : (
+                        <b className="font-semibold">{p.name}</b>
+                      )}
                       {p.isMe && <span className="text-ink-muted"> · {t("you")}</span>}
                     </span>
                   </span>

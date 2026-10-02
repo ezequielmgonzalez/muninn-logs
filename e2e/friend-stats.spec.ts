@@ -18,9 +18,18 @@ test("a friend's profile shows their stats, and comparing marks who does better"
   await page.goto("/es/matches/new");
   await page.getByLabel("Agregar jugador").fill("Beto");
   await page.getByRole("button", { name: "Beto" }).click();
+  await addGuest(page, "Lola");
   await fillScores(page, "Ana", [10, 6, 9, 5, 14, 2]); // 42
   await fillScores(page, "Beto", [8, 4, 6, 5, 9, 2]); // 30
+  await fillScores(page, "Lola", [1, 0, 0, 0, 0, 0]);
   await saveMatch(page);
+
+  // In the match's results, a friend's name opens their Estadísticas, and yours your own. A guest has none.
+  const results = page.getByRole("list").filter({ hasText: "Lola" });
+  await expect(results.getByRole("link", { name: "Beto", exact: true })).toHaveAttribute("href", `/es/friends/${betoUsername}`);
+  await expect(results.getByRole("link", { name: "Ana", exact: true })).toHaveAttribute("href", "/es/profile");
+  await expect(results.getByRole("link", { name: "Lola" })).toHaveCount(0);
+  const matchUrl = page.url();
 
   // Beto wins a game of his own: Beto 2 games, 1 win.
   await beto.goto("/es/matches/new");
@@ -37,6 +46,17 @@ test("a friend's profile shows their stats, and comparing marks who does better"
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Beto");
   await expect(page.getByText("2 expediciones registradas").filter({ visible: true })).toBeVisible();
   await expect(page.getByRole("img", { name: /^50\s%\sde 2 partidas$/ })).toBeVisible();
+  // The same screen as your own Estadísticas.
+  await expect(page.getByRole("heading", { name: "Win Rate" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Por categoría" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Líderes más jugados" })).toBeVisible();
+  await expect(page.getByLabel("Ordenar por")).toBeVisible();
+
+  // And from the match, too.
+  await page.goto(matchUrl);
+  await page.getByRole("link", { name: "Beto", exact: true }).click();
+  await expect(page).toHaveURL(`/es/friends/${betoUsername}`);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Diario de Beto");
 
   await page.getByRole("link", { name: "Compararme" }).click();
   await expect(page).toHaveURL(`/es/compare?with=${betoUsername}`);

@@ -30,7 +30,8 @@ export function FriendList({
               <TurnLink
                 href={`/friends/${person.username}`}
                 direction="forward"
-                className="truncate text-base font-semibold text-ink-body underline-offset-4 hover:underline"
+                // Underlined like the notebook's other links, so it reads as one: it opens their Estadísticas.
+                className="truncate text-base font-semibold text-ink-body underline decoration-ink-body/35 decoration-1 underline-offset-4 hover:decoration-bronze"
               >
                 {person.display_name}
               </TurnLink>

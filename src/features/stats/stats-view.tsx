@@ -21,11 +21,11 @@ async function getStatsFormat() {
 }
 
 /** The ring, then wins, average place and average points. */
-export async function WinRateSection({ stats }: { stats: PlayerStats }) {
+export async function WinRateSection({ stats, className }: { stats: PlayerStats; className?: string }) {
   const { t, format, decimals } = await getStatsFormat();
   const rate = stats.wins / stats.games;
   return (
-    <section>
+    <section className={className}>
       <PaintedBand>{t("winRate")}</PaintedBand>
       <div className="flex justify-center pt-5.5 pb-1">
         <WinRateRing

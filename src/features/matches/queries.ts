@@ -9,6 +9,8 @@ import { createClient } from "@/lib/supabase/server";
 export type MatchPlayer = {
   playerId: string;
   name: string;
+  /** A user's username (null for guests): their page, if they're a friend. */
+  username: string | null;
   isMe: boolean;
   isGuest: boolean;
   leader: ArnakLeader | null;
@@ -41,7 +43,7 @@ const MATCH_COLUMNS = `
   id, played_on, created_by, duration_minutes, setup,
   match_players (
     player_id, turn_order, won_tiebreak,
-    player:players ( name, user_id, profile:profiles!players_user_id_fkey ( display_name ) ),
+    player:players ( name, user_id, profile:profiles!players_user_id_fkey ( display_name, username ) ),
     character:game_characters ( slug )
   )` as const;
 
@@ -55,7 +57,11 @@ type MatchRow = {
     player_id: string;
     turn_order: number | null;
     won_tiebreak: boolean;
-    player: { name: string | null; user_id: string | null; profile: { display_name: string } | null } | null;
+    player: {
+      name: string | null;
+      user_id: string | null;
+      profile: { display_name: string; username: string | null } | null;
+    } | null;
     character: { slug: string } | null;
   }[];
 };
@@ -79,6 +85,7 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
       return {
         playerId: mp.player_id,
         name: mp.player?.profile?.display_name ?? mp.player?.name ?? "?",
+        username: mp.player?.profile?.username ?? null,
         isMe: mp.player?.user_id != null && mp.player.user_id === me,
         isGuest: mp.player?.user_id == null,
         leader: (mp.character?.slug as ArnakLeader | undefined) ?? null,
