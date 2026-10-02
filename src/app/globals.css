@@ -189,6 +189,25 @@
 }
 
 /*
+ * Pen lines, for what you press rather than read: a box drawn around a
+ * button's label (InkButton), and a loop circling the option you picked. Thin
+ * strokes that keep their width however the mask stretches
+ * (vector-effect: non-scaling-stroke in the SVG). The circle is drawn in
+ * around its center (pen-draw).
+ */
+@property --pen-sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 360deg;
+}
+@utility ink--pen-box {
+  mask-image: url(/pen/pen-box.svg);
+}
+@utility ink--pen-circle {
+  mask-image: url(/pen/pen-circle.svg);
+}
+
+/*
  * Motion: when a screen appears, its blocks rise in one after another and
  * every brush stroke is painted left to right, once and quickly. Only for
  * people who haven't asked their system for reduced motion; for them
@@ -282,6 +301,24 @@
   }
 }
 
+/*
+ * A pen circle drawn around the option just picked (PenCircle), quick like a
+ * flick of the wrist: a wrapper whose conic mask uncovers the circle as
+ * --pen-sweep turns, whole when nothing animates it. Two elements, not two
+ * mask layers on one: intersected masks leave a faint box around it in Chrome.
+ */
+@keyframes pen-draw {
+  from {
+    --pen-sweep: 0deg;
+  }
+}
+@utility pen-draw {
+  mask-image: conic-gradient(from 265deg, #000 var(--pen-sweep), transparent 0);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: pen-draw 420ms var(--ease-brush);
+  }
+}
+
 /* The win-rate ring fills from empty; --ring-from is its circumference. */
 @utility ring-fill {
   @media (prefers-reduced-motion: no-preference) {
@@ -301,6 +338,7 @@
 html[data-turning] .enter-stagger > *,
 html[data-turning] .enter-stagger > * > *,
 html[data-turning] .paint-in,
+html[data-turning] .pen-draw,
 html[data-turning] .before\:paint-in::before,
 html[data-turning] .ring-fill {
   animation-play-state: paused;

@@ -7,33 +7,36 @@ import { cn } from "@/lib/utils";
 import { PlusIcon } from "./icons";
 import { TurnLink } from "./page-turn";
 
-// The ink button: a screen's main action, painted with the same stroke as the
-// titles (design/components/InkButton.md). The stroke is a ::before with a
-// brush mask, behind the content, so the button can also render a link
-// (asChild) without an extra element. Never border-radius or shadow on it.
+// The ink button: a screen's main action, a box drawn in pen around its label
+// with a faint wash of ink inside (design/components/InkButton.md). Brush
+// strokes are for titles and the navigation; what you press is drawn in pen.
+// The box is a ::before with a pen mask and the wash an ::after, both behind
+// the content, so the button can also render a link (asChild) without an
+// extra element. Never border-radius or shadow on them.
 
 export const inkButtonVariants = cva(
   [
-    "relative isolate inline-flex cursor-pointer items-center justify-center gap-2.5 text-band-text select-none",
-    "before:ink before:-inset-x-3 before:-inset-y-[9px] before:-z-1 before:bg-ink",
-    "outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze",
-    // Disabled: the ink fades. Always say why next to it.
-    "disabled:cursor-not-allowed disabled:before:opacity-42 aria-disabled:pointer-events-none aria-disabled:before:opacity-42",
+    "relative isolate inline-flex cursor-pointer items-center justify-center gap-2.5 text-ink select-none",
+    "before:ink before:ink--pen-box before:-inset-x-1 before:-inset-y-1 before:-z-1 before:bg-ink",
+    "after:absolute after:inset-0.5 after:-z-1 after:bg-ink/7 after:transition-colors hover:after:bg-ink/12",
+    "outline-none focus-visible:outline-2 focus-visible:outline-offset-5 focus-visible:outline-bronze",
+    // Disabled: the whole button fades. Always say why next to it.
+    "disabled:cursor-not-allowed disabled:opacity-45 aria-disabled:pointer-events-none aria-disabled:opacity-45",
     "[&_svg]:shrink-0",
   ],
   {
     variants: {
       variant: {
         /** A screen's main action: full column width. */
-        // Painted in with its screen's other strokes.
-        primary: "type-ink-button h-[52px] w-full before:ink--band1 before:paint-in",
-        /** "Cargar partida" on the desktop insert: part of the notebook, so it doesn't repaint on every screen. */
-        insert: "type-ink-button h-12 w-full text-[13px] before:ink--band2",
+        // Drawn in with its screen's strokes.
+        primary: "type-ink-button h-[52px] w-full before:paint-in",
+        /** "Cargar partida" on the desktop insert: part of the notebook, so it isn't drawn again on every screen. */
+        insert: "type-ink-button h-12 w-full text-[13px]",
       },
       tone: {
         ink: "",
         /** Irreversible actions (deleting a game, the account): red ink. */
-        danger: "before:bg-destructive",
+        danger: "text-destructive before:bg-destructive after:bg-destructive/7 hover:after:bg-destructive/12",
       },
     },
     defaultVariants: { variant: "primary", tone: "ink" },

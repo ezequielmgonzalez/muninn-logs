@@ -8,6 +8,7 @@ import { InkButton } from "@/components/notebook/ink-button";
 import { NativeSelect } from "@/components/notebook/native-select";
 import { NotebookPage } from "@/components/notebook/notebook-page";
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { PenCircle } from "@/components/notebook/pen-circle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -215,9 +216,9 @@ export function LogMatchForm({
             </p>
             <div role="group" aria-labelledby="board-side" className="grid grid-cols-3 gap-2.5">
               {[null, ...ARNAK_BOARD_SIDES].map((side) => (
-                <BrushToggle key={side ?? "none"} pressed={boardSide === side} onClick={() => setBoardSide(side)}>
+                <PenToggle key={side ?? "none"} pressed={boardSide === side} onClick={() => setBoardSide(side)}>
                   {side ? t(side) : t("notRecorded")}
-                </BrushToggle>
+                </PenToggle>
               ))}
             </div>
           </div>
@@ -255,12 +256,12 @@ export function LogMatchForm({
             aria-describedby="turn-order-hint"
             className="grid grid-cols-2 gap-2.5"
           >
-            <BrushToggle pressed={turnOrderKnown} onClick={() => setTurnOrderKnown(true)}>
+            <PenToggle pressed={turnOrderKnown} onClick={() => setTurnOrderKnown(true)}>
               {t("turnOrderKnown")}
-            </BrushToggle>
-            <BrushToggle pressed={!turnOrderKnown} onClick={() => setTurnOrderKnown(false)}>
+            </PenToggle>
+            <PenToggle pressed={!turnOrderKnown} onClick={() => setTurnOrderKnown(false)}>
               {t("notRecorded")}
-            </BrushToggle>
+            </PenToggle>
           </div>
           <p id="turn-order-hint" className="type-caption mt-1.5 text-ink-muted">
             {turnOrderKnown ? t("turnOrderKnownHint") : t("turnOrderUnknownHint")}
@@ -345,17 +346,19 @@ export function LogMatchForm({
   );
 }
 
-/** A choice among a few, painted when pressed (design/components/FormFields.md). */
-function BrushToggle({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
+/** A choice among a few, circled in pen when pressed (design/components/FormFields.md). */
+function PenToggle({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <button
       type="button"
       aria-pressed={pressed}
       onClick={onClick}
-      className="relative flex h-11 cursor-pointer items-center justify-center border-b-[1.5px] border-ink-body/30 text-[15px] text-ink-body outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze aria-pressed:border-transparent aria-pressed:text-band-text"
+      className="flex h-11 cursor-pointer items-center justify-center border-b-[1.5px] border-ink-body/30 text-[15px] text-ink-body outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze aria-pressed:border-transparent aria-pressed:font-semibold aria-pressed:text-ink"
     >
-      {pressed && <span aria-hidden className="ink ink--tab paint-in -inset-x-1.5 -inset-y-[3px] bg-ink" />}
-      <span className="relative z-2">{children}</span>
+      <span className="relative">
+        {pressed && <PenCircle className="-inset-x-3.5 -inset-y-2" />}
+        {children}
+      </span>
     </button>
   );
 }
