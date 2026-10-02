@@ -2,6 +2,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 
 import { InkButton } from "@/components/notebook/ink-button";
 import { NotebookShell } from "@/components/notebook/notebook-shell";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { groupByMonth, type MonthGroup, spreadOf } from "@/features/matches/group-by-month";
@@ -64,9 +65,15 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
       </div>
     </section>
   );
+  // Older months are further into the diary: the page turns forward to them.
   const pageLink = (to: number, label: string) => (
     <Button asChild variant="link">
-      <Link href={to === 0 ? "/matches" : { pathname: "/matches", query: { page: String(to) } }}>{label}</Link>
+      <TurnLink
+        href={to === 0 ? "/matches" : { pathname: "/matches", query: { page: String(to) } }}
+        direction={to > current ? "forward" : "backward"}
+      >
+        {label}
+      </TurnLink>
     </Button>
   );
 

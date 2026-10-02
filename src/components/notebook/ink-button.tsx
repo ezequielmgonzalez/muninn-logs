@@ -2,10 +2,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import type { ComponentProps } from "react";
 
-import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 import { PlusIcon } from "./icons";
+import { TurnLink } from "./page-turn";
 
 // The ink button: a screen's main action, painted with the same stroke as the
 // titles (design/components/InkButton.md). The stroke is a ::before with a
@@ -57,8 +57,9 @@ export function InkButton({
  */
 export function LoadMatchFab({ label, shortLabel }: { label: string; shortLabel: string }) {
   return (
-    <Link
+    <TurnLink
       href="/matches/new"
+      direction="forward"
       aria-label={label}
       className="relative -mt-10 flex cursor-pointer flex-col items-center gap-0.5 text-[11px] leading-[14px] font-semibold text-ink-body outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze"
     >
@@ -67,6 +68,6 @@ export function LoadMatchFab({ label, shortLabel }: { label: string; shortLabel:
         <PlusIcon size={24} className="relative z-2 text-band-text" />
       </span>
       <span aria-hidden>{shortLabel}</span>
-    </Link>
+    </TurnLink>
   );
 }

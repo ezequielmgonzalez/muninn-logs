@@ -5,6 +5,7 @@ import * as rootParams from "next/root-params";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
+import { PageTurnProvider } from "@/components/notebook/page-turn";
 import { routing } from "@/i18n/routing";
 
 import "../globals.css";
@@ -59,7 +60,10 @@ export default async function LocaleLayout({
             <body>, whose overflow browsers hand to the viewport instead. */}
         <div className="flex flex-1 flex-col overflow-x-clip">
           {/* Every screen (notebook or paper sheet) carries the legal links itself. */}
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider>
+            {/* Outlives each screen, so a turning page can cover the navigation between them. */}
+            <PageTurnProvider>{children}</PageTurnProvider>
+          </NextIntlClientProvider>
         </div>
       </body>
     </html>

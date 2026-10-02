@@ -276,6 +276,26 @@
   }
 }
 
+/*
+ * A turning page (PageTurnProvider): what it carried away is hidden until the
+ * next screen replaces it, the next screen's entrance waits for the page to
+ * land, and the turning copy itself never animates its content.
+ */
+[data-turned-away] {
+  visibility: hidden;
+}
+html[data-turning] .enter-stagger > *,
+html[data-turning] .paint-in,
+html[data-turning] .before\:paint-in::before,
+html[data-turning] .ring-fill {
+  animation-play-state: paused;
+}
+.page-flap,
+.page-flap *,
+.page-flap *::before {
+  animation: none !important;
+}
+
 /* Type styles (design/tokens.json "type"). Display (Cinzel) is only for text
  * on a brush stroke and small labels; numbers always use the body face. */
 @utility type-diary-name {
