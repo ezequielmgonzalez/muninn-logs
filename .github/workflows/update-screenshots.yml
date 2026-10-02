@@ -1,0 +1,54 @@
+name: Update screenshots
+
+# Makes the screenshot references (e2e/__screenshots__) on Linux, like CI's
+# checks, and uploads them as the "screenshots" artifact. Add the
+# "update-screenshots" label to a pull request, or run it by hand on a branch.
+# It doesn't commit them: a commit pushed by this workflow wouldn't run the
+# required checks. Download and commit them instead (see CLAUDE.md).
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'update-screenshots'
+    name: Make screenshot references
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+
+      # The same environment as the e2e job in ci.yml.
+      - run: >
+          pnpm supabase start
+          -x realtime,storage-api,imgproxy,studio,edge-runtime,logflare,vector,supavisor,postgres-meta
+
+      - name: Point the app at the local Supabase
+        run: |
+          eval "$(pnpm -s supabase status -o env)"
+          echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+          echo "MAILPIT_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
+          echo "SUPABASE_SECRET_KEY=$SECRET_KEY" >> "$GITHUB_ENV"
+
+      - run: pnpm build
+      - run: pnpm test:e2e e2e/visual.spec.ts --project=desktop --update-snapshots=all
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: screenshots
+          path: e2e/__screenshots__/
+          retention-days: 7

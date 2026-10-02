@@ -10,6 +10,14 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
+  // Screenshot references (e2e/visual.spec.ts) live in one folder, made on CI.
+  snapshotPathTemplate: "{testDir}/__screenshots__/{arg}{ext}",
+  // On CI a missing reference is a failure, never silently written.
+  updateSnapshots: process.env.CI ? "none" : "missing",
+  expect: {
+    // Tolerate antialiasing noise, not a moved or restyled element.
+    toHaveScreenshot: { maxDiffPixelRatio: 0.002 },
+  },
   use: {
     baseURL,
     // Default to Spanish (the app's default) regardless of the machine's locale.
