@@ -84,3 +84,33 @@ test("leaders rank by any category's average, highest or lowest, games without a
   await expect(rows.nth(1)).toContainText("Capitán");
   await expect(rows.nth(1)).toContainText("2");
 });
+
+test("a leader's own page lists their lowest, average and highest points, with a way back", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  // Two Captain games: research 10 (52 in total) and 2 (12 in total).
+  for (const [research, cards] of [[10, 42], [2, 10]]) {
+    await page.goto("/es/matches/new");
+    await addGuest(page, `Rival ${research}`);
+    await page.getByLabel("Líder de Ana").selectOption("captain");
+    await fillScores(page, "Ana", [research, 0, 0, 0, cards, 0]);
+    await fillScores(page, `Rival ${research}`, [1, 0, 0, 0, 0, 0]);
+    await saveMatch(page);
+  }
+  await page.goto("/es/profile");
+
+  await page.getByRole("button", { name: "Ver las estadísticas con Capitán" }).click();
+  await expect(page.getByRole("heading", { name: "Capitán" })).toBeVisible();
+  const row = (name: string) => page.getByRole("row", { name: new RegExp(`^${name}`) });
+  await expect(page.getByRole("columnheader")).toHaveText(["Puntos", "Mín.", "Prom.", "Máx."]);
+  await expect(row("Investigación").getByRole("cell")).toHaveText(["2", "6", "10"]);
+  await expect(row("Puntos totales").getByRole("cell")).toHaveText(["12", "32", "52"]);
+  // The ranking's controls make way for the leader's page.
+  await expect(page.getByLabel("Ordenar por")).toHaveCount(0);
+
+  // Focus starts on the way back, and returns to the leader's row.
+  const back = page.getByRole("button", { name: "← Todos los líderes" });
+  await expect(back).toBeFocused();
+  await back.click();
+  await expect(page.getByLabel("Ordenar por")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Ver las estadísticas con Capitán" })).toBeFocused();
+});

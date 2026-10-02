@@ -217,7 +217,16 @@
       "max": "máximo",
       "min": "mínimo"
     },
-    "pointMetric": "{measure}: {stat}"
+    "pointMetric": "{measure}: {stat}",
+    "openLeader": "Ver las estadísticas con {name}",
+    "allLeaders": "Todos los líderes",
+    "leaderSummary": "{games} · ganaste {rate} · lugar prom. {place}",
+    "columns": {
+      "measure": "Puntos",
+      "min": "Mín.",
+      "average": "Prom.",
+      "max": "Máx."
+    }
   },
   "FriendProfile": {
     "back": "Amigos",
