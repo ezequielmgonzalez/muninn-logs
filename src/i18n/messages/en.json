@@ -217,7 +217,16 @@
       "max": "highest",
       "min": "lowest"
     },
-    "pointMetric": "{measure}: {stat}"
+    "pointMetric": "{measure}: {stat}",
+    "openLeader": "See the stats with {name}",
+    "allLeaders": "All leaders",
+    "leaderSummary": "{games} · you won {rate} · avg place {place}",
+    "columns": {
+      "measure": "Points",
+      "min": "Low",
+      "average": "Avg",
+      "max": "High"
+    }
   },
   "FriendProfile": {
     "back": "Friends",
