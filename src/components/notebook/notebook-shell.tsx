@@ -16,7 +16,8 @@ import { SpineRings, TopSpirals } from "./rings";
 
 // Every signed-in screen is a notebook (design/components/NotebookShell.md):
 // from 1200px an open notebook (insert with the navigation, two pages, rings),
-// a 1280×1000 scene scaled down to fit the viewport but never up; below it,
+// a 1280×1000 scene scaled to fill the viewport (up to 2×; --scene-scale, set by
+// the script in scene-scale.ts); below it,
 // a field notebook bound at the top, one page, and a tab bar.
 //
 // The notebook is the (notebook) group's layout, so it stays put between
@@ -77,8 +78,6 @@ export async function NotebookFrame({ children }: { children: ReactNode }) {
       data-notebook
       className={cn(
         "relative min-h-dvh bg-backdrop bg-[url(/paper/backdrop.webp)] bg-cover bg-position-[50%_40%]",
-        // The scene's scale: as large as fits, never above 1:1 (no JS, so no flash).
-        "[--scene-scale:min(1,tan(atan2(100vw,1280px)),tan(atan2(100dvh,1000px)))]",
         "notebook:flex notebook:h-dvh notebook:items-center notebook:justify-center notebook:overflow-hidden",
       )}
     >

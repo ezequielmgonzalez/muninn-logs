@@ -6,6 +6,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 import { PageTurnProvider } from "@/components/notebook/page-turn";
+import { sceneScaleScript } from "@/components/notebook/scene-scale";
 import { routing } from "@/i18n/routing";
 
 import "../globals.css";
@@ -54,7 +55,13 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       className={`${cinzel.variable} ${spectral.variable} h-full antialiased`}
+      // The scene-scale script sets a style on <html> before React hydrates.
+      suppressHydrationWarning
     >
+      <head>
+        {/* Before the first paint: how big the desktop notebook is (scene-scale.ts). */}
+        <script dangerouslySetInnerHTML={{ __html: sceneScaleScript }} />
+      </head>
       <body className="flex min-h-full flex-col">
         {/* Brush strokes bleed up to 26px past their box; clip it here, not on
             <body>, whose overflow browsers hand to the viewport instead. */}
