@@ -60,3 +60,19 @@ test("the diary's count follows the matches saved and deleted", async ({ page, r
   await nav.getByRole("link", { name: "Inicio", exact: true }).click();
   await expect(count).toHaveText("0 expediciones registradas");
 });
+
+test("on a big screen the notebook grows to fill it, and fits a small one", async ({ page, request, isMobile }) => {
+  test.skip(isMobile, "the scaled scene is the desktop notebook's");
+  await signUp(page, request, "Ana");
+  const scene = page.locator("[data-notebook] > div").first();
+
+  // A 1440p monitor: the 1280×1000 scene scales up to the window's height.
+  await page.setViewportSize({ width: 2560, height: 1300 });
+  await expect.poll(async () => (await scene.boundingBox())?.height).toBeCloseTo(1300, 0);
+  // Never past the paper's own resolution (2×), however big the screen.
+  await page.setViewportSize({ width: 5000, height: 3000 });
+  await expect.poll(async () => (await scene.boundingBox())?.width).toBeCloseTo(2560, 0);
+  // A laptop: smaller than designed, still whole.
+  await page.setViewportSize({ width: 1440, height: 800 });
+  await expect.poll(async () => (await scene.boundingBox())?.height).toBeCloseTo(800, 0);
+});

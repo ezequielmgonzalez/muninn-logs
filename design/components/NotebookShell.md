@@ -2,7 +2,7 @@ La estructura de cada pantalla: un cuaderno abierto en escritorio y una libreta 
 
 ## Escritorio (≥ `breakpoint-notebook`)
 
-Escena de 1280 × 1000 px centrada (escalarla para que entre en el viewport si es más chico; nunca más grande que 1:1):
+Escena de 1280 × 1000 px centrada (escalarla para que llene el viewport: más chica si no entra, y más grande en pantallas grandes, hasta 2×, la resolución de las texturas de papel):
 
 1. Fondo `backdrop.webp` cubriendo todo.
 2. Tapa: `left 270, top 28, 992 × 944`, `radius-cover`, gradiente de cuero, `shadow-cover`.
