@@ -3,10 +3,11 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { ImportForm } from "@/features/import/import-form";
 import { ARNAK_LEADERS, type ArnakLeader } from "@/games/arnak";
 import { routing } from "@/i18n/routing";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile, isAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -43,9 +44,9 @@ export default async function AdminImportPage({ searchParams }: PageProps<"/[loc
           {typeof imported === "string" && (
             <p role="status" className="type-body-strong mt-4 text-ink-body">
               {t("imported", { count: Number(imported) })}{" "}
-              <Link href="/matches" className="font-normal underline underline-offset-4">
+              <TurnLink href="/matches" direction="forward" section="matches" className="font-normal underline underline-offset-4">
                 {t("seeMatches")}
-              </Link>
+              </TurnLink>
             </p>
           )}
           <p className="mt-5.5 mb-11 text-ink-body">{t("description")}</p>

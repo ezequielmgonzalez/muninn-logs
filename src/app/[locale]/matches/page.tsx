@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { groupByMonth, type MonthGroup, spreadOf } from "@/features/matches/group-by-month";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 /** Every game the user logged or played, a month per notebook page, newest first. */
@@ -37,7 +37,9 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
             <PaintedBand>{t("title")}</PaintedBand>
             <p className="type-caption mt-5.5 mb-8 text-ink-muted">{t("empty")}</p>
             <InkButton asChild>
-              <Link href="/matches/new">{t("logFirst")}</Link>
+              <TurnLink href="/matches/new" direction="forward">
+                {t("logFirst")}
+              </TurnLink>
             </InkButton>
           </>
         }

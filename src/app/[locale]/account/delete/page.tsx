@@ -4,8 +4,9 @@ import { z } from "zod";
 import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { DeleteAccountForm } from "@/features/account/delete-account-form";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -56,7 +57,9 @@ export default async function DeleteAccountPage() {
           <DeleteAccountForm username={profile.username} />
           <p className="mt-8.5 flex justify-center">
             <Button asChild variant="link">
-              <Link href="/profile/edit">{t("back")}</Link>
+              <TurnLink href="/profile/edit" direction="backward">
+                {t("back")}
+              </TurnLink>
             </Button>
           </p>
         </>

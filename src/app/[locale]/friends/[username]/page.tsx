@@ -4,11 +4,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { getFriendByUsername } from "@/features/friends/queries";
 import { LeaderRanking } from "@/features/stats/leader-ranking";
 import { getPlayerStats } from "@/features/stats/queries";
 import { CategoriesSection, WinRateSection } from "@/features/stats/stats-view";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 /** A friend's diary: their stats, laid out like your own Estadísticas. */
@@ -36,10 +37,14 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
       <p className="type-caption mt-3 text-center text-ink-muted">{tStats("expeditions", { count: stats.games })}</p>
       <p className="mt-4 flex items-center justify-between gap-4">
         <Button asChild variant="link">
-          <Link href="/friends">← {t("back")}</Link>
+          <TurnLink href="/friends" direction="backward" section="friends">
+            ← {t("back")}
+          </TurnLink>
         </Button>
         <Button asChild variant="link">
-          <Link href={{ pathname: "/compare", query: { with: friend.username ?? "" } }}>{t("compare")} →</Link>
+          <TurnLink href={{ pathname: "/compare", query: { with: friend.username ?? "" } }} direction="forward">
+            {t("compare")} →
+          </TurnLink>
         </Button>
       </p>
       {stats.games === 0 ? (

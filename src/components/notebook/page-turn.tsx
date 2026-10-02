@@ -3,9 +3,9 @@
 import gsap from "gsap";
 import { type ComponentProps, createContext, type MouseEvent, type ReactNode, useCallback, useContext, useRef } from "react";
 
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
-import type { TurnDirection } from "./turn-direction";
+import type { NotebookSection, TurnDirection } from "./turn-direction";
 
 // Turning the diary's page when moving between sections: the current page
 // lifts and turns over the spine (on phones, whose notebook is bound at the
@@ -33,6 +33,18 @@ function div(style: Partial<CSSStyleDeclaration>, className?: string) {
   return el;
 }
 
+/**
+ * The turning page's overlay: decoration only. Its copy of the screen is
+ * hidden from assistive technology and can't be focused or clicked, so the
+ * screen is never there twice.
+ */
+function overlayDiv(style: Partial<CSSStyleDeclaration>) {
+  const el = div(style, "page-flap");
+  el.setAttribute("aria-hidden", "true");
+  el.inert = true;
+  return el;
+}
+
 /** A face of the turning page: paper, and optionally a copy of what was written on it. */
 function face(paper: string, content: HTMLElement | null, back: boolean) {
   const el = div({
@@ -48,6 +60,27 @@ function face(paper: string, content: HTMLElement | null, back: boolean) {
 }
 
 /**
+ * A copy of a page, painted rather than written: its text is drawn by CSS
+ * (globals.css, `.page-flap [data-text]`), so while the page turns nothing
+ * can find, select or read it twice. (SVG and form text stays as it is.)
+ */
+function paintedCopy(page: HTMLElement) {
+  const copy = page.cloneNode(true) as HTMLElement;
+  const walker = document.createTreeWalker(copy, NodeFilter.SHOW_TEXT);
+  const texts: Text[] = [];
+  while (walker.nextNode()) texts.push(walker.currentNode as Text);
+  for (const text of texts) {
+    const parent = text.parentElement;
+    if (!text.data.trim() || !parent || parent.namespaceURI !== "http://www.w3.org/1999/xhtml") continue;
+    if (parent.closest("select, option, textarea")) continue;
+    const painted = document.createElement("span");
+    painted.setAttribute("data-text", text.data);
+    text.replaceWith(painted);
+  }
+  return copy;
+}
+
+/**
  * Hides what the turning page carries away, until the next screen replaces
  * it. Only the old screen's elements, captured when the turn starts: if the
  * new screen has already arrived, they're gone and there's nothing to hide.
@@ -58,6 +91,14 @@ function turnAway(el: Element | null) {
 
 function restore() {
   for (const el of document.querySelectorAll("[data-turned-away]")) el.removeAttribute("data-turned-away");
+  for (const el of document.querySelectorAll("[data-pending]")) el.removeAttribute("data-pending");
+}
+
+/** Paints a section in the navigation the moment it's clicked, before its screen arrives (globals.css). */
+function paintNavItem(section: NotebookSection) {
+  for (const el of document.querySelectorAll(`[data-nav-item][data-section="${section}"]`)) {
+    el.setAttribute("data-pending", "");
+  }
 }
 
 /** The two-page notebook: the right page turns over the spine to the left, or back. */
@@ -71,15 +112,14 @@ function turnDesktop(direction: TurnDirection) {
 
   // A copy of the page's content, scrolled as it was.
   const page = document.querySelector<HTMLElement>(`[data-page="${fromSide}"]`);
-  const copy = page ? (page.cloneNode(true) as HTMLElement) : null;
+  const copy = page ? paintedCopy(page) : null;
   if (copy && page) {
     copy.removeAttribute("data-page");
     copy.style.height = "100%";
     queueMicrotask(() => (copy.scrollTop = page.scrollTop));
   }
 
-  const overlay = div(
-    {
+  const overlay = overlayDiv({
       position: "fixed",
       left: `${rect.left}px`,
       top: `${rect.top}px`,
@@ -90,9 +130,7 @@ function turnDesktop(direction: TurnDirection) {
       perspective: "2600px",
       zIndex: "50",
       pointerEvents: "none",
-    },
-    "page-flap",
-  );
+    });
   // It turns around the middle of the spine, so it lands exactly on the other page.
   const leaf = div({
     position: "absolute",
@@ -125,6 +163,9 @@ function turnDesktop(direction: TurnDirection) {
     .to(backShade, { opacity: 0, duration: 0.375, ease: "power1.out" }, 0.375)
     // Halfway, the page starts covering the other one: what was written there goes with the old screen.
     .call(() => turnAway(otherPage), [], 0.375)
+    // Past edge-on its front faces away: drop the copy, so the old screen's
+    // text is never around while the new one comes in.
+    .call(() => copy?.remove(), [], 0.375)
     .to(overlay, { opacity: 0, duration: 0.15, ease: "power1.out" }, 0.75);
   // The new screen starts writing itself as the page lands.
   return { overlay, tl, landsAt: 0.6 };
@@ -138,10 +179,7 @@ function turnPhone(direction: TurnDirection) {
   const content = wrapper.querySelector("main");
 
   // Below the tab bar (z-10), above the page.
-  const overlay = div(
-    { position: "fixed", inset: "0", overflow: "hidden", perspective: "1800px", zIndex: "9", pointerEvents: "none" },
-    "page-flap",
-  );
+  const overlay = overlayDiv({ position: "fixed", inset: "0", overflow: "hidden", perspective: "1800px", zIndex: "9", pointerEvents: "none" });
   const leaf = div({
     position: "absolute",
     left: `${rect.left}px`,
@@ -154,7 +192,7 @@ function turnPhone(direction: TurnDirection) {
   let copy: HTMLElement | null = null;
   if (direction === "forward") {
     // The page as it is on screen, scrolled.
-    copy = wrapper.cloneNode(true) as HTMLElement;
+    copy = paintedCopy(wrapper);
     copy.removeAttribute("data-sheet");
     Object.assign(copy.style, { position: "absolute", top: `${rect.top}px`, left: "0", width: "100%", margin: "0" });
   }
@@ -170,7 +208,9 @@ function turnPhone(direction: TurnDirection) {
     turnAway(content);
     tl.to(leaf, { rotateX: -105, duration: 0.55, ease: "power2.in" }, 0)
       .to(shade, { opacity: 1, duration: 0.45 }, 0)
-      .to(overlay, { opacity: 0, duration: 0.15 }, 0.42);
+      .to(overlay, { opacity: 0, duration: 0.15 }, 0.42)
+      // Edge-on by now: drop the copy before the new screen comes in.
+      .call(() => copy?.remove(), [], 0.5);
   } else {
     // A blank page comes down over this one, then the previous screen is written on it.
     gsap.set(leaf, { rotateX: -105 });
@@ -180,7 +220,7 @@ function turnPhone(direction: TurnDirection) {
       .call(() => turnAway(content), [], 0.5)
       .to(overlay, { opacity: 0, duration: 0.15 }, 0.52);
   }
-  return { overlay, tl, landsAt: direction === "forward" ? 0.4 : 0.5 };
+  return { overlay, tl, landsAt: 0.5 };
 }
 
 export function PageTurnProvider({ children }: { children: ReactNode }) {
@@ -225,26 +265,35 @@ export function PageTurnProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * A link that turns the diary's page: forward or backward. Without a
- * direction (or outside PageTurnProvider) it's a plain Link; new-tab and
- * modified clicks are left to the browser.
+ * A link that turns the diary's page: forward or backward. A section's own
+ * link turns back to it from one of its inner screens (a match, a friend's
+ * diary). With a `section`, that section is painted in the navigation as soon
+ * as it's clicked. Without a turn (or outside PageTurnProvider) it's a plain
+ * Link; new-tab and modified clicks are left to the browser.
  */
 export function TurnLink({
   direction,
+  section,
   onClick,
   ...props
-}: ComponentProps<typeof Link> & { direction?: TurnDirection }) {
+}: ComponentProps<typeof Link> & { direction?: TurnDirection; section?: NotebookSection }) {
   const turn = useContext(PageTurnContext);
+  const pathname = usePathname();
+  const upToSection = props["aria-current"] === "page" && typeof props.href === "string" && props.href !== pathname;
+  const effective = direction ?? (upToSection ? "backward" : undefined);
   return (
     <Link
       {...props}
-      data-turn={direction}
+      data-section={section}
+      data-turn={effective}
       onClick={(event: MouseEvent<HTMLAnchorElement>) => {
         onClick?.(event);
-        if (!direction || !turn || event.defaultPrevented) return;
+        if (event.defaultPrevented) return;
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (section) paintNavItem(section);
+        if (!effective || !turn) return;
         event.preventDefault();
-        turn(props.href, direction);
+        turn(props.href, effective);
       }}
     />
   );

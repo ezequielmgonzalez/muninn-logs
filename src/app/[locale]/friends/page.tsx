@@ -4,11 +4,12 @@ import { CloseIcon } from "@/components/notebook/icons";
 import { NotebookShell } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
+import { TurnLink } from "@/components/notebook/page-turn";
 import { acceptFriendRequest, removeFriendship } from "@/features/friends/actions";
 import { AddFriendForm } from "@/features/friends/add-friend-form";
 import { FriendList } from "@/features/friends/friend-list";
 import { getFriendships } from "@/features/friends/queries";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function FriendsPage() {
@@ -43,7 +44,9 @@ export default async function FriendsPage() {
   const seeMore = (href: string, label: string) => (
     <p className="mt-4.5 flex justify-end">
       <Button asChild variant="link">
-        <Link href={href}>{label} →</Link>
+        <TurnLink href={href} direction="forward">
+          {label} →
+        </TurnLink>
       </Button>
     </p>
   );
@@ -124,12 +127,13 @@ export default async function FriendsPage() {
                   <>
                     {person.username && (
                       <Button asChild variant="link">
-                        <Link
+                        <TurnLink
                           href={{ pathname: "/compare", query: { with: person.username } }}
+                          direction="forward"
                           aria-label={t("compareWith", { name: person.display_name })}
                         >
                           {t("compare")}
-                        </Link>
+                        </TurnLink>
                       </Button>
                     )}
                     {actionButton(

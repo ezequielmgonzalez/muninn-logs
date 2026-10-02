@@ -6,9 +6,12 @@ import es from "@/i18n/messages/es.json";
 
 import { SideNav, TabBar } from "./navigation";
 
-// The real navigation helpers need the Next.js router: use a plain <a>.
+// The real navigation helpers need the Next.js router: use a plain <a>, and
+// the screen being shown.
+let pathname = "/";
 vi.mock("@/i18n/navigation", () => ({
   Link: ({ href, ...props }: ComponentProps<"a"> & { href: string }) => <a href={href} {...props} />,
+  usePathname: () => pathname,
 }));
 // Server-side translations, from the real Spanish messages.
 vi.mock("next-intl/server", () => ({
@@ -17,7 +20,8 @@ vi.mock("next-intl/server", () => ({
 }));
 
 describe("SideNav", () => {
-  it("links every section and paints only the current one", async () => {
+  it("links every section and marks the current one", async () => {
+    pathname = "/profile";
     render(await SideNav({ active: "stats" }));
     const nav = screen.getByRole("navigation", { name: "Secciones" });
     const links = within(nav).getAllByRole("link");
@@ -29,13 +33,19 @@ describe("SideNav", () => {
     ]);
     const current = within(nav).getByRole("link", { current: "page" });
     expect(current).toHaveTextContent("Estadísticas");
-    // Selected = painted: one sweep stroke, on the current item only.
-    expect(nav.querySelectorAll(".ink--sweep")).toHaveLength(1);
-    expect(current.querySelector(".ink--sweep")).not.toBeNull();
-    // Arriving at a section paints its stroke in.
-    expect(current.querySelector(".ink--sweep")).toHaveClass("paint-in");
+    // Every item has its stroke, shown by CSS on the current one or a clicked one.
+    expect(links.map((l) => l.querySelector("[data-nav-stroke]")?.classList.contains("ink--sweep"))).toEqual([true, true, true, true]);
+    expect(links.map((l) => l.getAttribute("data-section"))).toEqual(["home", "matches", "stats", "friends"]);
     // Other sections turn the diary's page towards them; the current one doesn't.
     expect(links.map((l) => l.getAttribute("data-turn"))).toEqual(["backward", "backward", null, "forward"]);
+  });
+
+  it("turns back to the current section from one of its inner screens", async () => {
+    pathname = "/matches/some-match";
+    render(await SideNav({ active: "matches" }));
+    const current = screen.getByRole("link", { current: "page" });
+    expect(current).toHaveTextContent("Partidas");
+    expect(current).toHaveAttribute("data-turn", "backward");
   });
 
   it("ends with the ink button to log a match", async () => {
@@ -49,6 +59,7 @@ describe("SideNav", () => {
 
 describe("TabBar", () => {
   it("has the four sections around the raised log button", async () => {
+    pathname = "/";
     render(await TabBar({ active: "home" }));
     const nav = screen.getByRole("navigation", { name: "Secciones" });
     expect(within(nav).getAllByRole("link").map((l) => l.getAttribute("aria-label") ?? l.textContent)).toEqual([
@@ -59,12 +70,11 @@ describe("TabBar", () => {
       "Amigos",
     ]);
     expect(within(nav).getByRole("link", { current: "page" })).toHaveTextContent("Inicio");
-    expect(nav.querySelectorAll(".ink--tab")).toHaveLength(1);
+    expect(nav.querySelectorAll("[data-nav-stroke].ink--tab")).toHaveLength(4);
   });
 
   it("paints nothing when the screen isn't a section (e.g. a legal page)", async () => {
     render(await TabBar({}));
     expect(screen.queryByRole("link", { current: "page" })).toBeNull();
-    expect(document.querySelectorAll(".ink--tab")).toHaveLength(0);
   });
 });

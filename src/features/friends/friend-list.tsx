@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Link } from "@/i18n/navigation";
+import { TurnLink } from "@/components/notebook/page-turn";
 
 import type { FriendProfile } from "./group-friendships";
 
@@ -27,12 +27,13 @@ export function FriendList({
           </span>
           <div className="flex min-w-0 flex-1 flex-col">
             {linkToProfile && person.username ? (
-              <Link
+              <TurnLink
                 href={`/friends/${person.username}`}
+                direction="forward"
                 className="truncate text-base font-semibold text-ink-body underline-offset-4 hover:underline"
               >
                 {person.display_name}
-              </Link>
+              </TurnLink>
             ) : (
               <span className="truncate text-base font-semibold text-ink-body">{person.display_name}</span>
             )}
