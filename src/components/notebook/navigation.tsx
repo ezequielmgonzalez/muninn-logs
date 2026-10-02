@@ -1,18 +1,23 @@
-import { getTranslations } from "next-intl/server";
-import type { ComponentType, SVGProps } from "react";
+"use client";
 
+import { useTranslations } from "next-intl";
+import { type ComponentType, type SVGProps, useEffect } from "react";
+
+import { usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 import { BarsIcon, BookIcon, DiamondIcon, PeopleIcon, PlusIcon, SheetIcon } from "./icons";
 import { InkButton, LoadMatchFab } from "./ink-button";
 import { TurnLink } from "./page-turn";
+import { hasSaveBar, sectionOf } from "./sections";
 import { type NotebookSection, sectionTurn } from "./turn-direction";
 
 // The main navigation (design/components/Navigation.md): the insert's list on
-// desktop, the tab bar on phones. The current section is painted and marked
-// with aria-current. Compare and guests aren't sections: they live under
-// friends, and mark it as current. Moving between sections turns the diary's
-// page: forward to a later one, backward to an earlier one.
+// desktop, the tab bar on phones. It's part of the notebook's frame, which
+// stays put between screens, so it reads the current section from the path
+// (sections.ts). The current section is painted and marked with aria-current.
+// Moving between sections turns the diary's page: forward to a later one,
+// backward to an earlier one.
 
 export type { NotebookSection };
 
@@ -25,9 +30,27 @@ const SECTIONS: { key: NotebookSection; href: string; Icon: ComponentType<SVGPro
 
 const FOCUS = "outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze";
 
+/**
+ * The current section, from the path. A section clicked before its screen
+ * arrived (TurnLink marks it pending) is current once the path changes, so
+ * the pending marks go then; a stroke still painting in finishes first.
+ */
+function useActiveSection() {
+  const pathname = usePathname();
+  useEffect(() => {
+    document.documentElement.removeAttribute("data-pending-section");
+    for (const el of document.querySelectorAll<HTMLElement>("[data-pending]")) {
+      const painting = el.getAnimations?.({ subtree: true }) ?? [];
+      void Promise.allSettled(painting.map((a) => a.finished)).then(() => el.removeAttribute("data-pending"));
+    }
+  }, [pathname]);
+  return { pathname, active: sectionOf(pathname) };
+}
+
 /** Desktop: the list on the insert, then the "Cargar partida" ink button. */
-export async function SideNav({ active }: { active?: NotebookSection }) {
-  const t = await getTranslations("Nav");
+export function SideNav() {
+  const t = useTranslations("Nav");
+  const { active } = useActiveSection();
   return (
     <>
       <nav aria-label={t("sections")} className="flex flex-col gap-1.5">
@@ -63,9 +86,12 @@ export async function SideNav({ active }: { active?: NotebookSection }) {
   );
 }
 
-/** Phones: a strip of the insert's paper along the bottom, five positions. */
-export async function TabBar({ active }: { active?: NotebookSection }) {
-  const t = await getTranslations("Nav");
+/** Phones: a strip of the insert's paper along the bottom, five positions. The match form has its save bar instead. */
+export function TabBar() {
+  const t = useTranslations("Nav");
+  const { pathname, active } = useActiveSection();
+  if (hasSaveBar(pathname)) return null;
+
   const tab = ({ key, href, Icon }: (typeof SECTIONS)[number]) => (
     <TurnLink
       key={key}

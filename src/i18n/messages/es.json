@@ -497,5 +497,8 @@
     "all": "Todas",
     "count": "{count} jugadores",
     "none": "No hay partidas de {count} jugadores."
+  },
+  "Loading": {
+    "label": "Cargando…"
   }
 }

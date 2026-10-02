@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { signUp } from "./helpers/auth";
+import { notFoundSheet, signUp } from "./helpers/auth";
 import { befriend, sendFriendRequest } from "./helpers/friends";
 import { addGuest, fillScores, saveMatch } from "./helpers/matches";
 
@@ -65,7 +65,8 @@ test("someone who isn't your friend has no profile or comparison for you", async
   // friends yet: the friendship itself must be checked, not just visibility.
   await sendFriendRequest(page, carlaUsername);
 
-  expect((await page.goto(`/es/friends/${carlaUsername}`))?.status()).toBe(404);
+  await page.goto(`/es/friends/${carlaUsername}`);
+  await expect(notFoundSheet(page)).toBeVisible();
 
   // Asking to compare with her is ignored: no column, no stats.
   await page.goto(`/es/compare?with=${carlaUsername}`);

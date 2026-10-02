@@ -1,7 +1,7 @@
 import { type Browser, expect, type Page, test } from "@playwright/test";
 
 import { grantAdmin } from "./helpers/admin";
-import { signInWithCode, signUp } from "./helpers/auth";
+import { notFoundSheet, signInWithCode, signUp } from "./helpers/auth";
 import { befriend } from "./helpers/friends";
 import { addGuest, fillScores, saveMatch } from "./helpers/matches";
 
@@ -122,6 +122,6 @@ test("an admin links any guest to an account after confirming", async ({ page, r
 test("only admins have the admin page", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   await expect(page.getByRole("link", { name: "Administrar invitados" })).toHaveCount(0);
-  const response = await page.goto("/es/admin/guests");
-  expect(response?.status()).toBe(404);
+  await page.goto("/es/admin/guests");
+  await expect(notFoundSheet(page)).toBeVisible();
 });

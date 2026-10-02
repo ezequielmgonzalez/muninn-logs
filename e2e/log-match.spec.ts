@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { formError, signUp } from "./helpers/auth";
-import { addGuest, fillScores, saveMatch } from "./helpers/matches";
+import { addGuest, fillScores, saveMatch, setDate } from "./helpers/matches";
 
 test("logs a match with guests, leaders and a tiebreak", async ({ page, request }) => {
   await signUp(page, request, "Ana");
@@ -113,7 +113,7 @@ test("a game can be logged without a date", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   await page.goto("/es/matches/new");
   await expect(page.getByLabel("Fecha")).not.toHaveValue(""); // new games default to today
-  await page.getByLabel("Fecha").fill("");
+  await setDate(page, "");
   await addGuest(page, "Jessi");
   await saveMatch(page);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Partida sin fecha");

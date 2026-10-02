@@ -41,6 +41,7 @@ export function LeaderRanking({ leaders }: { leaders: LeaderStats[] }) {
   const returnTo = useRef<string | null>(null);
   const rowsRef = useRef<HTMLOListElement>(null);
   const ranked = rankLeaders(leaders, metric);
+  const paintKey = `${metric}|${ranked.map(({ leader, value }) => `${keyOf(leader)}:${value}`).join(",")}`;
   const opened = leaders.find((l) => keyOf(l) === open);
 
   useEffect(() => {
@@ -104,8 +105,8 @@ export function LeaderRanking({ leaders }: { leaders: LeaderStats[] }) {
               ))}
             </NativeSelect>
           </div>
-          {/* A new order repaints every bar, top to bottom. */}
-          <ol ref={rowsRef} key={metric} className="flex flex-col gap-[5px] notebook:gap-[7px]">
+          {/* A new order, or new numbers (another player count), repaints every bar, top to bottom. */}
+          <ol ref={rowsRef} key={paintKey} className="flex flex-col gap-[5px] notebook:gap-[7px]">
             {ranked.map(({ leader, value, bar }, i) => {
               const style = leader.slug ? ARNAK_LEADER_STYLES[leader.slug] : null;
               return (

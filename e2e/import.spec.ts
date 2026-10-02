@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { grantAdmin } from "./helpers/admin";
-import { signInWithCode, signUp } from "./helpers/auth";
+import { notFoundSheet, signInWithCode, signUp } from "./helpers/auth";
 import { befriend } from "./helpers/friends";
 
 function csv(text: string) {
@@ -84,6 +84,6 @@ test("an admin imports past games from a CSV", async ({ page, request, browser }
 test("only admins can import", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   await expect(page.getByRole("link", { name: "Importar partidas" })).toHaveCount(0);
-  const response = await page.goto("/es/admin/import");
-  expect(response?.status()).toBe(404);
+  await page.goto("/es/admin/import");
+  await expect(notFoundSheet(page)).toBeVisible();
 });

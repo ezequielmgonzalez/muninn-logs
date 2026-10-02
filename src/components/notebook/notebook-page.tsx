@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 /**
  * One page of the notebook: on desktop the left or right page of the open
  * notebook (462×908, scrolling inside if a screen overflows); on phones a
- * stretch of the single page. NotebookShell renders these for `left` and
+ * stretch of the single page. NotebookPages renders these for `left` and
  * `right`; a screen whose state spans both pages (e.g. one form) renders
- * them itself as the shell's children. `order` sets the phone's stacking.
+ * them itself. `order` sets the phone's stacking.
  */
 export function NotebookPage({
   side,

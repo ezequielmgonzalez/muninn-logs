@@ -9,6 +9,16 @@ export async function fillScores(page: Page, name: string, points: number[]) {
   }
 }
 
+/**
+ * Sets the match form's date. Waits for the form's own default (today) first:
+ * that means it's interactive, so the date typed isn't replaced by it.
+ */
+export async function setDate(page: Page, date: string) {
+  const field = page.getByLabel("Fecha");
+  await expect(field).not.toHaveValue("");
+  await field.fill(date);
+}
+
 export async function addGuest(page: Page, name: string) {
   await page.getByLabel("Agregar jugador").fill(name);
   await page.getByRole("button", { name: `Crear invitado “${name}”` }).click();

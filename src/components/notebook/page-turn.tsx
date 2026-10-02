@@ -22,7 +22,7 @@ type Turn = (href: Href, direction: TurnDirection) => void;
 
 const PageTurnContext = createContext<Turn | null>(null);
 
-/** The desktop page's size in the notebook scene (NotebookShell), and half the spine between pages. */
+/** The desktop page's size in the notebook scene (NotebookFrame), and half the spine between pages. */
 const PAGE = { width: 462, height: 908, halfSpine: 12 };
 const NOTEBOOK_QUERY = "(min-width: 1200px)";
 
@@ -99,16 +99,29 @@ function turnAway(el: Element | null) {
   if (el?.isConnected) el.setAttribute("data-turned-away", "");
 }
 
-function restore() {
+/**
+ * After a turn: shows again whatever is still hidden. If the navigation went
+ * nowhere, the clicked section isn't pending any more either. If it went
+ * ahead, the navigation clears that once the path changes (navigation.tsx).
+ */
+function restore(wentNowhere: boolean) {
   for (const el of document.querySelectorAll("[data-turned-away]")) el.removeAttribute("data-turned-away");
+  if (!wentNowhere) return;
   for (const el of document.querySelectorAll("[data-pending]")) el.removeAttribute("data-pending");
+  document.documentElement.removeAttribute("data-pending-section");
 }
 
-/** Paints a section in the navigation the moment it's clicked, before its screen arrives (globals.css). */
+/**
+ * Paints a section in the navigation the moment it's clicked, before its
+ * screen arrives (globals.css): the clicked links paint their stroke in, and
+ * the page root keeps the mark until the path changes, when the navigation
+ * itself marks the section as current (navigation.tsx).
+ */
 function paintNavItem(section: NotebookSection) {
   for (const el of document.querySelectorAll(`[data-nav-item][data-section="${section}"]`)) {
     el.setAttribute("data-pending", "");
   }
+  document.documentElement.setAttribute("data-pending-section", section);
 }
 
 /** The two-page notebook: the right page turns over the spine to the left, or back. */
@@ -262,7 +275,8 @@ export function PageTurnProvider({ children }: { children: ReactNode }) {
         // screen is still there, hidden: show it again once it's clear.
         const started = performance.now();
         const check = () => {
-          if (window.location.href !== startUrl || performance.now() - started > 4000) restore();
+          if (window.location.href !== startUrl) restore(false);
+          else if (performance.now() - started > 4000) restore(true);
           else requestAnimationFrame(check);
         };
         check();

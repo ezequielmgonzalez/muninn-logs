@@ -152,3 +152,22 @@ test("the player count filters every stat and list, and follows you between scre
   await filter.selectOption({ label: "Todas" });
   await expect(page.getByRole("link", { name: /Ganó/ })).toHaveCount(2);
 });
+
+test("while the player filter reloads, the screen says so instead of freezing", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await page.goto("/es/profile");
+  // The screen itself, not its loading sketch (revealed a moment after the load).
+  await expect(page.getByRole("heading", { name: "Win Rate" })).toBeVisible();
+  // Hold the reload back, so its state can be seen.
+  await page.route("**/es/profile**", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await route.continue();
+  });
+  const filter = page.getByLabel("Jugadores").filter({ visible: true });
+  await filter.selectOption({ label: "3 jugadores" });
+  await expect(page.getByRole("status").filter({ hasText: "Cargando…" }).filter({ visible: true })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("data-refreshing");
+
+  await expect(page.getByText("No hay partidas de 3 jugadores.")).toBeVisible({ timeout: 10_000 });
+  await expect(page.locator("html")).not.toHaveAttribute("data-refreshing");
+});

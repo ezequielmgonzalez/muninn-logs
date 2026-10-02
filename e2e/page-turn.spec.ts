@@ -41,25 +41,37 @@ test("under reduced motion, sections change without a turning page", async ({ pa
   await expect(page.getByRole("heading", { name: "Agregar amigo" })).toBeVisible();
 });
 
-test("a clicked section is painted at once, before its screen arrives", async ({ page, request }) => {
+test("a clicked section is painted at once, and a sketched notebook shows until its screen arrives", async ({ page, request }) => {
   await signUp(page, request, "Ana");
-  // Hold the next screen back, so the click's effect shows before it.
+  // A slow connection: the next screen's data is held back. Next's prefetch
+  // (which brings the loading state ahead of the click) goes through, as it
+  // would have arrived in the background before anyone clicked.
   await page.route("**/es/friends**", async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    if (!route.request().headers()["next-router-prefetch"]) await new Promise((resolve) => setTimeout(resolve, 2000));
     await route.continue();
   });
+  // Next prefetches the loading state of links on screen (in a few requests);
+  // let them all finish, as they would have before anyone clicked.
   await page.goto("/es");
+  await expect(page.getByRole("heading", { name: "Tu resumen" })).toBeVisible();
+  await page.waitForLoadState("networkidle");
   const nav = page.getByRole("navigation", { name: "Secciones" }).filter({ visible: true });
   const stroke = (name: string) =>
     nav.getByRole("link", { name, exact: true }).locator("[data-nav-stroke]").evaluate((el) => getComputedStyle(el).display);
 
   await nav.getByRole("link", { name: "Amigos", exact: true }).click();
-  await expect(page).toHaveURL("/es");
+  // Before the screen arrives: the sketched notebook, with Amigos already painted.
+  await expect(page.getByRole("status").filter({ hasText: "Cargando…" })).toBeAttached();
+  await expect(page.locator(".sketch").filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Agregar amigo" })).toHaveCount(0);
   expect(await stroke("Amigos")).toBe("block");
   expect(await stroke("Inicio")).toBe("none");
 
   await expect(page).toHaveURL("/es/friends", { timeout: 10_000 });
+  await expect(page.getByRole("heading", { name: "Agregar amigo" })).toBeVisible({ timeout: 10_000 });
   await expect(nav.getByRole("link", { name: "Amigos", exact: true })).toHaveAttribute("aria-current", "page");
+  // The real navigation has taken over: nothing is pending any more.
+  await expect(page.locator("html")).not.toHaveAttribute("data-pending-section");
 });
 
 test("links inside a screen turn the page too", async ({ page, request }) => {
@@ -92,6 +104,8 @@ test("the turning page is decoration: the screen is never there twice", async ({
 test("the turning page's text is painted, not written, so it's never found twice", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  // The real home, not its loading sketch, is the page that turns.
+  await expect(page.getByRole("heading", { name: "Tu resumen" })).toBeVisible();
   const nav = page.getByRole("navigation", { name: "Secciones" }).filter({ visible: true });
   await nav.getByRole("link", { name: "Amigos" }).click();
   const flap = page.locator(".page-flap");

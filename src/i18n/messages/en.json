@@ -497,5 +497,8 @@
     "all": "All",
     "count": "{count} players",
     "none": "No {count}-player games."
+  },
+  "Loading": {
+    "label": "Loading…"
   }
 }

@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { signUp } from "./helpers/auth";
 import { befriend } from "./helpers/friends";
-import { addGuest, fillScores, saveMatch } from "./helpers/matches";
+import { addGuest, fillScores, saveMatch, setDate } from "./helpers/matches";
 
 // Screenshots of each screen at the mockups' sizes (design/screens/*.html), so a
 // change that alters how a screen looks shows up as a diff. The references in
@@ -42,7 +42,7 @@ type Game = { date: string; leader: string; others: { name: string; known?: bool
 
 async function logGame(page: Page, me: string, game: Game) {
   await page.goto("/es/matches/new");
-  await page.getByLabel("Fecha").fill(game.date);
+  await setDate(page, game.date);
   for (const other of game.others) {
     if (other.known) await addKnown(page, other.name);
     else await addGuest(page, other.name);
@@ -114,7 +114,7 @@ test("screens of a diary with games and friends", async ({ page, request, browse
 
   // The form mid-game: two players at the table, leaders, a temple and scores.
   await page.goto("/es/matches/new");
-  await page.getByLabel("Fecha").fill("2026-10-01");
+  await setDate(page, "2026-10-01");
   await page.getByRole("button", { name: "Pájaro" }).click();
   await page.getByLabel(/^Duración/).fill("75");
   await addKnown(page, "Manuela");

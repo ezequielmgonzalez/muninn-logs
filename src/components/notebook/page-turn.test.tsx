@@ -29,6 +29,9 @@ describe("TurnLink", () => {
     );
     fireEvent.click(screen.getByText("Ver estadísticas"));
     expect(screen.getByText("Estadísticas")).toHaveAttribute("data-pending");
+    // The page root keeps it until the path changes (navigation.test.tsx).
+    expect(document.documentElement).toHaveAttribute("data-pending-section", "stats");
+    document.documentElement.removeAttribute("data-pending-section");
     // The link itself isn't a navigation item, so it isn't marked.
     expect(screen.getByText("Ver estadísticas")).not.toHaveAttribute("data-pending");
     expect(screen.getByText("Inicio")).not.toHaveAttribute("data-pending");

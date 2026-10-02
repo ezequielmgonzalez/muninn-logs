@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-import { signUp } from "./helpers/auth";
+import { notFoundSheet, signUp } from "./helpers/auth";
 import { befriend } from "./helpers/friends";
-import { addGuest, fillScores, saveMatch } from "./helpers/matches";
+import { addGuest, fillScores, saveMatch, setDate } from "./helpers/matches";
 
 test("a logged match shows its result to everyone who played, but only its creator can delete it", async ({
   page,
@@ -46,8 +46,8 @@ test("a logged match shows its result to everyone who played, but only its creat
   await expect(beto.getByRole("heading", { name: "Resultado" })).toBeVisible();
   await expect(beto.getByRole("button", { name: "Eliminar partida" })).toHaveCount(0);
   await expect(beto.getByRole("link", { name: "Editar partida" })).toHaveCount(0);
-  const betoEdit = await beto.goto(`${beto.url()}/edit`);
-  expect(betoEdit?.status()).toBe(404);
+  await beto.goto(`${beto.url()}/edit`);
+  await expect(notFoundSheet(beto)).toBeVisible();
 
   // Ana deletes it, after confirming, and it's gone for both.
   await page.getByRole("link", { name: /Ganó Beto/ }).click();
@@ -61,10 +61,10 @@ test("a logged match shows its result to everyone who played, but only its creat
   await beto.close();
 });
 
-test("an unknown match is a 404", async ({ page, request }) => {
+test("an unknown match shows the not-found sheet", async ({ page, request }) => {
   await signUp(page, request, "Ana");
-  const response = await page.goto("/es/matches/00000000-0000-4000-8000-000000000000");
-  expect(response?.status()).toBe(404);
+  await page.goto("/es/matches/00000000-0000-4000-8000-000000000000");
+  await expect(notFoundSheet(page)).toBeVisible();
   // The app's own not-found sheet, translated, with a way back.
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Página no encontrada");
   await page.getByRole("link", { name: "Volver al inicio" }).click();
@@ -104,7 +104,7 @@ test("the list puts a month on each page, two at a time", async ({ page, request
   await signUp(page, request, "Ana");
   for (const [date, guest] of [["2026-09-20", "Jessi"], ["2026-08-10", "Toto"], ["2026-07-05", "Lola"]]) {
     await page.goto("/es/matches/new");
-    await page.getByLabel("Fecha").fill(date);
+    await setDate(page, date);
     await addGuest(page, guest);
     await saveMatch(page);
   }

@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { localeSchema } from "@/features/auth/schemas";
@@ -54,6 +55,8 @@ export async function saveMatch(_state: SaveMatchState, formData: FormData): Pro
     return { status: "error", error: code };
   }
 
+  // The notebook around every screen outlives navigation: refresh its "N expediciones".
+  revalidatePath("/", "layout");
   return redirect({ href: { pathname: `/matches/${matchId}`, query: { saved: "1" } }, locale });
 }
 
@@ -67,5 +70,7 @@ export async function deleteMatch(formData: FormData) {
   const { error } = await supabase.from("matches").delete().eq("id", matchId);
   if (error) throw error;
 
+  // The notebook around every screen outlives navigation: refresh its "N expediciones".
+  revalidatePath("/", "layout");
   return redirect({ href: "/matches", locale });
 }

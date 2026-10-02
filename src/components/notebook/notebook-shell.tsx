@@ -1,15 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
-import { PlayerCountFilter } from "@/features/player-count/player-count-filter";
+import type { PlayerCount } from "@/features/player-count/options";
 import { getPlayerCount } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { getCurrentProfile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
+import { FramePlayerFilter } from "./frame-filter";
 import { CrowMark } from "./icons";
 import { LegalLinks } from "./legal-links";
-import { type NotebookSection, SideNav, TabBar } from "./navigation";
+import { SideNav, TabBar } from "./navigation";
 import { NotebookPage } from "./notebook-page";
 import { SpineRings, TopSpirals } from "./rings";
 
@@ -17,6 +18,12 @@ import { SpineRings, TopSpirals } from "./rings";
 // from 1200px an open notebook (insert with the navigation, two pages, rings),
 // a 1280×1000 scene scaled down to fit the viewport but never up; below it,
 // a field notebook bound at the top, one page, and a tab bar.
+//
+// The notebook is the (notebook) group's layout, so it stays put between
+// screens: the insert, the navigation and the binding never re-render, and
+// only the pages change (each screen renders <NotebookPages>). Whatever
+// depends on the screen (the current section, the player filter, the tab
+// bar) reads the path.
 //
 // The pages' content renders once: CSS places it on the two desktop pages or
 // stacks it on the phone page. Nothing is duplicated, so every form, label
@@ -43,15 +50,15 @@ export async function DiaryIdentity({ className }: { className?: string }) {
 }
 
 /** Desktop only: the loose sheet tucked under the left page, with the navigation. */
-async function Insert({ active, playerFilter }: { active?: NotebookSection; playerFilter?: ReactNode }) {
+function Insert({ playerCount }: { playerCount: PlayerCount | null }) {
   return (
     <div className="absolute top-[104px] left-6 z-2 hidden h-[790px] w-[300px] origin-[80%_50%] -rotate-[1.2deg] notebook:block">
       <div aria-hidden className={cn(SHEET, "inset-0 bg-[url(/paper/page-insert.webp)] drop-shadow-[0_10px_16px_rgba(48,30,12,0.45)]")} />
       <div className="relative z-2 flex h-full flex-col pt-[60px] pb-[26px]">
         <DiaryIdentity className="pl-[38px]" />
-        {playerFilter && <div className="mt-3.5 pl-[38px]">{playerFilter}</div>}
+        <FramePlayerFilter value={playerCount} placement="insert" />
         <div aria-hidden className="mt-[26px] mr-[60px] mb-5 ml-[38px] h-px bg-ink-body/22" />
-        <SideNav active={active} />
+        <SideNav />
         <div className="mt-auto pl-[70px]">
           {/* Muninn, in the same faint ink the compass had. */}
           <CrowMark className="text-ink opacity-16" />
@@ -62,31 +69,9 @@ async function Insert({ active, playerFilter }: { active?: NotebookSection; play
   );
 }
 
-type NotebookShellProps = {
-  /** The section marked as current in the navigation. */
-  active?: NotebookSection;
-  left?: ReactNode;
-  right?: ReactNode;
-  /** Instead of left/right: <NotebookPage>s rendered by one component, e.g. a form spanning both pages. */
-  children?: ReactNode;
-  /** On phones the pages stack left, then right, unless the screen says otherwise. */
-  mobileOrder?: "left-first" | "right-first";
-  /** Replaces the phone's tab bar; null for none (a screen with its own bar, like the save bar). */
-  bottomBar?: ReactNode;
-  /** Screens with stats or lists of games: shows "Jugadores: Todas / 2 / 3 / 4", which filters them. */
-  playerFilter?: boolean;
-};
-
-export async function NotebookShell({
-  active,
-  left,
-  right,
-  children,
-  mobileOrder = "left-first",
-  bottomBar,
-  playerFilter = false,
-}: NotebookShellProps) {
-  const filter = playerFilter ? <PlayerCountFilter value={await getPlayerCount()} /> : null;
+/** The notebook around every signed-in screen: the (notebook) layout. */
+export async function NotebookFrame({ children }: { children: ReactNode }) {
+  const playerCount = await getPlayerCount();
   return (
     <div
       data-notebook
@@ -107,7 +92,7 @@ export async function NotebookShell({
           )}
         />
 
-        <Insert active={active} playerFilter={filter} />
+        <Insert playerCount={playerCount} />
 
         {/* Desktop pages, with their thickness: two darker copies offset 3px and 6px. */}
         <div aria-hidden className="hidden notebook:block">
@@ -140,25 +125,42 @@ export async function NotebookShell({
             )}
           >
             {/* Phones: the player filter opens the page. */}
-            {filter && <div className="order-first -mb-5 flex justify-end notebook:hidden">{filter}</div>}
-            {children ?? (
-              <>
-                <NotebookPage side="left" order={mobileOrder === "right-first" ? 2 : undefined}>
-                  {left}
-                </NotebookPage>
-                {right && (
-                  <NotebookPage side="right" order={mobileOrder === "right-first" ? 1 : undefined}>
-                    {right}
-                  </NotebookPage>
-                )}
-              </>
-            )}
+            <FramePlayerFilter value={playerCount} placement="phone" />
+            {children}
             <LegalLinks className="order-3 justify-center notebook:hidden" />
           </main>
         </div>
       </div>
 
-      {bottomBar === undefined ? <TabBar active={active} /> : bottomBar}
+      <TabBar />
     </div>
+  );
+}
+
+/**
+ * A screen's two pages, inside the frame. A screen whose state spans both
+ * pages (e.g. one form) renders its <NotebookPage>s itself instead.
+ */
+export function NotebookPages({
+  left,
+  right,
+  mobileOrder = "left-first",
+}: {
+  left: ReactNode;
+  right?: ReactNode;
+  /** On phones the pages stack left, then right, unless the screen says otherwise. */
+  mobileOrder?: "left-first" | "right-first";
+}) {
+  return (
+    <>
+      <NotebookPage side="left" order={mobileOrder === "right-first" ? 2 : undefined}>
+        {left}
+      </NotebookPage>
+      {right && (
+        <NotebookPage side="right" order={mobileOrder === "right-first" ? 1 : undefined}>
+          {right}
+        </NotebookPage>
+      )}
+    </>
   );
 }
