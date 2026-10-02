@@ -110,10 +110,20 @@ describe("parseImport", () => {
   });
 
   it("reports missing and unknown columns", () => {
-    expect(parseImport("partida;jugador;templ\n1;Ana;3", leaders).issues).toEqual([
-      { code: "missingColumns", columns: "investigacion, templo, idolos, guardianes, cartas, miedo" },
+    expect(parseImport("partida;templ\n1;3", leaders).issues).toEqual([
+      { code: "missingColumns", columns: "jugador" },
       { code: "unknownColumns", columns: "templ" },
     ]);
+  });
+
+  it("counts an empty score, or a missing score column, as 0", () => {
+    const { games, issues } = parseImport(
+      ["partida;jugador;investigacion;templo;miedo;total", "1;Ana;10;;;10", "1;Bob;5;2;1;6"].join("\n"),
+      leaders,
+    );
+    expect(issues).toEqual([]);
+    expect(games[0].players[0].scores).toEqual({ research: 10, temple: 0, idols: 0, guardians: 0, cards: 0, fear: 0 });
+    expect(games[0].players[1].scores).toEqual({ research: 5, temple: 2, idols: 0, guardians: 0, cards: 0, fear: 1 });
   });
 
   it("reports an empty file", () => {
@@ -128,7 +138,6 @@ describe("parseImport", () => {
     expect(issues).toEqual([
       { code: "missingGame", row: 2 },
       { code: "missingPlayer", row: 3 },
-      { code: "missingNumber", row: 3, column: "templo" },
       { code: "invalidNumber", row: 3, column: "idolos", value: "x" },
       { code: "invalidNumber", row: 3, column: "cartas", value: "-3" },
       { code: "unknownLeader", row: 3, value: "Nadie" },
