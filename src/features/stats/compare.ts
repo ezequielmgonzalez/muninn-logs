@@ -1,6 +1,6 @@
 import { ARNAK_SCORE_CATEGORIES, type ArnakScoreCategory } from "@/games/arnak";
 
-import type { PlayerStats } from "./queries";
+import type { ComparableStats } from "./queries";
 
 export type ComparisonKey = "games" | "winRate" | "avgPlace" | "avgPoints" | ArnakScoreCategory;
 
@@ -12,7 +12,7 @@ export type ComparisonRow = {
   best: boolean[];
 };
 
-function winRate(stats: PlayerStats) {
+function winRate(stats: ComparableStats) {
   return stats.games > 0 ? stats.wins / stats.games : null;
 }
 
@@ -34,13 +34,13 @@ function markBest(values: (number | null)[], lowerIsBetter = false): boolean[] {
  * place. Fear is stored negative, so a higher (less negative) fear average is
  * better too. Games played is context, not a contest.
  */
-export function compareStats(players: PlayerStats[]): ComparisonRow[] {
+export function compareStats(players: ComparableStats[]): ComparisonRow[] {
   const row = (key: ComparisonKey, values: (number | null)[], lowerIsBetter = false): ComparisonRow => ({
     key,
     values,
     best: markBest(values, lowerIsBetter),
   });
-  const category = (stats: PlayerStats, slug: ArnakScoreCategory) =>
+  const category = (stats: ComparableStats, slug: ArnakScoreCategory) =>
     stats.categories.find((c) => c.slug === slug)?.average ?? null;
 
   return [
@@ -62,7 +62,7 @@ export type CategoryBars = {
 };
 
 /** "Puntos por categoría": each category's averages, scaled to that category's best. */
-export function categoryBars(players: PlayerStats[]): CategoryBars[] {
+export function categoryBars(players: ComparableStats[]): CategoryBars[] {
   return CHART_CATEGORIES.map((slug) => {
     const values = players.map((p) => p.categories.find((c) => c.slug === slug)?.average ?? null);
     const max = Math.max(0, ...values.filter((v): v is number => v !== null));

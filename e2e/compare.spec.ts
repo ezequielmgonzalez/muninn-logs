@@ -58,3 +58,42 @@ test("compares you with several friends at once, marking who does best", async (
   await expect(research).toContainText("Beto: 12");
   await expect(research).toContainText("Vos: 2");
 });
+
+test("compares only the games played together, when asked", async ({ page, request, browser }) => {
+  await signUp(page, request, "Ana");
+  // Beto wins a game of his own, then loses the one he plays with Ana.
+  const beto = await friendWhoWins(browser, request, page, "Beto", 12);
+  const carla = await friendWhoWins(browser, request, page, "Carla", 8);
+  await page.goto("/es/matches/new");
+  await page.getByLabel("Agregar jugador").fill("Beto");
+  await page.getByRole("button", { name: /^Beto/ }).click();
+  await fillScores(page, "Ana", [20, 0, 0, 0, 10, 0]);
+  await fillScores(page, "Beto", [5, 0, 0, 0, 5, 0]);
+  await saveMatch(page);
+
+  const games = (cell: number) => page.getByRole("row", { name: /^Partidas/ }).getByRole("cell").nth(cell);
+  const winRate = (cell: number) => page.getByRole("row", { name: /^Win Rate/ }).getByRole("cell").nth(cell);
+
+  // Each person's games: Beto has two, and won one.
+  await page.goto(`/es/compare?with=${beto}`);
+  await expect(page.getByLabel("Partidas")).toHaveValue("all");
+  await expect(games(1)).toHaveText("2");
+  await expect(winRate(1)).toContainText(/50\s%/);
+
+  // Only the game they played together: Ana won it, Beto didn't.
+  await page.getByLabel("Partidas").selectOption("together");
+  await page.getByRole("button", { name: "Comparar" }).click();
+  await expect(page).toHaveURL(new RegExp(`with=${beto}.*scope=together`));
+  await expect(games(0)).toHaveText("1");
+  await expect(games(1)).toHaveText("1");
+  await expect(winRate(0)).toContainText(/100\s%/);
+  await expect(winRate(1)).toContainText(/0\s%/);
+  await expect(page.getByText("Solo la partida en que jugaron todos juntos.")).toBeVisible();
+
+  // Carla never sat at Ana's table: nothing to compare, and why.
+  await page.goto(`/es/compare?with=${carla}&scope=together`);
+  await expect(page.getByRole("status")).toHaveText(
+    "Todavía no jugaron todos juntos. Elegí menos amigos, o mirá todas las partidas de cada uno.",
+  );
+  await expect(page.getByRole("table")).toHaveCount(0);
+});

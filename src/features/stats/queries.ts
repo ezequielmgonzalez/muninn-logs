@@ -30,6 +30,8 @@ const statsSchema = z.object({
 });
 
 export type PlayerStats = z.infer<typeof statsSchema>;
+/** What comparing needs: a player's own stats, or theirs over the games played together. */
+export type ComparableStats = Omit<PlayerStats, "leaders">;
 export type LeaderStats = PlayerStats["leaders"][number];
 
 /**
@@ -42,3 +44,17 @@ export const getPlayerStats = cache(async (userId: string): Promise<PlayerStats>
   if (error) throw error;
   return statsSchema.parse(data);
 });
+
+const sharedStatsSchema = z.array(statsSchema.omit({ leaders: true }));
+
+/**
+ * The user's and each friend's stats over only the games where all of them
+ * played together: the user first, then the friends in this order. The
+ * database refuses anyone who isn't an accepted friend.
+ */
+export async function getSharedStats(friendIds: string[]): Promise<ComparableStats[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_shared_stats", { friend_ids: friendIds });
+  if (error) throw error;
+  return sharedStatsSchema.parse(data);
+}

@@ -252,7 +252,14 @@
     "link": "Compare with several friends",
     "chartTitle": "Points by category",
     "bestNote": "Best value in each row. For average place, lower is better.",
-    "chartValue": "{name}: {value}"
+    "chartValue": "{name}: {value}",
+    "scopeLabel": "Games",
+    "scopes": {
+      "all": "Each person's games",
+      "together": "Only games played together"
+    },
+    "noteTogether": "Only the {count, plural, one {game} other {# games}} you all played together.",
+    "noShared": "You haven't all played together yet. Pick fewer friends, or look at each person's games."
   },
   "Legal": {
     "updated": "Last updated: September 29, 2026",
