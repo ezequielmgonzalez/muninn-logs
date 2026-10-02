@@ -201,13 +201,23 @@
     "metrics": {
       "winRate": "Win Rate",
       "avgPlace": "Lugar prom.",
-      "avgPoints": "Puntos prom.",
-      "avgResearch": "Investigación prom."
+      "games": "Partidas"
     },
     "games": "{count, plural, one {# partida} other {# partidas}}",
     "empty": "Todavía no hay partidas tuyas registradas. Cuando cargues una, acá vas a ver cómo jugás.",
     "noLeaders": "Todavía no jugaste con líderes.",
-    "logGame": "Cargar partida"
+    "logGame": "Cargar partida",
+    "noLeader": "Sin líder",
+    "metricGroups": {
+      "general": "General",
+      "total": "Puntos totales"
+    },
+    "pointStats": {
+      "average": "promedio",
+      "max": "máximo",
+      "min": "mínimo"
+    },
+    "pointMetric": "{measure}: {stat}"
   },
   "FriendProfile": {
     "back": "Amigos",

@@ -7,20 +7,24 @@ import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { createClient } from "@/lib/supabase/server";
 
 // The shape get_player_stats() returns, parsed so the pages get real types.
+/** A leader's points in the total or a category: average, lowest and highest. */
+const points = z.object({ average: z.number(), min: z.number(), max: z.number() });
+
 const statsSchema = z.object({
   games: z.number(),
   wins: z.number(),
   avg_points: z.number().nullable(),
   avg_place: z.number().nullable(),
   categories: z.array(z.object({ slug: z.enum(ARNAK_SCORE_CATEGORIES), average: z.number().nullable() })),
+  /** Per leader, most played first; matches without a leader come last, with slug null. */
   leaders: z.array(
     z.object({
-      slug: z.enum(ARNAK_LEADERS),
+      slug: z.enum(ARNAK_LEADERS).nullable(),
       games: z.number(),
       wins: z.number(),
       avg_place: z.number(),
-      avg_points: z.number(),
-      avg_research: z.number().nullable(),
+      total: points,
+      categories: z.array(points.extend({ slug: z.enum(ARNAK_SCORE_CATEGORIES) })),
     }),
   ),
 });

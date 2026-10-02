@@ -201,13 +201,23 @@
     "metrics": {
       "winRate": "Win Rate",
       "avgPlace": "Avg place",
-      "avgPoints": "Avg points",
-      "avgResearch": "Avg research"
+      "games": "Games"
     },
     "games": "{count, plural, one {# game} other {# games}}",
     "empty": "You haven't played any logged games yet. Once you log one, this is where you'll see how you play.",
     "noLeaders": "You haven't played with leaders yet.",
-    "logGame": "Log a game"
+    "logGame": "Log a game",
+    "noLeader": "No leader",
+    "metricGroups": {
+      "general": "General",
+      "total": "Total points"
+    },
+    "pointStats": {
+      "average": "average",
+      "max": "highest",
+      "min": "lowest"
+    },
+    "pointMetric": "{measure}: {stat}"
   },
   "FriendProfile": {
     "back": "Friends",

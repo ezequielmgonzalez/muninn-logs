@@ -50,7 +50,10 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   const percent = (value: number) => format.number(value, { style: "percent", maximumFractionDigits: 0 });
 
   // "Tus líderes": the three most played, bars scaled to the first.
-  const topLeaders = [...stats.leaders].sort((a, b) => b.games - a.games).slice(0, 3);
+  const topLeaders = stats.leaders
+    .filter((l): l is typeof l & { slug: NonNullable<typeof l.slug> } => l.slug !== null)
+    .sort((a, b) => b.games - a.games)
+    .slice(0, 3);
   const mostGames = topLeaders[0]?.games ?? 0;
 
   const left = (
