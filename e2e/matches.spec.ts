@@ -65,6 +65,10 @@ test("an unknown match is a 404", async ({ page, request }) => {
   await signUp(page, request, "Ana");
   const response = await page.goto("/es/matches/00000000-0000-4000-8000-000000000000");
   expect(response?.status()).toBe(404);
+  // The app's own not-found sheet, translated, with a way back.
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Página no encontrada");
+  await page.getByRole("link", { name: "Volver al inicio" }).click();
+  await expect(page).toHaveURL("/es");
 });
 
 test("editing a match starts from its saved values and replaces them", async ({ page, request }) => {

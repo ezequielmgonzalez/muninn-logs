@@ -1,8 +1,11 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { CompassRose } from "@/components/notebook/icons";
+import { InkButton } from "@/components/notebook/ink-button";
 import { DiaryIdentity, NotebookShell } from "@/components/notebook/notebook-shell";
 import { BrushBar, PaintedBand } from "@/components/notebook/painted-band";
+import { PaperSheet } from "@/components/notebook/paper-sheet";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/features/auth/actions";
 import { countIncomingRequests } from "@/features/friends/queries";
@@ -195,22 +198,20 @@ async function Landing({ searchParams }: Pick<PageProps<"/[locale]">, "searchPar
     searchParams,
   ]);
   return (
-    <>
-      <PaintedBand as="h1" size="page">
+    <PaperSheet brand={false}>
+      <CompassRose aria-hidden className="mx-auto block opacity-25" />
+      <h1 className="type-diary-name mt-5.5 text-center text-[34px] leading-[40px] text-ink notebook:text-[40px] notebook:leading-[48px]">
         Muninn Logs
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center gap-6 px-6 py-11 text-center">
-        {accountDeleted === "1" && (
-          <p role="status" className="type-body-strong text-ink-body">
-            {tDelete("deleted")}
-          </p>
-        )}
-        <p className="text-lg text-ink-muted italic">{t("tagline")}</p>
-        <Button asChild className="h-11 w-full text-base">
-          <Link href="/login">{t("signIn")}</Link>
-        </Button>
-        <LocaleSwitcher />
-      </main>
-    </>
+      </h1>
+      <p className="mt-3 text-center text-lg text-ink-muted italic">{t("tagline")}</p>
+      {accountDeleted === "1" && (
+        <p role="status" className="type-body-strong mt-8.5 text-center text-ink-body">
+          {tDelete("deleted")}
+        </p>
+      )}
+      <InkButton asChild className="mt-11">
+        <Link href="/login">{t("signIn")}</Link>
+      </InkButton>
+    </PaperSheet>
   );
 }

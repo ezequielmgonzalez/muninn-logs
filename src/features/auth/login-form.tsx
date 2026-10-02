@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 
+import { InkButton } from "@/components/notebook/ink-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,16 +51,16 @@ function LoginSteps({
 
   if (sendState.status === "code-sent") {
     return (
-      <form action={verifyAction} className="flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground">
+      <form action={verifyAction} className="flex flex-col gap-5.5">
+        <p className="text-ink-body">
           {t("codeSentTo", { email: sendState.email })}
         </p>
         <input type="hidden" name="email" value={sendState.email} />
         <input type="hidden" name="locale" value={locale} />
-        <div className="flex flex-col gap-2">
+        <div>
           <Label htmlFor="code">{t("codeLabel")}</Label>
           <Input
-            className="h-11"
+            className="text-center text-xl tracking-[0.4em]"
             id="code"
             name="code"
             inputMode="numeric"
@@ -75,12 +76,14 @@ function LoginSteps({
             {t(`errors.${verifyState.error}`)}
           </p>
         )}
-        <Button type="submit" className="h-11 text-base" disabled={verifying}>
+        <InkButton type="submit" className="mt-2" disabled={verifying}>
           {t("verify")}
-        </Button>
-        <Button type="button" variant="ghost" onClick={onReset}>
-          {t("useDifferentEmail")}
-        </Button>
+        </InkButton>
+        <p className="flex justify-center">
+          <Button type="button" variant="link" onClick={onReset}>
+            {t("useDifferentEmail")}
+          </Button>
+        </p>
       </form>
     );
   }
@@ -88,12 +91,11 @@ function LoginSteps({
   const error = oauthError || googleError ? "oauth" : sendState.status === "error" ? sendState.error : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <form action={sendAction} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-5.5">
+      <form action={sendAction} className="flex flex-col gap-5.5">
+        <div>
           <Label htmlFor="email">{t("emailLabel")}</Label>
           <Input
-            className="h-11"
             id="email"
             name="email"
             type="email"
@@ -107,14 +109,14 @@ function LoginSteps({
             {t(`errors.${error}`)}
           </p>
         )}
-        <Button type="submit" className="h-11 text-base" disabled={sending}>
+        <InkButton type="submit" className="mt-2" disabled={sending}>
           {t("sendCode")}
-        </Button>
+        </InkButton>
       </form>
       {googleEnabled && (
         <>
-          <p className="text-center text-sm text-muted-foreground">{t("or")}</p>
-          <Button type="button" variant="outline" className="h-11 text-base" onClick={signInWithGoogle}>
+          <p className="type-caption text-center text-ink-muted">{t("or")}</p>
+          <Button type="button" variant="outline" className="w-full" onClick={signInWithGoogle}>
             {t("continueWithGoogle")}
           </Button>
         </>

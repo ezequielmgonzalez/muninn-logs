@@ -451,5 +451,10 @@
         "fear": "Fear"
       }
     }
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "This page doesn't exist, or you don't have access to it.",
+    "home": "Back to the start"
   }
 }

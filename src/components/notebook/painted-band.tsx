@@ -27,10 +27,6 @@ export type PaintTone =
 
 type PaintedBandProps = {
   children: ReactNode;
-  /** "page": a page's title. "section": a section title, as wide as its column. */
-  size?: "page" | "section";
-  /** Secondary text, e.g. "28 expediciones registradas", or a control on the band. */
-  trailing?: ReactNode;
   /** Which of the two band strokes; alternate them between sections of a page. */
   variant?: 1 | 2;
   /** Mirrors the stroke (never the text), so two titles in a row differ. */
@@ -41,23 +37,14 @@ type PaintedBandProps = {
 
 export function PaintedBand({
   children,
-  size = "section",
-  trailing,
   variant = 1,
   flip = false,
   as: Tag = "h2",
   className,
 }: PaintedBandProps) {
   return (
-    <div data-painted-band={size} className={cn("flex flex-col items-center gap-2", className)}>
-      <div
-        className={cn(
-          "relative flex min-h-[46px] items-center gap-x-4 text-band-text notebook:min-h-[50px]",
-          // A page title hugs its text (no edge-to-edge header); a section title fills its column.
-          size === "page" ? "mt-6 px-10" : "w-full px-2",
-          trailing && size === "section" ? "justify-between" : "justify-center",
-        )}
-      >
+    <div data-painted-band className={cn("flex flex-col items-center", className)}>
+      <div className="relative flex min-h-[46px] w-full items-center justify-center px-2 text-band-text notebook:min-h-[50px]">
         <div
           aria-hidden
           data-paint-layer="stroke"
@@ -67,14 +54,8 @@ export function PaintedBand({
             flip && "-scale-x-100",
           )}
         />
-        <Tag className={cn("relative z-2 m-0 text-center", size === "page" ? "type-ink-button" : "type-band-md")}>
-          {children}
-        </Tag>
-        {/* On a section band, a control (e.g. a sort order) sits at its far end. */}
-        {trailing && size === "section" && <div className="relative z-2 shrink-0">{trailing}</div>}
+        <Tag className="type-band-md relative z-2 m-0 text-center">{children}</Tag>
       </div>
-      {/* A page title's secondary text reads below the stroke, on the paper. */}
-      {trailing && size === "page" && <p className="type-caption m-0 text-ink-muted">{trailing}</p>}
     </div>
   );
 }

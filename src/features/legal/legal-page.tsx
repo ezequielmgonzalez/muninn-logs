@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { PaintedBand } from "@/components/notebook/painted-band";
-import { Link } from "@/i18n/navigation";
+import { PaperSheet } from "@/components/notebook/paper-sheet";
 
 type Section = { heading: string; body: string };
 
@@ -11,22 +11,17 @@ export async function LegalPage({ page }: { page: "privacy" | "terms" }) {
   const sections = t.raw(`${page}.sections`) as Section[];
 
   return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">Muninn Logs</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 py-11">
-        <div className="flex flex-col gap-3">
-          <PaintedBand as="h1">{t(`${page}.title`)}</PaintedBand>
-          <p className="type-caption text-ink-muted">{t("updated")}</p>
-        </div>
+    <PaperSheet wide>
+      <PaintedBand as="h1">{t(`${page}.title`)}</PaintedBand>
+      <p className="type-caption mt-3 text-center text-ink-muted">{t("updated")}</p>
+      <div className="mt-8.5 flex flex-col gap-8">
         {sections.map((section) => (
-          <section key={section.heading} className="flex flex-col gap-2">
-            <h2 className="type-body-strong text-lg">{section.heading}</h2>
-            <p className="leading-relaxed text-ink-body">{section.body}</p>
+          <section key={section.heading}>
+            <h2 className="m-0 mb-2 text-lg font-semibold text-ink-body">{section.heading}</h2>
+            <p className="m-0 leading-relaxed text-ink-body">{section.body}</p>
           </section>
         ))}
-      </main>
-    </>
+      </div>
+    </PaperSheet>
   );
 }

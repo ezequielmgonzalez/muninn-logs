@@ -1,8 +1,9 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { PaperSheet } from "@/components/notebook/paper-sheet";
 import { LoginForm } from "@/features/auth/login-form";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function LoginPage({ searchParams }: PageProps<"/[locale]/login">) {
@@ -17,20 +18,13 @@ export default async function LoginPage({ searchParams }: PageProps<"/[locale]/l
   const { error } = await searchParams;
 
   return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">Muninn Logs</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-6 px-6 py-11 sm:justify-center">
-        <div className="flex flex-col gap-5">
-          <PaintedBand as="h1">{t("title")}</PaintedBand>
-          <p className="text-ink-muted">{t("description")}</p>
-        </div>
-        <LoginForm
-          googleEnabled={process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true"}
-          oauthError={error === "oauth"}
-        />
-      </main>
-    </>
+    <PaperSheet>
+      <PaintedBand as="h1">{t("title")}</PaintedBand>
+      <p className="mt-5.5 mb-5.5 text-ink-body">{t("description")}</p>
+      <LoginForm
+        googleEnabled={process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true"}
+        oauthError={error === "oauth"}
+      />
+    </PaperSheet>
   );
 }
