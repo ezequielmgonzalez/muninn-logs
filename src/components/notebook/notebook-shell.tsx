@@ -2,11 +2,11 @@ import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { getPlayerStats } from "@/features/stats/queries";
-import { Link } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 import { CompassRose } from "./icons";
+import { LegalLinks } from "./legal-links";
 import { type NotebookSection, SideNav, TabBar } from "./navigation";
 import { NotebookPage } from "./notebook-page";
 import { SpineRings, TopSpirals } from "./rings";
@@ -36,20 +36,6 @@ export async function DiaryIdentity({ className }: { className?: string }) {
       <p className="type-caption m-0 text-sm text-ink-muted">{t("diaryOf")}</p>
       <p className="type-diary-name m-0 leading-[1.15] text-ink">{profile.display_name}</p>
       <p className="type-caption m-0 mt-1 text-ink-muted">{tStats("expeditions", { count: stats.games })}</p>
-    </div>
-  );
-}
-
-async function LegalLinks({ className }: { className?: string }) {
-  const t = await getTranslations("Legal.footer");
-  return (
-    <div className={cn("flex gap-4 text-xs text-ink-muted", className)}>
-      <Link href="/privacy" className="underline-offset-4 hover:underline">
-        {t("privacy")}
-      </Link>
-      <Link href="/terms" className="underline-offset-4 hover:underline">
-        {t("terms")}
-      </Link>
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { PaperSheet } from "@/components/notebook/paper-sheet";
 import { ProfileForm } from "@/features/auth/profile-form";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
 export default async function OnboardingPage() {
@@ -15,17 +16,10 @@ export default async function OnboardingPage() {
   if (profile.username) return redirect({ href: "/", locale });
 
   return (
-    <>
-      <PaintedBand as="p" size="page">
-        <Link href="/">Muninn Logs</Link>
-      </PaintedBand>
-      <main className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-6 px-6 py-11 sm:justify-center">
-        <div className="flex flex-col gap-5">
-          <PaintedBand as="h1">{t("title")}</PaintedBand>
-          <p className="text-ink-muted">{t("description")}</p>
-        </div>
-        <ProfileForm mode="onboarding" defaultDisplayName={profile.display_name} submitLabel={t("submit")} />
-      </main>
-    </>
+    <PaperSheet>
+      <PaintedBand as="h1">{t("title")}</PaintedBand>
+      <p className="mt-5.5 mb-5.5 text-ink-body">{t("description")}</p>
+      <ProfileForm mode="onboarding" defaultDisplayName={profile.display_name} submitLabel={t("submit")} />
+    </PaperSheet>
   );
 }

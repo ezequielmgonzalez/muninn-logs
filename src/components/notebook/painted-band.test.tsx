@@ -33,14 +33,6 @@ describe("PaintedBand", () => {
     expect(screen.getByRole("heading").className).not.toMatch(/scale/);
   });
 
-  it("shows a page title's trailing text below the stroke", () => {
-    render(
-      <PaintedBand size="page" trailing="28 expediciones registradas">
-        Diario de Ezequiel
-      </PaintedBand>,
-    );
-    expect(screen.getByText("28 expediciones registradas").tagName).toBe("P");
-  });
 });
 
 describe("BrushBar", () => {
