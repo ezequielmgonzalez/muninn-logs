@@ -19,6 +19,7 @@ function game(label: string, ...names: string[]): ImportedGame {
     playedOn: null,
     boardSide: null,
     durationMinutes: null,
+    turnOrderKnown: false,
     players: names.map((name) => ({ name, leader: null, scores: zero, wonTiebreak: false })),
   };
 }

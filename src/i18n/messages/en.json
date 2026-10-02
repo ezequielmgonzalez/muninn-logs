@@ -156,7 +156,11 @@
     "totalFor": "{name}'s total",
     "summaryPlayers": "{count, plural, one {# player} other {# players}}",
     "summaryLeading": "{players} · {name} leads with {points}",
-    "summaryTied": "{players} · tied at {points}"
+    "summaryTied": "{players} · tied at {points}",
+    "turnOrder": "Turn order",
+    "turnOrderKnown": "As at the table",
+    "turnOrderKnownHint": "The first player “At the table” started the game: reorder them with the arrows.",
+    "turnOrderUnknownHint": "For games copied from old score pads: no order is made up, and it won't count in stats by turn."
   },
   "Matches": {
     "title": "Games",
@@ -355,12 +359,12 @@
     "link": "Import games",
     "description": "Add many games at once from a CSV, for example from old score pads.",
     "formatSection": "The file",
-    "formatRows": "One row per player in each game, in turn order. Rows of the same game share its number under “game”.",
+    "formatRows": "One row per player in each game. Rows of the same game share its number in “game”; their order doesn't matter.",
     "formatRequired": "Required: game, player, research, temple, idols, guardians, cards and fear (the number of fear cards).",
-    "formatOptional": "Optional: date (YYYY-MM-DD or DD/MM/YYYY), leader, total (to check the sum), tiebreak (an x), board (bird, snake, waterfall, tree, monkey or lizard) and duration in minutes.",
+    "formatOptional": "Optional: date (YYYY-MM-DD or DD/MM/YYYY), turn (1 for whoever started, 2 for the next…; if you don't know the order, leave it empty for the whole game), leader, total (to check the sum), tiebreak (an x), board (bird, snake, waterfall, tree, monkey or lizard) and duration in minutes.",
     "template": "Download template",
     "templateFile": "games-template.csv",
-    "templateCsv": "game,date,player,leader,research,temple,idols,guardians,cards,fear,total,tiebreak,board,duration\n1,2025-03-15,Ana,Falconer,12,10,8,6,14,2,48,,bird,95\n1,,Bob,Mystic,10,8,9,5,12,1,43,,,\n2,,Ana,,9,4,6,3,10,3,29,x,snake,\n2,,Jessi,Captain,8,5,6,3,7,0,29,,,\n",
+    "templateCsv": "game,date,turn,player,leader,research,temple,idols,guardians,cards,fear,total,tiebreak,board,duration\n1,2025-03-15,1,Ana,Falconer,12,10,8,6,14,2,48,,waterfall,95\n1,,2,Bob,Mystic,10,8,9,5,12,1,43,,,\n2,2025-04-02,,Ana,,9,4,6,3,10,3,29,x,snake,\n2,,,Jessi,Captain,8,5,6,3,7,0,29,,,\n",
     "file": "CSV file",
     "issuesTitle": "This can't be imported. Fix the file and choose it again:",
     "moreIssues": "{count, plural, one {and # more problem.} other {and # more problems.}}",
@@ -396,13 +400,17 @@
       "multipleTiebreaks": "Game {game}: more than one player won the tiebreak.",
       "tiebreakNotTied": "Game {game}: {name} won the tiebreak but wasn't tied for first.",
       "conflict": "Game {game}: its rows disagree on {column}.",
-      "samePlayer": "Game {game}: two names in the file are {name}."
+      "samePlayer": "Game {game}: two names in the file are {name}.",
+      "invalidTurn": "Row {row}: the turn is a number from 1 to 4, not “{value}”.",
+      "partialTurns": "Game {game}: some rows have a turn and others don't. Fill it in on all of them or leave it empty on all.",
+      "badTurns": "Game {game}: turns must go from 1 to {count}, with no repeats."
     },
     "errors": {
       "invalid": "Check the games' details.",
       "notAllowed": "You can't add one of the players (you may no longer be friends), or your account isn't an admin.",
       "generic": "Something went wrong. Nothing was imported: try again."
-    }
+    },
+    "noTurnOrder": "turn order not recorded"
   },
   "DeleteAccount": {
     "link": "Delete account",

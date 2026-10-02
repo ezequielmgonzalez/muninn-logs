@@ -42,6 +42,7 @@ export async function saveMatch(_state: SaveMatchState, formData: FormData): Pro
         players: args.players,
         duration_minutes: args.duration_minutes,
         setup: args.setup,
+        turn_order_known: args.turn_order_known,
       })
     : await supabase.rpc("log_match", args);
   if (error) {

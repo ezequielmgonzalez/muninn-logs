@@ -159,6 +159,7 @@ export function ImportForm({
                       {game.playedOn
                         ? format.dateTime(playedOnDate(game.playedOn), { dateStyle: "medium", timeZone: "UTC" })
                         : t("undated")}
+                      {!game.turnOrderKnown && ` · ${t("noTurnOrder")}`}
                     </span>
                   </span>
                   <span className="text-sm text-ink-muted">

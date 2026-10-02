@@ -33,7 +33,13 @@ export const logMatchSchema = z
     playedOn: z.iso.date().nullable(),
     boardSide: z.enum(ARNAK_BOARD_SIDES).nullable(),
     durationMinutes: z.number().int().min(1).max(1440).nullable(),
-    // Arnak without the solo mode: 2 to 4 players, in turn order.
+    /**
+     * Whether `players` is in turn order. Games copied from old score pads
+     * often don't say who went first: then no player gets a turn, rather than
+     * a made-up one that stats by turn order would count.
+     */
+    turnOrderKnown: z.boolean(),
+    // Arnak without the solo mode: 2 to 4 players.
     players: z.array(playerSchema).min(2).max(4),
   })
   .refine(
@@ -64,6 +70,7 @@ export function toLogMatchArgs(input: LogMatchInput) {
     played_on: input.playedOn,
     duration_minutes: input.durationMinutes ?? undefined,
     setup: input.boardSide ? { board_side: input.boardSide } : {},
+    turn_order_known: input.turnOrderKnown,
     players: input.players.map((p) => ({
       ...(p.playerId ? { player_id: p.playerId } : { new_guest_name: p.newGuestName }),
       character: p.leader,

@@ -40,14 +40,15 @@ test("an admin imports past games from a CSV", async ({ page, request, browser }
   await expect(page.getByRole("button", { name: /^Importar/ })).toHaveCount(0);
 
   // The fixed file: names are matched to players, new ones become guests.
+  // Game 1 says who went first (Bob); game 2's turn order wasn't recorded.
   await file.setInputFiles(
     csv(
-      "partida,fecha,jugador,lider,investigacion,templo,idolos,guardianes,cartas,miedo,desempate\n" +
-        "1,15/03/2025,ana,La Cetrera,12,10,8,6,14,2,\n" +
-        "1,,Bob,,10,8,9,5,12,1,\n" +
-        `1,,${guest},,1,1,1,1,1,0,\n` +
-        `2,,${guest},,9,4,6,3,10,3,x\n` +
-        "2,,Ana,,8,5,6,3,7,0,\n",
+      "partida,fecha,turno,jugador,lider,investigacion,templo,idolos,guardianes,cartas,miedo,desempate\n" +
+        "1,15/03/2025,2,ana,La Cetrera,12,10,8,6,14,2,\n" +
+        "1,,1,Bob,,10,8,9,5,12,1,\n" +
+        `1,,3,${guest},,1,1,1,1,1,0,\n` +
+        `2,,,${guest},,9,4,6,3,10,3,x\n` +
+        "2,,,Ana,,8,5,6,3,7,0,\n",
     ),
   );
   await expect(issues).toHaveCount(0);
@@ -55,7 +56,7 @@ test("an admin imports past games from a CSV", async ({ page, request, browser }
   await expect(chosen("ana")).toHaveText("Ana (vos)");
   await expect(chosen("Bob")).toHaveText("Bob");
   await expect(chosen(guest)).toHaveText("Invitado nuevo");
-  await expect(page.getByText("Partida 2 · sin fecha")).toBeVisible();
+  await expect(page.getByText("Partida 2 · sin fecha · orden de turnos sin registrar")).toBeVisible();
   await expect(page.getByText(`${guest} 29 · Ana 29`)).toBeVisible();
 
   await page.getByRole("button", { name: "Importar 2 partidas" }).click();
@@ -63,6 +64,14 @@ test("an admin imports past games from a CSV", async ({ page, request, browser }
 
   await page.getByRole("link", { name: "Ver historial" }).click();
   await expect(page.getByRole("link", { name: /Ganó Ana/ })).toBeVisible();
+
+  // Game 1 kept its turns from the file, not from the order of its rows.
+  await page.getByRole("link", { name: /Ganó Ana/ }).click();
+  await page.getByRole("link", { name: "Editar partida" }).click();
+  const turns = page.getByRole("listitem").filter({ hasText: "Turno" });
+  await expect(turns.nth(0)).toContainText("Bob");
+  await expect(turns.nth(1)).toContainText("Ana");
+  await page.goto("/es/matches");
   // Tied at 29: the guest won the tiebreak, in the undated game.
   await expect(page.getByRole("link", { name: new RegExp(`Sin fecha.*Ganó ${guest}`) })).toBeVisible();
 

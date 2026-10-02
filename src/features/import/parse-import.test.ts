@@ -14,7 +14,7 @@ function parse(...rows: string[]) {
 }
 
 describe("parseImport", () => {
-  it("groups rows into games, in turn order", () => {
+  it("groups rows into games; without a turn column, their turn order is unknown", () => {
     const { games, issues } = parse(
       "1;01/03/2025;Ana;La Cetrera;10;8;6;4;12;2",
       "1;;Bob;;9;7;5;3;11;1",
@@ -28,6 +28,7 @@ describe("parseImport", () => {
         playedOn: "2025-03-01",
         boardSide: null,
         durationMinutes: null,
+        turnOrderKnown: false,
         players: [
           { name: "Ana", leader: "falconer", scores: { research: 10, temple: 8, idols: 6, guardians: 4, cards: 12, fear: 2 }, wonTiebreak: false },
           { name: "Bob", leader: null, scores: { research: 9, temple: 7, idols: 5, guardians: 3, cards: 11, fear: 1 }, wonTiebreak: false },
@@ -35,6 +36,38 @@ describe("parseImport", () => {
       },
       expect.objectContaining({ label: "2", playedOn: null, players: [expect.objectContaining({ leader: "mystic" }), expect.objectContaining({ leader: "captain" })] }),
     ]);
+  });
+
+  it("puts players in the order of their turn column", () => {
+    const { games, issues } = parseImport(
+      ["partida;turno;jugador;investigacion;templo;idolos;guardianes;cartas;miedo", "1;2;Ana;1;0;0;0;0;0", "1;1;Bob;2;0;0;0;0;0", "1;3;Jessi;3;0;0;0;0;0"].join("\n"),
+      leaders,
+    );
+    expect(issues).toEqual([]);
+    expect(games[0].turnOrderKnown).toBe(true);
+    expect(games[0].players.map((p) => p.name)).toEqual(["Bob", "Ana", "Jessi"]);
+  });
+
+  it("leaves a game's turn order unknown when its turn column is empty, even if others have it", () => {
+    const { games, issues } = parseImport(
+      ["partida;turno;jugador;investigacion;templo;idolos;guardianes;cartas;miedo", "1;1;Ana;1;0;0;0;0;0", "1;2;Bob;2;0;0;0;0;0", "2;;Ana;1;0;0;0;0;0", "2;;Bob;2;0;0;0;0;0"].join("\n"),
+      leaders,
+    );
+    expect(issues).toEqual([]);
+    expect(games.map((g) => g.turnOrderKnown)).toEqual([true, false]);
+  });
+
+  it.each([
+    ["on some rows only", ["1;1;Ana", "1;;Bob"], { code: "partialTurns", game: "1" }],
+    ["repeated", ["1;1;Ana", "1;1;Bob"], { code: "badTurns", game: "1", count: 2 }],
+    ["with a gap", ["1;1;Ana", "1;3;Bob"], { code: "badTurns", game: "1", count: 2 }],
+    ["not a turn", ["1;1;Ana", "1;quinto;Bob"], { code: "invalidTurn", row: 3, value: "quinto" }],
+  ])("reports turns %s", (_, rows, issue) => {
+    const { issues } = parseImport(
+      ["partida;turno;jugador;investigacion;templo;idolos;guardianes;cartas;miedo", ...rows.map((r) => `${r};1;0;0;0;0;0`)].join("\n"),
+      leaders,
+    );
+    expect(issues).toEqual([issue]);
   });
 
   it("accepts English headers, commas, and optional columns", () => {

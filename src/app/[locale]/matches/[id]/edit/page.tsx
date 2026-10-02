@@ -30,7 +30,8 @@ export default async function EditMatchPage({ params }: PageProps<"/[locale]/mat
   if (error) throw error;
 
   const players: FormPlayer[] = [...match.players]
-    .sort((a, b) => a.turnOrder - b.turnOrder)
+    // In turn order when it's known; otherwise as ranked.
+    .sort((a, b) => (a.turnOrder ?? 0) - (b.turnOrder ?? 0))
     .map((p) => {
       const scores = match.scores[p.playerId];
       return {
@@ -62,6 +63,7 @@ export default async function EditMatchPage({ params }: PageProps<"/[locale]/mat
           playedOn: match.playedOn ?? "",
           boardSide: match.boardSide,
           durationMinutes: match.durationMinutes,
+          turnOrderKnown: match.turnOrderKnown,
           players,
           tiebreakKey: match.players.find((p) => p.wonTiebreak)?.playerId ?? null,
         }}

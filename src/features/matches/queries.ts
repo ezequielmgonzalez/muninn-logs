@@ -11,7 +11,8 @@ export type MatchPlayer = {
   isMe: boolean;
   isGuest: boolean;
   leader: ArnakLeader | null;
-  turnOrder: number;
+  /** Null when the match's turn order is unknown (e.g. copied from an old score pad). */
+  turnOrder: number | null;
   total: number;
   rank: number;
   isWinner: boolean;
@@ -25,6 +26,8 @@ export type MatchSummary = {
   durationMinutes: number | null;
   boardSide: ArnakBoardSide | null;
   loggedByMe: boolean;
+  /** Whether the players' turn order was recorded (it's all or nothing). */
+  turnOrderKnown: boolean;
   /** Ranked: winners first, then by rank and turn order. */
   players: MatchPlayer[];
 };
@@ -49,7 +52,7 @@ type MatchRow = {
   setup: unknown;
   match_players: {
     player_id: string;
-    turn_order: number;
+    turn_order: number | null;
     won_tiebreak: boolean;
     player: { name: string | null; user_id: string | null; profile: { display_name: string } | null } | null;
     character: { slug: string } | null;
@@ -85,7 +88,7 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
         wonTiebreak: mp.won_tiebreak,
       };
     });
-    players.sort((a, b) => a.rank - b.rank || a.turnOrder - b.turnOrder);
+    players.sort((a, b) => a.rank - b.rank || (a.turnOrder ?? 0) - (b.turnOrder ?? 0));
 
     const setup = (row.setup ?? {}) as { board_side?: string };
     return {
@@ -94,6 +97,7 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
       durationMinutes: row.duration_minutes,
       boardSide: ARNAK_BOARD_SIDES.find((side) => side === setup.board_side) ?? null,
       loggedByMe: row.created_by === me,
+      turnOrderKnown: players.every((p) => p.turnOrder !== null),
       players,
     };
   });

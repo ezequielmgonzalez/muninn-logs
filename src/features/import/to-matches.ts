@@ -42,6 +42,7 @@ export function toMatchInputs(
       playedOn: game.playedOn,
       boardSide: game.boardSide,
       durationMinutes: game.durationMinutes,
+      turnOrderKnown: game.turnOrderKnown,
       players,
     };
   });

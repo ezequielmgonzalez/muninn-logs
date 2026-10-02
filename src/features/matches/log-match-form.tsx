@@ -55,6 +55,7 @@ export type InitialMatch = {
   playedOn: string;
   boardSide: ArnakBoardSide | null;
   durationMinutes: number | null;
+  turnOrderKnown: boolean;
   players: FormPlayer[];
   tiebreakKey: string | null;
 };
@@ -112,6 +113,8 @@ export function LogMatchForm({
   const [playedOn, setPlayedOn] = useState(initial?.playedOn ?? "");
   const [boardSide, setBoardSide] = useState<ArnakBoardSide | null>(initial?.boardSide ?? null);
   const [duration, setDuration] = useState(initial?.durationMinutes?.toString() ?? "");
+  // Known by default: at the table, the list is the turn order. Old score pads may not say.
+  const [turnOrderKnown, setTurnOrderKnown] = useState(initial?.turnOrderKnown ?? true);
   const [tiebreakKey, setTiebreakKey] = useState<string | null>(initial?.tiebreakKey ?? null);
 
   // New games default to today, set on the client (the server doesn't know
@@ -132,6 +135,7 @@ export function LogMatchForm({
     playedOn: playedOn === "" ? null : playedOn,
     boardSide,
     durationMinutes: duration === "" ? null : Number(duration),
+    turnOrderKnown,
     players: players.map((p) => ({
       ...(p.playerId ? { playerId: p.playerId } : { newGuestName: p.name }),
       leader: p.leader,
@@ -241,6 +245,27 @@ export function LogMatchForm({
         <PaintedBand variant={2} flip className="mt-8.5 mb-4.5">
           {t("playersSection")}
         </PaintedBand>
+        <div className="mb-5.5">
+          <p id="turn-order" className="type-label mb-2">
+            {t("turnOrder")}
+          </p>
+          <div
+            role="group"
+            aria-labelledby="turn-order"
+            aria-describedby="turn-order-hint"
+            className="grid grid-cols-2 gap-2.5"
+          >
+            <BrushToggle pressed={turnOrderKnown} onClick={() => setTurnOrderKnown(true)}>
+              {t("turnOrderKnown")}
+            </BrushToggle>
+            <BrushToggle pressed={!turnOrderKnown} onClick={() => setTurnOrderKnown(false)}>
+              {t("notRecorded")}
+            </BrushToggle>
+          </div>
+          <p id="turn-order-hint" className="type-caption mt-1.5 text-ink-muted">
+            {turnOrderKnown ? t("turnOrderKnownHint") : t("turnOrderUnknownHint")}
+          </p>
+        </div>
         {players.length < MAX_PLAYERS ? (
           <PlayerPicker
             addable={addable}
@@ -273,12 +298,13 @@ export function LogMatchForm({
             <PlayerCard
               key={p.key}
               player={p}
-              turn={i + 1}
+              turn={turnOrderKnown ? i + 1 : null}
               total={totals[i]}
               takenLeaders={new Set(players.filter((o) => o.key !== p.key).map((o) => o.leader))}
               onChange={(change) => update(p.key, change)}
-              onMoveUp={i > 0 ? () => move(i, -1) : undefined}
-              onMoveDown={i < players.length - 1 ? () => move(i, 1) : undefined}
+              // Moving players only means something when the list is the turn order.
+              onMoveUp={turnOrderKnown && i > 0 ? () => move(i, -1) : undefined}
+              onMoveDown={turnOrderKnown && i < players.length - 1 ? () => move(i, 1) : undefined}
               onRemove={() => setPlayers((current) => current.filter((o) => o.key !== p.key))}
             />
           ))}
@@ -346,7 +372,8 @@ function PlayerCard({
   onRemove,
 }: {
   player: FormPlayer;
-  turn: number;
+  /** Null when the turn order isn't recorded. */
+  turn: number | null;
   total: number;
   takenLeaders: Set<ArnakLeader | null>;
   onChange: (change: Partial<FormPlayer>) => void;
@@ -370,7 +397,7 @@ function PlayerCard({
     <li className="border-b border-ink-body/18 py-3">
       <div className="flex items-center gap-2">
         <div className="min-w-0 flex-1">
-          <p className="type-overline m-0 text-ink-muted">{t("turn", { n: turn })}</p>
+          {turn !== null && <p className="type-overline m-0 text-ink-muted">{t("turn", { n: turn })}</p>}
           <p className="m-0 truncate text-base">
             <b className="font-bold">{p.name}</b>
             {who && <span className="text-ink-muted"> · {who}</span>}
