@@ -197,16 +197,27 @@
  * Fill mode "backwards" holds the start state during a delay, then hands back
  * to the element's own styles (e.g. its own translate) when it ends.
  */
+:root {
+  /* Like a brush stroke: it touches down gently, sweeps through, and settles. */
+  --ease-brush: cubic-bezier(0.55, 0.1, 0.3, 1);
+}
 @keyframes enter-rise {
   from {
     opacity: 0;
     translate: 0 8px;
   }
 }
-/* Painting reveals the stroke instead of stretching it, so the brush texture never distorts. */
+/*
+ * Painting reveals the stroke instead of stretching it, so the brush texture
+ * never distorts. Both ends are explicit: the element's own clip-path is
+ * "none", which can't be blended with inset(), so it would just jump.
+ */
 @keyframes paint-in {
   from {
     clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
 @keyframes ring-fill {
@@ -252,7 +263,7 @@
 /* A stroke painted left to right, after its block has risen in, plus --paint-delay (e.g. a bar's place in its list). */
 @utility paint-in {
   @media (prefers-reduced-motion: no-preference) {
-    animation: paint-in 650ms cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+    animation: paint-in 750ms var(--ease-brush) backwards;
     animation-delay: calc(var(--enter-delay, 0ms) + 120ms + var(--paint-delay, 0ms));
   }
 }
@@ -260,7 +271,7 @@
 /* The win-rate ring fills from empty; --ring-from is its circumference. */
 @utility ring-fill {
   @media (prefers-reduced-motion: no-preference) {
-    animation: ring-fill 900ms cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+    animation: ring-fill 1000ms var(--ease-brush) backwards;
     animation-delay: calc(var(--enter-delay, 0ms) + 150ms);
   }
 }
