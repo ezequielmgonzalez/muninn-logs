@@ -49,8 +49,10 @@
       "invalidCode": "That code is wrong or expired. Request a new one if needed.",
       "rateLimited": "Too many codes requested. Wait a moment and try again.",
       "oauth": "We couldn't sign you in with Google. Try again.",
-      "generic": "Something went wrong. Try again."
-    }
+      "generic": "Something went wrong. Try again.",
+      "emailDisabled": "Sign in with Google."
+    },
+    "descriptionGoogle": "Sign in with your Google account. If it's your first time, your account is created."
   },
   "Onboarding": {
     "title": "Choose your username",
