@@ -7,6 +7,7 @@ import { BrushBar, PaintedBand, PLAYER_TONES } from "@/components/notebook/paint
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
 import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
 import { NativeSelect } from "@/components/notebook/native-select";
+import { getPlayerCount } from "@/features/player-count/server";
 import { type ComparableStats, getPlayerStats, getSharedStats } from "@/features/stats/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { redirect } from "@/i18n/navigation";
@@ -38,12 +39,16 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   ]);
   const chosen = found.filter((f) => f !== null);
 
+  const players = await getPlayerCount();
   const stats: ComparableStats[] =
     chosen.length === 0
       ? []
       : scope === "together"
-        ? await getSharedStats(chosen.map((f) => f.id))
-        : await Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id)));
+        ? await getSharedStats(
+            chosen.map((f) => f.id),
+            players,
+          )
+        : await Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id, players)));
   // Together, everyone has the same games: none means they never all sat at one table.
   const shared = scope === "together" ? (stats[0]?.games ?? 0) : null;
   const comparing = chosen.length > 0 && shared !== 0;
@@ -212,7 +217,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
 
   return (
     // Amigos stays current: comparing is reached from there.
-    <NotebookShell active="friends">
+    <NotebookShell active="friends" playerFilter>
       {/* On phones the left page dissolves so the table can sit between the chips and the chart. */}
       <NotebookPage side="left" className={comparing ? "max-notebook:contents" : undefined}>
         <section className="order-1">

@@ -14,6 +14,7 @@ import { listReceivedClaims } from "@/features/guests/queries";
 import { ReceivedClaims } from "@/features/guests/received-claims";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";
+import { getPlayerCount } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { ARNAK_LEADER_STYLES } from "@/games/arnak";
 import { Link, redirect } from "@/i18n/navigation";
@@ -28,6 +29,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   if (!profile) return <Landing searchParams={searchParams} />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
+  const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
   const [tStats, tAuth, tEdit, tGuests, tAdmin, tImport, tLeaders, format, stats, recent, incomingRequests, claims, admin, params] =
     await Promise.all([
       getTranslations("Stats"),
@@ -38,8 +40,8 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       getTranslations("AdminImport"),
       getTranslations("Games.arnak.leaders"),
       getFormatter(),
-      getPlayerStats(profile.id),
-      listMatches(4),
+      getPlayerStats(profile.id, players),
+      listMatches(4, players),
       countIncomingRequests(profile.id),
       listReceivedClaims(),
       isAdmin(),
@@ -76,7 +78,9 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       <section>
         <PaintedBand>{t("summary")}</PaintedBand>
         {stats.games === 0 ? (
-          <p className="type-caption mt-[26px] text-ink-muted">{t("noMatches")}</p>
+          <p className="type-caption mt-[26px] text-ink-muted">
+            {players ? tCount("none", { count: players }) : t("noMatches")}
+          </p>
         ) : (
           <>
             <dl className="mt-[26px] grid grid-cols-3 text-center">
@@ -203,7 +207,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
     </>
   );
 
-  return <NotebookShell active="home" left={left} right={right} />;
+  return <NotebookShell active="home" left={left} right={right} playerFilter />;
 }
 
 /** The signed-out home: what Muninn Logs is, and a way in. */

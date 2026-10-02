@@ -114,3 +114,41 @@ test("a leader's own page lists their lowest, average and highest points, with a
   await expect(page.getByLabel("Ordenar por")).toBeVisible();
   await expect(page.getByRole("button", { name: "Ver las estadísticas con Capitán" })).toBeFocused();
 });
+
+test("the player count filters every stat and list, and follows you between screens", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  // A 2-player game Ana wins, and a 3-player game she loses.
+  await page.goto("/es/matches/new");
+  await addGuest(page, "Uno");
+  await fillScores(page, "Ana", [10, 0, 0, 0, 0, 0]);
+  await fillScores(page, "Uno", [1, 0, 0, 0, 0, 0]);
+  await saveMatch(page);
+  await page.goto("/es/matches/new");
+  await addGuest(page, "Dos");
+  await addGuest(page, "Tres");
+  await fillScores(page, "Ana", [1, 0, 0, 0, 0, 0]);
+  await fillScores(page, "Dos", [10, 0, 0, 0, 0, 0]);
+  await fillScores(page, "Tres", [5, 0, 0, 0, 0, 0]);
+  await saveMatch(page);
+
+  const filter = page.getByLabel("Jugadores").filter({ visible: true });
+  await page.goto("/es/profile");
+  await expect(filter).toHaveValue("all");
+  await expect(page.getByRole("img", { name: /^50\s%\sde 2 partidas$/ })).toBeVisible();
+
+  await filter.selectOption({ label: "2 jugadores" });
+  await expect(page.getByRole("img", { name: /^100\s%\sde 1 partida$/ })).toBeVisible();
+
+  // Partidas remembers it: only the 2-player game.
+  await page.goto("/es/matches");
+  await expect(filter).toHaveValue("2");
+  await expect(page.getByRole("link", { name: /Ganó/ })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: /Ganó Ana/ })).toBeVisible();
+
+  await filter.selectOption({ label: "4 jugadores" });
+  await expect(page.getByText("No hay partidas de 4 jugadores.")).toBeVisible();
+
+  // Back to all of them.
+  await filter.selectOption({ label: "Todas" });
+  await expect(page.getByRole("link", { name: /Ganó/ })).toHaveCount(2);
+});
