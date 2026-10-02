@@ -122,7 +122,7 @@
     "guestOf": "{owner}'s guest",
     "newGuest": "new guest",
     "leader": "{name}'s leader",
-    "noLeader": "No leader",
+    "noLeader": "Unspecified",
     "moveUp": "Move {name} up",
     "moveDown": "Move {name} down",
     "remove": "Remove {name}",
@@ -209,7 +209,7 @@
     "empty": "You haven't played any logged games yet. Once you log one, this is where you'll see how you play.",
     "noLeaders": "You haven't played with leaders yet.",
     "logGame": "Log a game",
-    "noLeader": "No leader",
+    "noLeader": "Unspecified",
     "metricGroups": {
       "general": "General",
       "total": "Total points"

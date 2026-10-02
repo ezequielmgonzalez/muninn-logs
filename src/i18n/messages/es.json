@@ -122,7 +122,7 @@
     "guestOf": "invitado de {owner}",
     "newGuest": "invitado nuevo",
     "leader": "Líder de {name}",
-    "noLeader": "Sin líder",
+    "noLeader": "Sin especificar",
     "moveUp": "Subir a {name}",
     "moveDown": "Bajar a {name}",
     "remove": "Quitar a {name}",
@@ -209,7 +209,7 @@
     "empty": "Todavía no hay partidas tuyas registradas. Cuando cargues una, acá vas a ver cómo jugás.",
     "noLeaders": "Todavía no jugaste con líderes.",
     "logGame": "Cargar partida",
-    "noLeader": "Sin líder",
+    "noLeader": "Sin especificar",
     "metricGroups": {
       "general": "General",
       "total": "Puntos totales"
