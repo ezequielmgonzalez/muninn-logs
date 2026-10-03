@@ -323,16 +323,27 @@
     "submit": "Compare",
     "noFriends": "Add friends to compare yourself with them.",
     "link": "Compare with several friends",
-    "chartTitle": "Points by category",
     "bestNote": "Best value in each row. For average place, lower is better.",
-    "chartValue": "{name}: {value}",
     "scopeLabel": "Games",
     "scopes": {
       "all": "Each person's games",
       "together": "Only games played together"
     },
     "noteTogether": "Only the {count, plural, one {game} other {# games}} you all played together.",
-    "noShared": "You haven't all played together yet. Pick fewer friends, or look at each person's games."
+    "noShared": "You haven't all played together yet. Pick fewer friends, or look at each person's games.",
+    "headToHead": "Head to head",
+    "headToHeadNote": "Who finished higher in the games you played together",
+    "score": "<b>You {mine}</b> — {theirs} {name}",
+    "together": "{count, plural, one {# game together} other {# games together}}",
+    "notTogether": "You haven't played together yet.",
+    "ahead": "You lead by {diff} in {category}",
+    "behind": "they lead by {diff} in {category}",
+    "behindOnly": "They lead by {diff} in {category}",
+    "even": "Even in everything",
+    "wholeTable": "All {count, select, 3 {three} 4 {four} 5 {five} other {#}} at the table",
+    "wholeTableGames": "{count, plural, one {# game} other {# games}}",
+    "wonFirst": "{name} won {count}",
+    "won": "{name} {count}"
   },
   "Legal": {
     "updated": "Last updated: September 29, 2026",

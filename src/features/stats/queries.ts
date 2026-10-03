@@ -7,6 +7,8 @@ import { type PlayerCounts, parsePlayerCounts, serializePlayerCounts } from "@/f
 import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { createClient } from "@/lib/supabase/server";
 
+import type { Finish } from "./head-to-head";
+
 // The shape get_player_stats() returns, parsed so the pages get real types.
 /** A leader's points in the total or a category: average, lowest and highest. */
 const points = z.object({ average: z.number(), min: z.number(), max: z.number() });
@@ -85,4 +87,42 @@ export async function getSharedStats(friendIds: string[], players: PlayerCounts 
   });
   if (error) throw error;
   return sharedStatsSchema.parse(data);
+}
+
+/**
+ * For Comparar's "Cara a cara": every finish of the user and these friends in
+ * the Arnak matches the user played (only those can be "together"), at those
+ * table sizes. RLS shows exactly the user's matches. Returns each user's
+ * player id alongside, in the same order.
+ */
+export async function getFinishes(userIds: string[], players: PlayerCounts = null) {
+  const supabase = await createClient();
+  const { data: people, error } = await supabase.from("players").select("id, user_id").in("user_id", userIds);
+  if (error) throw error;
+  const playerIds = userIds.map((id) => people.find((p) => p.user_id === id)?.id ?? null);
+  if (!playerIds[0]) return { playerIds, finishes: [] };
+
+  let mine = supabase
+    .from("matches")
+    .select("id, game:games!inner(slug), match_players!inner(player_id)")
+    .eq("game.slug", "arnak")
+    .eq("match_players.player_id", playerIds[0]);
+  if (players) mine = mine.in("player_count", [...players]);
+  const [{ data: matches, error: matchesError }, { data: results, error: resultsError }] = await Promise.all([
+    mine,
+    supabase
+      .from("match_results")
+      .select("match_id, player_id, rank, is_winner")
+      .in("player_id", playerIds.filter((id) => id !== null)),
+  ]);
+  if (matchesError) throw matchesError;
+  if (resultsError) throw resultsError;
+
+  const played = new Set(matches.map((m) => m.id));
+  const finishes: Finish[] = results.flatMap((r) =>
+    r.match_id && r.player_id && r.rank !== null && played.has(r.match_id)
+      ? [{ match_id: r.match_id, player_id: r.player_id, rank: r.rank, is_winner: r.is_winner ?? false }]
+      : [],
+  );
+  return { playerIds, finishes };
 }

@@ -3,15 +3,17 @@ import { Fragment } from "react";
 
 import { InkButton } from "@/components/notebook/ink-button";
 import { NotebookPage } from "@/components/notebook/notebook-page";
-import { BrushBar, PaintedBand, PLAYER_TONES } from "@/components/notebook/painted-band";
+import { PaintedBand, PLAYER_TONES } from "@/components/notebook/painted-band";
 import { PenCircle } from "@/components/notebook/pen-circle";
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
-import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
+import { type ComparisonRow, compareStats } from "@/features/stats/compare";
+import { advantage, duel, wholeTable } from "@/features/stats/head-to-head";
+import { HeadToHead } from "@/features/stats/head-to-head-view";
 import { NativeSelect } from "@/components/notebook/native-select";
 import { PlayerCountsNote } from "@/features/player-count/copy";
 import { playerCountsKey } from "@/features/player-count/options";
 import { getPlayerCounts } from "@/features/player-count/server";
-import { type ComparableStats, getPlayerStats, getSharedStats } from "@/features/stats/queries";
+import { type ComparableStats, getFinishes, getPlayerStats, getSharedStats } from "@/features/stats/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
@@ -43,15 +45,19 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   const chosen = found.filter((f) => f !== null);
 
   const players = await getPlayerCounts();
-  const stats: ComparableStats[] =
+  const [stats, { playerIds, finishes }]: [ComparableStats[], Awaited<ReturnType<typeof getFinishes>>] =
     chosen.length === 0
-      ? []
-      : scope === "together"
-        ? await getSharedStats(
-            chosen.map((f) => f.id),
-            players,
-          )
-        : await Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id, players)));
+      ? [[], { playerIds: [], finishes: [] }]
+      : await Promise.all([
+          scope === "together"
+            ? getSharedStats(
+                chosen.map((f) => f.id),
+                players,
+              )
+            : Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id, players))),
+          // Cara a cara: always over the games played together, whatever the scope.
+          getFinishes([profile.id, ...chosen.map((f) => f.id)], players),
+        ]);
   // Together, everyone has the same games: none means they never all sat at one table.
   const shared = scope === "together" ? (stats[0]?.games ?? 0) : null;
   const comparing = chosen.length > 0 && shared !== 0;
@@ -70,7 +76,12 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   };
 
   const names = [t("you"), ...chosen.map((f) => f.display_name)];
-  const bars = comparing ? categoryBars(stats) : [];
+  // You against each friend, and (with two or more) everyone at once.
+  const [me, ...others] = playerIds;
+  const duels = chosen.map((_, i) => (me && others[i] ? duel(finishes, me, others[i]) : { together: 0, mine: 0, theirs: 0 }));
+  const notes = chosen.map((_, i) => (stats[0] && stats[i + 1] ? advantage(stats[0], stats[i + 1]) : null));
+  const everyone =
+    chosen.length >= 2 && playerIds.every((id) => id !== null) ? wholeTable(finishes, playerIds as string[]) : null;
   const dot = (i: number) => (
     <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ background: `var(--${PLAYER_TONES[i]})` }} />
   );
@@ -120,46 +131,6 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
         </InkButton>
       </form>
     );
-
-  const chart = (
-    <section className="order-3">
-      <PaintedBand variant={2} flip>
-        {t("chartTitle")}
-      </PaintedBand>
-      <p aria-hidden className="mt-4.5 mb-3.5 flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
-        {names.map((name, i) => (
-          <span key={i} className="inline-flex items-center gap-1.5">
-            {dot(i)}
-            {name}
-          </span>
-        ))}
-      </p>
-      <ul>
-        {bars.map((category) => (
-          <li key={category.slug} className="mb-3.5">
-            <p className="m-0 mb-0.5 text-sm">{tGame(`scoreCategories.${category.slug}`)}</p>
-            <ul>
-              {category.players.map((player, i) => (
-                <li key={i} className="mt-1">
-                  <span className="sr-only">
-                    {t("chartValue", { name: names[i], value: display(category.slug, player.value) })}
-                  </span>
-                  <BrushBar
-                    value={player.bar}
-                    tone={PLAYER_TONES[i]}
-                    size="thin"
-                    index={i + bars.indexOf(category)}
-                    // Top to bottom, at half the usual step: up to 25 bars.
-                    order={(bars.indexOf(category) * category.players.length + i) / 2}
-                  />
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
 
   const table = (
     <>
@@ -223,26 +194,26 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   return (
     // Amigos stays current (sections.ts): comparing is reached from there.
     <>
-      {/* On phones the left page dissolves so the table can sit between the chips and the chart. */}
+      {/* On phones the left page dissolves so Cara a cara can sit between the controls and the table. */}
       <NotebookPage side="left" className={comparing ? "max-notebook:contents" : undefined}>
         <section className="order-1">
           <PaintedBand as={comparing ? "h2" : "h1"}>{t("pickTitle")}</PaintedBand>
           {picker}
         </section>
-        {/* A new player count paints the chart and the table again. */}
-        {comparing && (
-          <div key={playerCountsKey(players)} className="mt-11 max-notebook:mt-0 max-notebook:contents">
-            {chart}
-          </div>
-        )}
         {chosen.length > 0 && !comparing && (
           <p role="status" className="type-body-strong mt-8.5 text-ink-body">
             {t("noShared")}
           </p>
         )}
+        {/* Under the controls; on phones, before the table. A new player count paints it again. */}
+        {chosen.length > 0 && (
+          <div key={playerCountsKey(players)} className="order-2 mt-11 max-notebook:mt-0">
+            <HeadToHead names={names} duels={duels} notes={notes} table={everyone} />
+          </div>
+        )}
       </NotebookPage>
       {comparing && (
-        <NotebookPage side="right" order={2}>
+        <NotebookPage side="right" className="order-3">
           <Fragment key={playerCountsKey(players)}>{table}</Fragment>
         </NotebookPage>
       )}
