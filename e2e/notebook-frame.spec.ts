@@ -31,7 +31,7 @@ test("the diary's name and the navigation stay put between screens, even while o
 
   // Amigos has no player filter, and still nothing on the insert moves.
   await expect(page.getByRole("heading", { name: "Agregar amigo" })).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByLabel("Jugadores").filter({ visible: true })).toHaveCount(0);
+  await expect(page.getByRole("group", { name: "Jugadores" }).filter({ visible: true })).toHaveCount(0);
   expect(await where()).toEqual(before);
 });
 

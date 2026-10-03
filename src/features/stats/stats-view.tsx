@@ -1,4 +1,5 @@
 import { getFormatter, getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { ARNAK_CATEGORY_TONES } from "@/games/arnak";
@@ -20,13 +21,14 @@ async function getStatsFormat() {
   return { t, tGame, format, decimals };
 }
 
-/** The ring, then wins, average place and average points. */
-export async function WinRateSection({ stats, className }: { stats: PlayerStats; className?: string }) {
+/** The ring, then wins, average place and average points. `note` goes under the title (e.g. the player filter's). */
+export async function WinRateSection({ stats, className, note }: { stats: PlayerStats; className?: string; note?: ReactNode }) {
   const { t, format, decimals } = await getStatsFormat();
   const rate = stats.wins / stats.games;
   return (
     <section className={className}>
       <PaintedBand>{t("winRate")}</PaintedBand>
+      {note}
       <div className="flex justify-center pt-5.5 pb-1">
         <WinRateRing
           rate={rate}

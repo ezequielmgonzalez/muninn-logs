@@ -15,7 +15,9 @@ import { listReceivedClaims } from "@/features/guests/queries";
 import { ReceivedClaims } from "@/features/guests/received-claims";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";
-import { getPlayerCount } from "@/features/player-count/server";
+import { noGamesFor, PlayerCountsNote } from "@/features/player-count/copy";
+import { playerCountsKey } from "@/features/player-count/options";
+import { getPlayerCounts } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { ARNAK_LEADER_STYLES } from "@/games/arnak";
 import { Link, redirect } from "@/i18n/navigation";
@@ -30,7 +32,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   if (!profile) return <Landing searchParams={searchParams} />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
+  const players = await getPlayerCounts();
   const [tStats, tAuth, tEdit, tGuests, tAdmin, tImport, tLeaders, format, stats, recent, incomingRequests, claims, admin, params] =
     await Promise.all([
       getTranslations("Stats"),
@@ -60,7 +62,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   const mostGames = topLeaders[0]?.games ?? 0;
 
   // A new player count paints the screen again: every block rises, every bar fills.
-  const fresh = players ?? "all";
+  const fresh = playerCountsKey(players);
   const left = (
     <Fragment key={fresh}>
       {/* On phones the diary's name opens the page; on desktop it's on the insert. */}
@@ -80,9 +82,10 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
 
       <section>
         <PaintedBand>{t("summary")}</PaintedBand>
+        <PlayerCountsNote counts={players} />
         {stats.games === 0 ? (
           <p className="type-caption mt-[26px] text-ink-muted">
-            {players ? tCount("none", { count: players }) : t("noMatches")}
+            {players ? await noGamesFor(players) : t("noMatches")}
           </p>
         ) : (
           <>

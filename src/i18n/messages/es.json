@@ -500,9 +500,10 @@
   },
   "PlayerCount": {
     "label": "Jugadores",
-    "all": "Todas",
     "count": "{count} jugadores",
-    "none": "No hay partidas de {count} jugadores."
+    "atLeastOne": "Tiene que quedar al menos una",
+    "only": "Solo mesas de {counts} jugadores",
+    "none": "No hay partidas de {counts} jugadores."
   },
   "Loading": {
     "label": "Cargando…"

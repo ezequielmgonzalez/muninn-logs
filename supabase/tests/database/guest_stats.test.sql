@@ -52,11 +52,11 @@ cross join public.score_categories c
 where c.game_id = (select id from public.games where slug = 'arnak');
 
 select ok(
-  not has_function_privilege('anon', 'public.get_guest_stats(uuid, text, integer)', 'execute'),
+  not has_function_privilege('anon', 'public.get_guest_stats(uuid, text, integer[])', 'execute'),
   'visitors can''t ask for a guest''s stats'
 );
 select ok(
-  not has_function_privilege('authenticated', 'private.player_stats(uuid, uuid, integer, boolean)', 'execute'),
+  not has_function_privilege('authenticated', 'private.player_stats(uuid, uuid, integer[], boolean)', 'execute'),
   'the shared calculation is only reachable through the checked functions'
 );
 
@@ -77,7 +77,7 @@ select results_eq(
 );
 
 select results_eq(
-  $$ select (public.get_guest_stats('a0000000-0000-0000-0000-00000000000a', 'arnak', 3) ->> 'games')::int $$,
+  $$ select (public.get_guest_stats('a0000000-0000-0000-0000-00000000000a', 'arnak', array[3]) ->> 'games')::int $$,
   $$ values (0) $$,
   'the player count filters them too'
 );

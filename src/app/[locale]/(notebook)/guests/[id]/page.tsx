@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { getGuest } from "@/features/guests/queries";
-import { getPlayerCount } from "@/features/player-count/server";
+import { getPlayerCounts } from "@/features/player-count/server";
 import { getGuestStats } from "@/features/stats/queries";
 import { SomeoneElsesStats } from "@/features/stats/someone-elses-stats";
 import { redirect } from "@/i18n/navigation";
@@ -30,7 +30,7 @@ export default async function GuestProfilePage({ params }: PageProps<"/[locale]/
   // Someone else's guest you never played with, or not a guest at all: nothing here.
   if (!guest) notFound();
 
-  const players = await getPlayerCount();
+  const players = await getPlayerCounts();
   const stats = await getGuestStats(guest.id, players);
 
   return (

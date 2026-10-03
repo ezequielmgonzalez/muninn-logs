@@ -285,13 +285,13 @@ isOneToOne: false
             }[]
                            },
 "get_guest_stats":
-{ Args: { "game_slug"?: string,"guest_id": string,"player_count"?: number }; Returns: Json
+{ Args: { "game_slug"?: string,"guest_id": string,"player_counts"?: (number)[] }; Returns: Json
                            },
 "get_player_stats":
-{ Args: { "game_slug"?: string,"player_count"?: number,"target_user_id": string }; Returns: Json
+{ Args: { "game_slug"?: string,"player_counts"?: (number)[],"target_user_id": string }; Returns: Json
                            },
 "get_shared_stats":
-{ Args: { "friend_ids": (string)[],"game_slug"?: string,"player_count"?: number }; Returns: Json
+{ Args: { "friend_ids": (string)[],"game_slug"?: string,"player_counts"?: (number)[] }; Returns: Json
                            },
 "import_matches":
 { Args: { "games": Json }; Returns: number

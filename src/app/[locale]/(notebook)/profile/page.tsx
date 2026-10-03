@@ -4,7 +4,9 @@ import { Fragment } from "react";
 import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
 import { LeaderRanking } from "@/features/stats/leader-ranking";
-import { getPlayerCount } from "@/features/player-count/server";
+import { noGamesFor, PlayerCountsNote } from "@/features/player-count/copy";
+import { playerCountsKey } from "@/features/player-count/options";
+import { getPlayerCounts } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { CategoriesSection, WinRateSection } from "@/features/stats/stats-view";
 import { redirect } from "@/i18n/navigation";
@@ -20,7 +22,7 @@ export default async function ProfilePage() {
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
+  const players = await getPlayerCounts();
   const stats = await getPlayerStats(profile.id, players);
   const title = <h1 className="sr-only">{tHome("journal", { name: profile.display_name })}</h1>;
 
@@ -32,7 +34,8 @@ export default async function ProfilePage() {
           <>
             {title}
             <PaintedBand>{t("winRate")}</PaintedBand>
-            <p className="type-caption mt-5.5 text-ink-muted">{players ? tCount("none", { count: players }) : t("empty")}</p>
+            <PlayerCountsNote counts={players} />
+            <p className="type-caption mt-5.5 text-ink-muted">{players ? await noGamesFor(players) : t("empty")}</p>
           </>
         }
       />
@@ -43,9 +46,9 @@ export default async function ProfilePage() {
     <NotebookPages
       left={
         // A new player count paints the page again. The ranking repaints its own bars, keeping its order.
-        <Fragment key={players ?? "all"}>
+        <Fragment key={playerCountsKey(players)}>
           {title}
-          <WinRateSection stats={stats} />
+          <WinRateSection stats={stats} note={<PlayerCountsNote counts={players} />} />
           <CategoriesSection stats={stats} className="mt-8 notebook:mt-8.5" />
         </Fragment>
       }

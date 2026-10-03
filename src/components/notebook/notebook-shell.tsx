@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
-import type { PlayerCount } from "@/features/player-count/options";
-import { getPlayerCount } from "@/features/player-count/server";
+import type { PlayerCounts } from "@/features/player-count/options";
+import { getPlayerCounts } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { getCurrentProfile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -51,7 +51,7 @@ export async function DiaryIdentity({ className }: { className?: string }) {
 }
 
 /** Desktop only: the loose sheet tucked under the left page, with the navigation. */
-function Insert({ playerCount }: { playerCount: PlayerCount | null }) {
+function Insert({ playerCount }: { playerCount: PlayerCounts }) {
   return (
     <div className="absolute top-[104px] left-6 z-2 hidden h-[790px] w-[300px] origin-[80%_50%] -rotate-[1.2deg] notebook:block">
       <div aria-hidden className={cn(SHEET, "inset-0 bg-[url(/paper/page-insert.webp)] drop-shadow-[0_10px_16px_rgba(48,30,12,0.45)]")} />
@@ -72,7 +72,7 @@ function Insert({ playerCount }: { playerCount: PlayerCount | null }) {
 
 /** The notebook around every signed-in screen: the (notebook) layout. */
 export async function NotebookFrame({ children }: { children: ReactNode }) {
-  const playerCount = await getPlayerCount();
+  const playerCount = await getPlayerCounts();
   return (
     <div
       data-notebook

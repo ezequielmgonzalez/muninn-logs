@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { signUp } from "./helpers/auth";
 import { addGuest, fillScores, saveMatch } from "./helpers/matches";
+import { pickTableSizes, tableSize } from "./helpers/players";
 
 test("the profile shows how you play, per category and per leader", async ({ page, request }) => {
   await signUp(page, request, "Ana");
@@ -131,26 +132,49 @@ test("the player count filters every stat and list, and follows you between scre
   await fillScores(page, "Tres", [5, 0, 0, 0, 0, 0]);
   await saveMatch(page);
 
-  const filter = page.getByLabel("Jugadores").filter({ visible: true });
   await page.goto("/es/profile");
-  await expect(filter).toHaveValue("all");
+  for (const size of [2, 3, 4]) await expect(tableSize(page, size)).toBeChecked();
   await expect(page.getByRole("img", { name: /^50\s%\sde 2 partidas$/ })).toBeVisible();
+  await expect(page.getByText(/^Solo mesas de/)).toHaveCount(0);
 
-  await filter.selectOption({ label: "2 jugadores" });
+  await pickTableSizes(page, [2]);
+  await expect(page).toHaveURL("/es/profile?jugadores=2");
   await expect(page.getByRole("img", { name: /^100\s%\sde 1 partida$/ })).toBeVisible();
+  await expect(page.getByText("Solo mesas de 2 jugadores")).toBeVisible();
 
   // Partidas remembers it: only the 2-player game.
   await page.goto("/es/matches");
-  await expect(filter).toHaveValue("2");
+  await expect(tableSize(page, 2)).toBeChecked();
+  await expect(tableSize(page, 3)).not.toBeChecked();
   await expect(page.getByRole("link", { name: /Ganó/ })).toHaveCount(1);
   await expect(page.getByRole("link", { name: /Ganó Ana/ })).toBeVisible();
 
-  await filter.selectOption({ label: "4 jugadores" });
+  // Several sizes at once.
+  await pickTableSizes(page, [2, 3]);
+  await expect(page).toHaveURL("/es/matches?jugadores=2%2C3");
+  await expect(page.getByRole("link", { name: /Ganó/ })).toHaveCount(2);
+  await expect(page.getByText("Solo mesas de 2 y 3 jugadores")).toBeVisible();
+
+  await pickTableSizes(page, [4]);
   await expect(page.getByText("No hay partidas de 4 jugadores.")).toBeVisible();
 
-  // Back to all of them.
-  await filter.selectOption({ label: "Todas" });
+  // The last one stays ticked, and the screen says why.
+  await tableSize(page, 4).click();
+  await expect(tableSize(page, 4)).toBeChecked();
+  await expect(page.getByText("Tiene que quedar al menos una")).toBeAttached();
+
+  // Back to all of them: no filter, nothing in the URL.
+  await pickTableSizes(page, [2, 3, 4]);
+  await expect(page).toHaveURL("/es/matches");
   await expect(page.getByRole("link", { name: /Ganó/ })).toHaveCount(2);
+
+  // A link carrying the filter shows the same games, and the choice sticks.
+  await page.goto("/es/matches?jugadores=3");
+  await expect(page.getByRole("link", { name: /Ganó/ })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: /Ganó Dos/ })).toBeVisible();
+  await page.goto("/es");
+  await expect(tableSize(page, 3)).toBeChecked();
+  await expect(tableSize(page, 2)).not.toBeChecked();
 });
 
 test("while the player filter reloads, the screen says so instead of freezing", async ({ page, request }) => {
@@ -163,8 +187,8 @@ test("while the player filter reloads, the screen says so instead of freezing", 
     await new Promise((resolve) => setTimeout(resolve, 1500));
     await route.continue();
   });
-  const filter = page.getByLabel("Jugadores").filter({ visible: true });
-  await filter.selectOption({ label: "3 jugadores" });
+  await tableSize(page, 2).setChecked(false);
+  await tableSize(page, 4).setChecked(false);
   await expect(page.getByRole("status").filter({ hasText: "Cargando…" }).filter({ visible: true })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("data-refreshing");
 

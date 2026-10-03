@@ -2,6 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { signUp } from "./helpers/auth";
 import { addGuest, fillScores, saveMatch } from "./helpers/matches";
+import { tableSize } from "./helpers/players";
 
 // Screens rise in and strokes are painted in, unless the system asks for
 // reduced motion: then nothing moves at all.
@@ -112,7 +113,7 @@ test("a new player count repaints every bar, keeping the leaders' order", async 
   const bars = page.locator("[data-brush-bar]");
   await expect(bars).toHaveCount(2);
   await bars.evaluateAll((els) => els.forEach((el) => el.setAttribute("data-before", "")));
-  await page.getByLabel("Jugadores").filter({ visible: true }).selectOption({ label: "2 jugadores" });
+  await tableSize(page, 3).setChecked(false);
 
   await expect(page.locator("[data-brush-bar][data-before]")).toHaveCount(0);
   await expect(bars).toHaveCount(2);

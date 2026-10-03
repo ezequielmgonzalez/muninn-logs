@@ -8,7 +8,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(15);
+select plan(17);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'shared-ana@example.com'),
@@ -116,7 +116,7 @@ select results_eq(
 
 select results_eq(
   $$ select (p ->> 'games')::int, (p ->> 'wins')::int
-     from jsonb_array_elements(public.get_shared_stats(array['22222222-2222-2222-2222-222222222222'::uuid], 'arnak', 2))
+     from jsonb_array_elements(public.get_shared_stats(array['22222222-2222-2222-2222-222222222222'::uuid], 'arnak', array[2]))
        with ordinality as e(p, ord)
      order by ord $$,
   $$ values (1, 1), (1, 0) $$,
@@ -125,7 +125,7 @@ select results_eq(
 
 select results_eq(
   $$ select (p ->> 'games')::int, (p ->> 'wins')::int
-     from jsonb_array_elements(public.get_shared_stats(array['22222222-2222-2222-2222-222222222222'::uuid], 'arnak', 3))
+     from jsonb_array_elements(public.get_shared_stats(array['22222222-2222-2222-2222-222222222222'::uuid], 'arnak', array[3]))
        with ordinality as e(p, ord)
      order by ord $$,
   $$ values (1, 0), (1, 1) $$,
@@ -134,16 +134,32 @@ select results_eq(
 
 select results_eq(
   $$ select (s ->> 'games')::int, (s ->> 'wins')::int, jsonb_array_length(s -> 'leaders')
-     from (select public.get_player_stats('11111111-1111-1111-1111-111111111111', 'arnak', 2) as s) own $$,
+     from (select public.get_player_stats('11111111-1111-1111-1111-111111111111', 'arnak', array[2]) as s) own $$,
   $$ values (2, 2, 1) $$,
   'Ana''s own stats in 2-player games: m1 and m3, both won, and their one leader entry (none)'
 );
 
 select results_eq(
   $$ select (s ->> 'games')::int, s ->> 'avg_points'
-     from (select public.get_player_stats('11111111-1111-1111-1111-111111111111', 'arnak', 4) as s) own $$,
+     from (select public.get_player_stats('11111111-1111-1111-1111-111111111111', 'arnak', array[4]) as s) own $$,
   $$ values (0, null::text) $$,
   'no 4-player games: zeros and no averages'
+);
+
+select results_eq(
+  $$ select (s ->> 'games')::int, (s ->> 'wins')::int
+     from (select public.get_player_stats('11111111-1111-1111-1111-111111111111', 'arnak', array[2, 3]) as s) own $$,
+  $$ values (3, 2) $$,
+  'several table sizes at once: 2 and 3 players count m1, m3 and m2'
+);
+
+select results_eq(
+  $$ select (p ->> 'games')::int
+     from jsonb_array_elements(public.get_shared_stats(array['22222222-2222-2222-2222-222222222222'::uuid], 'arnak', array[2, 4]))
+       with ordinality as e(p, ord)
+     order by ord $$,
+  $$ values (1), (1) $$,
+  'and together: 2 or 4 players leaves only m1'
 );
 
 select throws_ok(
@@ -180,7 +196,7 @@ select throws_ok(
 );
 
 select ok(
-  not has_function_privilege('anon', 'public.get_shared_stats(uuid[], text, integer)', 'execute'),
+  not has_function_privilege('anon', 'public.get_shared_stats(uuid[], text, integer[])', 'execute'),
   'anon can''t even call the function'
 );
 

@@ -500,9 +500,10 @@
   },
   "PlayerCount": {
     "label": "Players",
-    "all": "All",
     "count": "{count} players",
-    "none": "No {count}-player games."
+    "atLeastOne": "At least one has to stay",
+    "only": "Only {counts}-player tables",
+    "none": "No {counts}-player games."
   },
   "Loading": {
     "label": "Loading…"

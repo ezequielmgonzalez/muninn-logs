@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { getFriendByUsername } from "@/features/friends/queries";
-import { getPlayerCount } from "@/features/player-count/server";
+import { getPlayerCounts } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
 import { SomeoneElsesStats } from "@/features/stats/someone-elses-stats";
 import { redirect } from "@/i18n/navigation";
@@ -26,7 +26,7 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
   // Not a friend (or not a user at all): to the viewer, there's nothing here.
   if (!friend) notFound();
 
-  const players = await getPlayerCount();
+  const players = await getPlayerCounts();
   const stats = await getPlayerStats(friend.id, players);
 
   return (

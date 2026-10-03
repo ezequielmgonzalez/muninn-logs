@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Fragment, type ReactNode } from "react";
 
 import { NotebookPages } from "@/components/notebook/notebook-shell";
-import type { PlayerCount } from "@/features/player-count/options";
+import { noGamesFor, PlayerCountsNote } from "@/features/player-count/copy";
+import { type PlayerCounts, playerCountsKey } from "@/features/player-count/options";
 
 import { LeaderRanking } from "./leader-ranking";
 import type { PlayerStats } from "./queries";
@@ -28,13 +29,13 @@ export async function SomeoneElsesStats({
   /** The way back, and anything else to do from here. */
   links: ReactNode;
   stats: PlayerStats;
-  players: PlayerCount | null;
+  players: PlayerCounts;
   /** When there are no games to show (with no player filter). */
   empty: string;
 }) {
-  const [tNav, tCount] = await Promise.all([getTranslations("Nav"), getTranslations("PlayerCount")]);
+  const tNav = await getTranslations("Nav");
   const left = (
-    <Fragment key={players ?? "all"}>
+    <Fragment key={playerCountsKey(players)}>
       <header className="text-center">
         <h1 className="m-0">
           <span className="type-caption block text-sm text-ink-muted">{tNav("diaryOf")} </span>
@@ -44,10 +45,10 @@ export async function SomeoneElsesStats({
         <p className="mt-3 flex items-center justify-between gap-4">{links}</p>
       </header>
       {stats.games === 0 ? (
-        <p className="type-caption mt-8.5 text-ink-muted">{players ? tCount("none", { count: players }) : empty}</p>
+        <p className="type-caption mt-8.5 text-ink-muted">{players ? await noGamesFor(players) : empty}</p>
       ) : (
         <>
-          <WinRateSection stats={stats} className="mt-8 notebook:mt-8.5" />
+          <WinRateSection stats={stats} className="mt-8 notebook:mt-8.5" note={<PlayerCountsNote counts={players} />} />
           <CategoriesSection stats={stats} className="mt-8 notebook:mt-8.5" />
         </>
       )}
