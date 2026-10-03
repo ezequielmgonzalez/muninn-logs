@@ -28,7 +28,7 @@ export default async function ProfilePage() {
   // Phones: the switch to Rankings (the tab bar has no room for it), then the page's title.
   const title = (
     <>
-      <StatsSwitch current="stats" />
+      <StatsSwitch current="stats" className="mb-8.5" />
       <h1 className="sr-only">{tHome("journal", { name: profile.display_name })}</h1>
     </>
   );
