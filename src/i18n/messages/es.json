@@ -30,7 +30,8 @@
     "friends": "Amigos",
     "logMatch": "Cargar partida",
     "logShort": "Cargar",
-    "diaryOf": "Diario de"
+    "diaryOf": "Diario de",
+    "rankings": "Rankings"
   },
   "Auth": {
     "title": "Iniciar sesión",
@@ -229,6 +230,70 @@
       "average": "Prom.",
       "max": "Máx."
     }
+  },
+  "Rankings": {
+    "consulta": "Consulta",
+    "ranking": "Ranking",
+    "leader": "Líder",
+    "leaderHint": "El que usó cada jugador en sus partidas.",
+    "allLeaders": "Todos",
+    "temple": "Templo",
+    "anyTemple": "Cualquiera",
+    "temples": {
+      "bird": "Pájaro",
+      "snake": "Serpiente"
+    },
+    "who": "Quiénes entran",
+    "groups": {
+      "friends": "Amigos",
+      "ownGuests": "Tus invitados",
+      "otherGuests": "Invitados de otros"
+    },
+    "whoHint": "Vos siempre estás. Los invitados de otros, solo si jugaron con vos.",
+    "clear": "Limpiar filtros",
+    "articles": {
+      "captain": "el",
+      "falconer": "la",
+      "baroness": "la",
+      "professor": "el",
+      "explorer": "la",
+      "mystic": "el",
+      "mechanic": "la",
+      "journalist": "la"
+    },
+    "sentence": "Con {leader, select, all {todos los líderes} other {{article} <b>{name}</b>}}{temple, select, bird { en el templo del <b>Pájaro</b>} snake { en el templo de la <b>Serpiente</b>} other {}}",
+    "summary": "{players, plural, one {# jugador} other {# jugadores}} · {matches, plural, one {# partida} other {# partidas}}",
+    "sortBy": "Ordenar por",
+    "sorts": {
+      "winRate": "Win Rate",
+      "avgPoints": "Puntos promedio",
+      "avgPlace": "Lugar promedio",
+      "games": "Partidas"
+    },
+    "games": "{count, plural, one {# partida} other {# partidas}}",
+    "you": "Vos",
+    "kinds": {
+      "friend": "amigo",
+      "own_guest": "tu invitado",
+      "other_guest": "invitado de {owner}",
+      "guest": "invitado"
+    },
+    "empty": "Nadie jugó esa combinación todavía.",
+    "switch": {
+      "label": "Estadísticas",
+      "stats": "Tus números",
+      "rankings": "Rankings"
+    },
+    "card": {
+      "leaderTemple": "{leader}{temple, select, bird { · templo del Pájaro} snake { · templo de la Serpiente} other {}}",
+      "everyone": "Amigos e invitados",
+      "onlyYou": "Solo vos",
+      "allTables": "todas las mesas",
+      "tables": "mesas de {counts}"
+    },
+    "change": "Cambiar filtros",
+    "close": "Cerrar",
+    "apply": "Ver ranking"
   },
   "FriendProfile": {
     "back": "Amigos",

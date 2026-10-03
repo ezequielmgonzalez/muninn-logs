@@ -376,12 +376,14 @@ html[data-pending-section] [data-nav-item][aria-current="page"] > [data-nav-stro
 html[data-pending-section="home"] [data-nav-item][data-section="home"],
 html[data-pending-section="matches"] [data-nav-item][data-section="matches"],
 html[data-pending-section="stats"] [data-nav-item][data-section="stats"],
+html[data-pending-section="rankings"] [data-nav-item][data-section="rankings"],
 html[data-pending-section="friends"] [data-nav-item][data-section="friends"] {
   color: var(--color-band-text);
 }
 html[data-pending-section="home"] [data-nav-item][data-section="home"] > [data-nav-stroke],
 html[data-pending-section="matches"] [data-nav-item][data-section="matches"] > [data-nav-stroke],
 html[data-pending-section="stats"] [data-nav-item][data-section="stats"] > [data-nav-stroke],
+html[data-pending-section="rankings"] [data-nav-item][data-section="rankings"] > [data-nav-stroke],
 html[data-pending-section="friends"] [data-nav-item][data-section="friends"] > [data-nav-stroke] {
   display: block;
 }

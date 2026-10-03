@@ -30,7 +30,8 @@
     "friends": "Friends",
     "logMatch": "Log a game",
     "logShort": "Log",
-    "diaryOf": "Journal of"
+    "diaryOf": "Journal of",
+    "rankings": "Rankings"
   },
   "Auth": {
     "title": "Sign in",
@@ -229,6 +230,70 @@
       "average": "Avg",
       "max": "High"
     }
+  },
+  "Rankings": {
+    "consulta": "Query",
+    "ranking": "Ranking",
+    "leader": "Leader",
+    "leaderHint": "The one each player used in their games.",
+    "allLeaders": "All",
+    "temple": "Temple",
+    "anyTemple": "Either",
+    "temples": {
+      "bird": "Bird",
+      "snake": "Snake"
+    },
+    "who": "Who's in",
+    "groups": {
+      "friends": "Friends",
+      "ownGuests": "Your guests",
+      "otherGuests": "Others' guests"
+    },
+    "whoHint": "You're always in. Others' guests, only if they played with you.",
+    "clear": "Clear filters",
+    "articles": {
+      "captain": "the",
+      "falconer": "the",
+      "baroness": "the",
+      "professor": "the",
+      "explorer": "the",
+      "mystic": "the",
+      "mechanic": "the",
+      "journalist": "the"
+    },
+    "sentence": "With {leader, select, all {every leader} other {{article} <b>{name}</b>}}{temple, select, bird { on the <b>Bird</b> temple} snake { on the <b>Snake</b> temple} other {}}",
+    "summary": "{players, plural, one {# player} other {# players}} · {matches, plural, one {# game} other {# games}}",
+    "sortBy": "Sort by",
+    "sorts": {
+      "winRate": "Win rate",
+      "avgPoints": "Average points",
+      "avgPlace": "Average place",
+      "games": "Games"
+    },
+    "games": "{count, plural, one {# game} other {# games}}",
+    "you": "You",
+    "kinds": {
+      "friend": "friend",
+      "own_guest": "your guest",
+      "other_guest": "{owner}'s guest",
+      "guest": "guest"
+    },
+    "empty": "Nobody has played that combination yet.",
+    "switch": {
+      "label": "Stats",
+      "stats": "Your numbers",
+      "rankings": "Rankings"
+    },
+    "card": {
+      "leaderTemple": "{leader}{temple, select, bird { · Bird temple} snake { · Snake temple} other {}}",
+      "everyone": "Friends and guests",
+      "onlyYou": "Only you",
+      "allTables": "every table",
+      "tables": "{counts}-player tables"
+    },
+    "change": "Change filters",
+    "close": "Close",
+    "apply": "See ranking"
   },
   "FriendProfile": {
     "back": "Friends",

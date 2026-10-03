@@ -3,6 +3,7 @@ import { Fragment } from "react";
 
 import { NotebookPages } from "@/components/notebook/notebook-shell";
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { StatsSwitch } from "@/features/rankings/stats-switch";
 import { LeaderRanking } from "@/features/stats/leader-ranking";
 import { noGamesFor, PlayerCountsNote } from "@/features/player-count/copy";
 import { playerCountsKey } from "@/features/player-count/options";
@@ -24,7 +25,13 @@ export default async function ProfilePage() {
 
   const players = await getPlayerCounts();
   const stats = await getPlayerStats(profile.id, players);
-  const title = <h1 className="sr-only">{tHome("journal", { name: profile.display_name })}</h1>;
+  // Phones: the switch to Rankings (the tab bar has no room for it), then the page's title.
+  const title = (
+    <>
+      <StatsSwitch current="stats" className="mb-8.5" />
+      <h1 className="sr-only">{tHome("journal", { name: profile.display_name })}</h1>
+    </>
+  );
 
   if (stats.games === 0) {
     // Nothing to show yet: the insert and the tab bar offer "Cargar partida".

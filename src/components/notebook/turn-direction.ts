@@ -2,7 +2,7 @@
 export type TurnDirection = "forward" | "backward";
 
 /** The sections in the order of the diary (and of the navigation). */
-export const SECTION_ORDER = ["home", "matches", "stats", "friends"] as const;
+export const SECTION_ORDER = ["home", "matches", "stats", "rankings", "friends"] as const;
 export type NotebookSection = (typeof SECTION_ORDER)[number];
 
 /**
