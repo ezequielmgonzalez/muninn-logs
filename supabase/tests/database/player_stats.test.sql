@@ -159,7 +159,7 @@ select results_eq(
 );
 
 select ok(
-  has_function_privilege('authenticated', 'public.get_player_stats(uuid, text, integer)', 'execute'),
+  has_function_privilege('authenticated', 'public.get_player_stats(uuid, text, integer[])', 'execute'),
   'signed-in users can still call it after the new version'
 );
 
@@ -179,7 +179,7 @@ select throws_ok(
 );
 
 select ok(
-  not has_function_privilege('anon', 'public.get_player_stats(uuid, text, integer)', 'execute'),
+  not has_function_privilege('anon', 'public.get_player_stats(uuid, text, integer[])', 'execute'),
   'anon can''t even call the function'
 );
 

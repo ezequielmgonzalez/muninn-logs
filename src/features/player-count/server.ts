@@ -2,9 +2,9 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
-import { PLAYER_COUNT_COOKIE, type PlayerCount, parsePlayerCount } from "./options";
+import { PLAYER_COUNTS_COOKIE, type PlayerCounts, parsePlayerCounts } from "./options";
 
-/** The number of players the user filters by, or null for every game. */
-export async function getPlayerCount(): Promise<PlayerCount | null> {
-  return parsePlayerCount((await cookies()).get(PLAYER_COUNT_COOKIE)?.value);
+/** The table sizes the user filters by, or null for every game. ?jugadores= reaches it through the proxy. */
+export async function getPlayerCounts(): Promise<PlayerCounts> {
+  return parsePlayerCounts((await cookies()).get(PLAYER_COUNTS_COOKIE)?.value);
 }

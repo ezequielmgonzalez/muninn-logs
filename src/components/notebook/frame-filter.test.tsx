@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -24,13 +24,15 @@ function renderAt(path: string, ui: ReactNode) {
 
 describe("FramePlayerFilter", () => {
   it("filters the screens with stats or lists of games", () => {
-    renderAt("/profile", <FramePlayerFilter value={3} placement="insert" />);
-    expect(screen.getByRole("combobox", { name: "Jugadores" })).toHaveValue("3");
+    renderAt("/profile", <FramePlayerFilter value={[3]} placement="insert" />);
+    const group = screen.getByRole("group", { name: "Jugadores" });
+    expect(within(group).getByRole("checkbox", { name: "3 jugadores" })).toBeChecked();
+    expect(within(group).getByRole("checkbox", { name: "2 jugadores" })).not.toBeChecked();
   });
 
   it("keeps its place on the insert elsewhere, hidden, so the navigation doesn't move", () => {
     const { container } = renderAt("/friends", <FramePlayerFilter value={null} placement="insert" />);
-    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.queryByRole("group")).toBeNull();
     const box = container.firstElementChild!;
     expect(box).toHaveClass("invisible");
     expect(box).toHaveAttribute("inert");

@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { groupByMonth, type MonthGroup, spreadOf } from "@/features/matches/group-by-month";
 import { MatchList } from "@/features/matches/match-list";
 import { listMatches } from "@/features/matches/queries";
-import { getPlayerCount } from "@/features/player-count/server";
+import { noGamesFor, PlayerCountsNote } from "@/features/player-count/copy";
+import { playerCountsKey } from "@/features/player-count/options";
+import { getPlayerCounts } from "@/features/player-count/server";
 import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
@@ -26,7 +28,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   // A group's whole history fits in one read; months are paged here.
-  const [players, tCount] = await Promise.all([getPlayerCount(), getTranslations("PlayerCount")]);
+  const players = await getPlayerCounts();
   const matches = await listMatches(1000, players);
   const title = <h1 className="sr-only">{t("title")}</h1>;
 
@@ -38,7 +40,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
             {title}
             <PaintedBand>{t("title")}</PaintedBand>
             <p className="type-caption mt-5.5 mb-8 text-ink-muted">
-              {players ? tCount("none", { count: players }) : t("empty")}
+              {players ? await noGamesFor(players) : t("empty")}
             </p>
             <InkButton asChild>
               <TurnLink href="/matches/new" direction="forward">
@@ -66,6 +68,8 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
       <PaintedBand variant={flip ? 2 : 1} flip={flip}>
         {monthTitle(group)}
       </PaintedBand>
+      {/* Under the screen's first title only: the filter applies to every month. */}
+      {!flip && <PlayerCountsNote counts={players} />}
       <div className="mt-2.5 notebook:mt-3">
         <MatchList matches={group.matches} />
       </div>
@@ -97,7 +101,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
     <NotebookPages
       left={
         // A new player count paints the screen again.
-        <Fragment key={players ?? "all"}>
+        <Fragment key={playerCountsKey(players)}>
           {title}
           {left && month(left, false)}
           {!right && pager}
@@ -105,7 +109,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
       }
       right={
         right && (
-          <Fragment key={players ?? "all"}>
+          <Fragment key={playerCountsKey(players)}>
             {month(right, true)}
             {pager}
           </Fragment>

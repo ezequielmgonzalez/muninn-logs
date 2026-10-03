@@ -1,7 +1,7 @@
 "use client";
 
 import { PlayerCountFilter } from "@/features/player-count/player-count-filter";
-import type { PlayerCount } from "@/features/player-count/options";
+import type { PlayerCounts } from "@/features/player-count/options";
 import { usePathname } from "@/i18n/navigation";
 
 import { hasPlayerFilter } from "./sections";
@@ -11,7 +11,7 @@ import { hasPlayerFilter } from "./sections";
  * keeps its place on the others (hidden), so the navigation below it never
  * moves between screens; on phones it opens the page, or isn't there.
  */
-export function FramePlayerFilter({ value, placement }: { value: PlayerCount | null; placement: "insert" | "phone" }) {
+export function FramePlayerFilter({ value, placement }: { value: PlayerCounts; placement: "insert" | "phone" }) {
   const shown = hasPlayerFilter(usePathname());
   if (placement === "phone") {
     return shown ? (

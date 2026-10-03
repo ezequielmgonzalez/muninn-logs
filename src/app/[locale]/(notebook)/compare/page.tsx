@@ -8,7 +8,9 @@ import { PenCircle } from "@/components/notebook/pen-circle";
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
 import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
 import { NativeSelect } from "@/components/notebook/native-select";
-import { getPlayerCount } from "@/features/player-count/server";
+import { PlayerCountsNote } from "@/features/player-count/copy";
+import { playerCountsKey } from "@/features/player-count/options";
+import { getPlayerCounts } from "@/features/player-count/server";
 import { type ComparableStats, getPlayerStats, getSharedStats } from "@/features/stats/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { redirect } from "@/i18n/navigation";
@@ -40,7 +42,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   ]);
   const chosen = found.filter((f) => f !== null);
 
-  const players = await getPlayerCount();
+  const players = await getPlayerCounts();
   const stats: ComparableStats[] =
     chosen.length === 0
       ? []
@@ -162,6 +164,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   const table = (
     <>
       <PaintedBand as="h1">{t("title", { names: format.list(chosen.map((f) => f.display_name)) })}</PaintedBand>
+      <PlayerCountsNote counts={players} />
       <div className="mt-3.5 overflow-x-auto notebook:mt-4.5">
         <table className="w-full border-collapse text-sm notebook:text-[15px]">
           <thead>
@@ -228,7 +231,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
         </section>
         {/* A new player count paints the chart and the table again. */}
         {comparing && (
-          <div key={players ?? "all"} className="mt-11 max-notebook:mt-0 max-notebook:contents">
+          <div key={playerCountsKey(players)} className="mt-11 max-notebook:mt-0 max-notebook:contents">
             {chart}
           </div>
         )}
@@ -240,7 +243,7 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
       </NotebookPage>
       {comparing && (
         <NotebookPage side="right" order={2}>
-          <Fragment key={players ?? "all"}>{table}</Fragment>
+          <Fragment key={playerCountsKey(players)}>{table}</Fragment>
         </NotebookPage>
       )}
     </>
