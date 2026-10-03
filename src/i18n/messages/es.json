@@ -343,7 +343,9 @@
     "wholeTable": "Los {count, select, 3 {tres} 4 {cuatro} 5 {cinco} other {#}} en la mesa",
     "wholeTableGames": "{count, plural, one {# partida} other {# partidas}}",
     "wonFirst": "{name} ganó {count}",
-    "won": "{name} {count}"
+    "won": "{name} {count}",
+    "chartTitle": "Puntos por categoría",
+    "chartValue": "{name}: {value}"
   },
   "Legal": {
     "updated": "Última actualización: 29 de septiembre de 2026",

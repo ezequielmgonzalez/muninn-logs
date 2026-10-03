@@ -343,7 +343,9 @@
     "wholeTable": "All {count, select, 3 {three} 4 {four} 5 {five} other {#}} at the table",
     "wholeTableGames": "{count, plural, one {# game} other {# games}}",
     "wonFirst": "{name} won {count}",
-    "won": "{name} {count}"
+    "won": "{name} {count}",
+    "chartTitle": "Points by category",
+    "chartValue": "{name}: {value}"
   },
   "Legal": {
     "updated": "Last updated: September 29, 2026",

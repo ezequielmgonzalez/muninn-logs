@@ -48,6 +48,12 @@ v3, "cuaderno de campo": surfaces are paper inside a notebook, every accent is a
 - Leaders are shown by emoji plus their chart color (`ARNAK_LEADER_STYLES` in `src/games/arnak.ts`), never with the official leader art: it isn't licensed, so it must not be committed or displayed (even where the design mentions portraits).
 - One radius (4px; the leather cover is 12px). Design spacing `space-1…8` (4, 8, 12, 16, 22, 34, 46, 54px) = Tailwind `1, 2, 3, 4, 5.5, 8.5, 11.5, 13.5`. Touch targets are at least 44px; inputs keep 16px text on phones so iOS doesn't zoom.
 
+## Feature flags
+
+- A feature that ships turned off sits behind `isEnabled("<flag>")` (`src/lib/flags.ts`, server-only): an environment variable, on only when it's exactly `"true"`, read on every request. Add each flag there and to `.env.example`. On Vercel, set it per environment (Settings → Environment Variables) and redeploy; locally, `.env.local`.
+- Both sides stay tested: the normal e2e projects run with every flag off; `e2e/flagged/` runs in the `flagged` project against a second server (port 3101, same build) with the flags on (`FLAGS_ON` in `playwright.config.ts`). Screenshots are taken with flags off.
+- Today: `FEATURE_COMPARE_HEAD_TO_HEAD` (Comparar's "Cara a cara" in place of "Puntos por categoría").
+
 ## Database
 
 - Every schema change is a new migration: `pnpm supabase migration new <name> < /dev/null` (without `< /dev/null` it waits for SQL on stdin). Never edit a migration that's on `main`; it's already applied to staging and production.
