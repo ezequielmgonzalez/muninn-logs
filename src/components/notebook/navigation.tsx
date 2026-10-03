@@ -21,7 +21,20 @@ import { type NotebookSection, sectionTurn } from "./turn-direction";
 
 export type { NotebookSection };
 
-const SECTIONS: { key: NotebookSection; href: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+/** The insert lists every section. */
+const SECTIONS: { key: NotebookSection; href: string }[] = [
+  { key: "home", href: "/" },
+  { key: "matches", href: "/matches" },
+  { key: "stats", href: "/profile" },
+  { key: "rankings", href: "/rankings" },
+  { key: "friends", href: "/friends" },
+];
+
+/**
+ * The tab bar has room for four around "Cargar": Rankings has no tab, it's
+ * reached from Estadísticas (a switch at the top of both), whose tab stays current.
+ */
+const TABS: { key: Exclude<NotebookSection, "rankings">; href: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
   { key: "home", href: "/", Icon: BookIcon },
   { key: "matches", href: "/matches", Icon: SheetIcon },
   { key: "stats", href: "/profile", Icon: BarsIcon },
@@ -89,10 +102,11 @@ export function SideNav() {
 /** Phones: a strip of the insert's paper along the bottom, five positions. The match form has its save bar instead. */
 export function TabBar() {
   const t = useTranslations("Nav");
-  const { pathname, active } = useActiveSection();
+  const { pathname, active: section } = useActiveSection();
   if (hasSaveBar(pathname)) return null;
+  const active = section === "rankings" ? "stats" : section;
 
-  const tab = ({ key, href, Icon }: (typeof SECTIONS)[number]) => (
+  const tab = ({ key, href, Icon }: (typeof TABS)[number]) => (
     <TurnLink
       key={key}
       href={href}
@@ -120,9 +134,9 @@ export function TabBar() {
         className="absolute inset-x-[-8px] top-1.5 bottom-[-6px] bg-[url(/paper/tabbar.webp)] bg-size-[100%_100%] bg-no-repeat drop-shadow-[0_-6px_12px_rgba(48,30,12,0.4)]"
       />
       <div className="relative z-2 grid h-24 grid-cols-5 items-center px-1.5 pt-[18px] pb-3.5">
-        {SECTIONS.slice(0, 2).map(tab)}
+        {TABS.slice(0, 2).map(tab)}
         <LoadMatchFab label={t("logMatch")} shortLabel={t("logShort")} />
-        {SECTIONS.slice(2).map(tab)}
+        {TABS.slice(2).map(tab)}
       </div>
     </nav>
   );

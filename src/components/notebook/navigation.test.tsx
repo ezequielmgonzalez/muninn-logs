@@ -36,15 +36,16 @@ describe("SideNav", () => {
       ["Inicio", "/"],
       ["Partidas", "/matches"],
       ["Estadísticas", "/profile"],
+      ["Rankings", "/rankings"],
       ["Amigos", "/friends"],
     ]);
     const current = within(nav).getByRole("link", { current: "page" });
     expect(current).toHaveTextContent("Estadísticas");
     // Every item has its stroke, shown by CSS on the current one or a clicked one.
-    expect(links.map((l) => l.querySelector("[data-nav-stroke]")?.classList.contains("ink--sweep"))).toEqual([true, true, true, true]);
-    expect(links.map((l) => l.getAttribute("data-section"))).toEqual(["home", "matches", "stats", "friends"]);
+    expect(links.every((l) => l.querySelector("[data-nav-stroke]")?.classList.contains("ink--sweep"))).toBe(true);
+    expect(links.map((l) => l.getAttribute("data-section"))).toEqual(["home", "matches", "stats", "rankings", "friends"]);
     // Other sections turn the diary's page towards them; the current one doesn't.
-    expect(links.map((l) => l.getAttribute("data-turn"))).toEqual(["backward", "backward", null, "forward"]);
+    expect(links.map((l) => l.getAttribute("data-turn"))).toEqual(["backward", "backward", null, "forward", "forward"]);
   });
 
   it("turns back to the current section from one of its inner screens", () => {
@@ -97,6 +98,13 @@ describe("TabBar", () => {
     renderAt("/account/delete", <TabBar />);
     expect(screen.getByRole("navigation", { name: "Secciones" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { current: "page" })).toBeNull();
+  });
+
+  it("has no tab for Rankings: Estadísticas stays current there", () => {
+    renderAt("/rankings", <TabBar />);
+    const nav = screen.getByRole("navigation", { name: "Secciones" });
+    expect(within(nav).queryByRole("link", { name: "Rankings" })).toBeNull();
+    expect(within(nav).getByRole("link", { current: "page" })).toHaveTextContent("Estadísticas");
   });
 
   it("makes way for the match form's save bar", () => {

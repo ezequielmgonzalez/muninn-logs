@@ -62,7 +62,7 @@ function Insert({ playerCount }: { playerCount: PlayerCounts }) {
         <SideNav />
         <div className="mt-auto pl-[70px]">
           {/* Muninn, in the same faint ink the compass had. */}
-          <CrowMark className="text-ink opacity-16" />
+          <CrowMark width={96} className="text-ink opacity-16" />
         </div>
         <LegalLinks className="pt-[22px] pl-[38px]" />
       </div>

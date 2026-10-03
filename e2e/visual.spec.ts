@@ -111,6 +111,14 @@ test("screens of a diary with games and friends", async ({ page, request, browse
   await snap(page, "amigos");
   await page.goto(`/es/compare?with=${friends[0]}&with=${friends[1]}`);
   await snap(page, "comparar");
+  // Rankings with a leader picked (its bars take the leader's color), and the phone's sheet.
+  await page.goto("/es/rankings?lider=capitan");
+  await snap(page, "rankings");
+  await page.setViewportSize(SIZES.phone);
+  await page.getByRole("button", { name: "Cambiar filtros" }).click();
+  await expect(page.getByRole("dialog", { name: "Consulta" })).toBeVisible();
+  await expect(page).toHaveScreenshot("rankings-filtros-phone.png", { mask: [page.getByText(/@?e2e_\w+/)] });
+  await page.keyboard.press("Escape");
 
   // The form mid-game: two players at the table, leaders, a temple and scores.
   await page.goto("/es/matches/new");
