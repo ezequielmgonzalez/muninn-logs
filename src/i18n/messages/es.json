@@ -323,16 +323,29 @@
     "submit": "Comparar",
     "noFriends": "Agregá amigos para compararte con ellos.",
     "link": "Comparar con varios amigos",
-    "chartTitle": "Puntos por categoría",
     "bestNote": "Mejor valor de cada fila. En lugar promedio, menos es mejor.",
-    "chartValue": "{name}: {value}",
     "scopeLabel": "Partidas",
     "scopes": {
       "all": "Todas las de cada uno",
       "together": "Solo las que jugaron juntos"
     },
     "noteTogether": "Solo {count, plural, one {la partida} other {las # partidas}} en que jugaron todos juntos.",
-    "noShared": "Todavía no jugaron todos juntos. Elegí menos amigos, o mirá todas las partidas de cada uno."
+    "noShared": "Todavía no jugaron todos juntos. Elegí menos amigos, o mirá todas las partidas de cada uno.",
+    "headToHead": "Cara a cara",
+    "headToHeadNote": "Quién quedó más arriba en las partidas que jugaron juntos",
+    "score": "<b>Vos {mine}</b> — {theirs} {name}",
+    "together": "{count, plural, one {# partida juntos} other {# partidas juntos}}",
+    "notTogether": "Todavía no jugaron juntos.",
+    "ahead": "Le sacás {diff} en {category}",
+    "behind": "te saca {diff} en {category}",
+    "behindOnly": "Te saca {diff} en {category}",
+    "even": "Van parejos en todo",
+    "wholeTable": "Los {count, select, 3 {tres} 4 {cuatro} 5 {cinco} other {#}} en la mesa",
+    "wholeTableGames": "{count, plural, one {# partida} other {# partidas}}",
+    "wonFirst": "{name} ganó {count}",
+    "won": "{name} {count}",
+    "chartTitle": "Puntos por categoría",
+    "chartValue": "{name}: {value}"
   },
   "Legal": {
     "updated": "Última actualización: 29 de septiembre de 2026",

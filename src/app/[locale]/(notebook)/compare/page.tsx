@@ -7,14 +7,17 @@ import { BrushBar, PaintedBand, PLAYER_TONES } from "@/components/notebook/paint
 import { PenCircle } from "@/components/notebook/pen-circle";
 import { getFriendByUsername, getFriendships } from "@/features/friends/queries";
 import { categoryBars, type ComparisonRow, compareStats } from "@/features/stats/compare";
+import { advantage, duel, wholeTable } from "@/features/stats/head-to-head";
+import { HeadToHead } from "@/features/stats/head-to-head-view";
 import { NativeSelect } from "@/components/notebook/native-select";
 import { PlayerCountsNote } from "@/features/player-count/copy";
 import { playerCountsKey } from "@/features/player-count/options";
 import { getPlayerCounts } from "@/features/player-count/server";
-import { type ComparableStats, getPlayerStats, getSharedStats } from "@/features/stats/queries";
+import { type ComparableStats, getFinishes, getPlayerStats, getSharedStats } from "@/features/stats/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
 import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
+import { isEnabled } from "@/lib/flags";
 import { cn } from "@/lib/utils";
 
 /** You plus up to this many friends, so the table still fits a phone. */
@@ -43,15 +46,21 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   const chosen = found.filter((f) => f !== null);
 
   const players = await getPlayerCounts();
-  const stats: ComparableStats[] =
+  // "Cara a cara" in place of "Puntos por categoría", behind a flag while it's tried out.
+  const headToHead = isEnabled("compareHeadToHead");
+  const [stats, { playerIds, finishes }]: [ComparableStats[], Awaited<ReturnType<typeof getFinishes>>] =
     chosen.length === 0
-      ? []
-      : scope === "together"
-        ? await getSharedStats(
-            chosen.map((f) => f.id),
-            players,
-          )
-        : await Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id, players)));
+      ? [[], { playerIds: [], finishes: [] }]
+      : await Promise.all([
+          scope === "together"
+            ? getSharedStats(
+                chosen.map((f) => f.id),
+                players,
+              )
+            : Promise.all([profile, ...chosen].map((p) => getPlayerStats(p.id, players))),
+          // Cara a cara: always over the games played together, whatever the scope.
+          headToHead ? getFinishes([profile.id, ...chosen.map((f) => f.id)], players) : { playerIds: [], finishes: [] },
+        ]);
   // Together, everyone has the same games: none means they never all sat at one table.
   const shared = scope === "together" ? (stats[0]?.games ?? 0) : null;
   const comparing = chosen.length > 0 && shared !== 0;
@@ -70,7 +79,13 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   };
 
   const names = [t("you"), ...chosen.map((f) => f.display_name)];
-  const bars = comparing ? categoryBars(stats) : [];
+  // You against each friend, and (with two or more) everyone at once.
+  const [me, ...others] = playerIds;
+  const duels = chosen.map((_, i) => (me && others[i] ? duel(finishes, me, others[i]) : { together: 0, mine: 0, theirs: 0 }));
+  const notes = chosen.map((_, i) => (stats[0] && stats[i + 1] ? advantage(stats[0], stats[i + 1]) : null));
+  const bars = comparing && !headToHead ? categoryBars(stats) : [];
+  const everyone =
+    chosen.length >= 2 && playerIds.every((id) => id !== null) ? wholeTable(finishes, playerIds as string[]) : null;
   const dot = (i: number) => (
     <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ background: `var(--${PLAYER_TONES[i]})` }} />
   );
@@ -223,26 +238,33 @@ export default async function ComparePage({ searchParams }: PageProps<"/[locale]
   return (
     // Amigos stays current (sections.ts): comparing is reached from there.
     <>
-      {/* On phones the left page dissolves so the table can sit between the chips and the chart. */}
+      {/* On phones the left page dissolves, so its blocks and the table can be ordered on one page:
+          the controls, then Cara a cara and the table, or the table and the bars. */}
       <NotebookPage side="left" className={comparing ? "max-notebook:contents" : undefined}>
         <section className="order-1">
           <PaintedBand as={comparing ? "h2" : "h1"}>{t("pickTitle")}</PaintedBand>
           {picker}
         </section>
-        {/* A new player count paints the chart and the table again. */}
-        {comparing && (
-          <div key={playerCountsKey(players)} className="mt-11 max-notebook:mt-0 max-notebook:contents">
-            {chart}
-          </div>
-        )}
         {chosen.length > 0 && !comparing && (
           <p role="status" className="type-body-strong mt-8.5 text-ink-body">
             {t("noShared")}
           </p>
         )}
+        {/* Under the controls; on phones, before the table. A new player count paints it again. */}
+        {headToHead && chosen.length > 0 && (
+          <div key={playerCountsKey(players)} className="order-2 mt-11 max-notebook:mt-0">
+            <HeadToHead names={names} duels={duels} notes={notes} table={everyone} />
+          </div>
+        )}
+        {/* Without the flag: the grouped bars, after the table on phones. */}
+        {!headToHead && comparing && (
+          <div key={playerCountsKey(players)} className="mt-11 max-notebook:mt-0 max-notebook:contents">
+            {chart}
+          </div>
+        )}
       </NotebookPage>
       {comparing && (
-        <NotebookPage side="right" order={2}>
+        <NotebookPage side="right" className={headToHead ? "order-3" : "order-2"}>
           <Fragment key={playerCountsKey(players)}>{table}</Fragment>
         </NotebookPage>
       )}
