@@ -291,7 +291,7 @@ isOneToOne: false
 { Args: { "game_slug"?: string,"player_counts"?: (number)[],"target_user_id": string }; Returns: Json
                            },
 "get_rankings":
-{ Args: { "board_side"?: string,"game_slug"?: string,"include_friends"?: boolean,"include_other_guests"?: boolean,"include_own_guests"?: boolean,"leader_slug"?: string,"player_counts"?: (number)[] }; Returns: Json
+{ Args: { "board_side"?: string,"game_slug"?: string,"include_friends"?: boolean,"include_other_guests"?: boolean,"include_own_guests"?: boolean,"leader_slug"?: string,"no_board_side"?: boolean,"no_leader"?: boolean,"player_counts"?: (number)[],"seat"?: number }; Returns: Json
                            },
 "get_shared_stats":
 { Args: { "friend_ids": (string)[],"game_slug"?: string,"player_counts"?: (number)[] }; Returns: Json
