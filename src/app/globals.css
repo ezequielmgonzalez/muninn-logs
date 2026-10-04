@@ -175,17 +175,37 @@
 @utility ink--blot {
   mask-image: url(/brush/ink-blot.png);
 }
+/*
+ * Bars: their stroke is never crushed into a short bar (the whole 1400px
+ * stroke in a few pixels is a blocky smear). Two copies of it, one from the
+ * left (the brush landing) and one from the right (its dry tail), and the
+ * bar is where they overlap. The left copy is at least 160px wide; the right
+ * one at least four times the bar (cqw: the bar is a container), up to
+ * 160px, so a tiny bar's tail stays short instead of being all strands. A
+ * long bar is both copies at full width: the stroke as it is.
+ */
 @utility ink--bar1 {
-  mask-image: url(/brush/brush-bar-1.png);
+  --bar-stroke: url(/brush/brush-bar-1.png);
 }
 @utility ink--bar2 {
-  mask-image: url(/brush/brush-bar-2.png);
+  --bar-stroke: url(/brush/brush-bar-2.png);
 }
 @utility ink--bar3 {
-  mask-image: url(/brush/brush-bar-3.png);
+  --bar-stroke: url(/brush/brush-bar-3.png);
 }
 @utility ink--bar4 {
-  mask-image: url(/brush/brush-bar-4.png);
+  --bar-stroke: url(/brush/brush-bar-4.png);
+}
+[data-bar-stroke] {
+  mask-image: var(--bar-stroke), var(--bar-stroke);
+  mask-size:
+    max(100%, 160px) 100%,
+    max(100%, min(160px, 400cqw)) 100%;
+  mask-position:
+    left center,
+    right center;
+  mask-repeat: no-repeat;
+  mask-composite: intersect;
 }
 
 /*
