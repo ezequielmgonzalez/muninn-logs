@@ -21,14 +21,14 @@ function onlyOnce() {
   test.skip(test.info().project.name !== "desktop", "Runs once, in the desktop project.");
 }
 
-/** Both sizes of the page as it is now. Usernames are random per run, so they're masked. */
+/** Both sizes of the page as it is now. Usernames are random per run, and the crow's facts come in a random order, so they're masked. */
 async function snap(page: Page, name: string) {
   await page.waitForLoadState("networkidle");
   await page.mouse.move(0, 0);
   for (const [size, viewport] of Object.entries(SIZES)) {
     await page.setViewportSize(viewport);
     await page.evaluate(() => window.scrollTo(0, 0));
-    await expect(page).toHaveScreenshot(`${name}-${size}.png`, { mask: [page.getByText(/@?e2e_\w+/)] });
+    await expect(page).toHaveScreenshot(`${name}-${size}.png`, { mask: [page.getByText(/@?e2e_\w+/), page.locator("[data-fact]")] });
   }
 }
 

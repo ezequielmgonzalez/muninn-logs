@@ -22,10 +22,20 @@ async function logGame(page: Page, mine: number, jessi: number, first: boolean) 
 
 const crow = (page: Page) => page.getByRole("region", { name: "¿Sabías que…?" }).filter({ visible: true });
 
-test("the crow tells facts about the group's games, one after another", async ({ page, request }) => {
+/** On desktop the crow's small bubble opens the facts; on phones they're open. */
+async function listen(page: Page, isMobile: boolean) {
+  if (isMobile) return;
+  const bubble = crow(page).getByRole("button", { name: "¿Sabías que…?" });
+  await expect(bubble).toBeEnabled();
+  await bubble.click();
+  await expect(bubble).toHaveAttribute("aria-expanded", "true");
+}
+
+test("the crow tells facts about the group's games, one after another", async ({ page, request, isMobile }) => {
   test.setTimeout(90_000);
   await signUp(page, request, "Ezequiel");
   // No games yet: nothing to tell.
+  await listen(page, isMobile);
   await expect(crow(page)).toContainText("Cuando haya unas partidas más, te cuento cosas.");
   await expect(crow(page).getByRole("button", { name: "Otro dato" })).toBeHidden();
 
@@ -34,6 +44,7 @@ test("the crow tells facts about the group's games, one after another", async ({
   await logGame(page, 70, 30, false);
 
   await page.goto("/es");
+  await listen(page, isMobile);
   const fact = crow(page).locator("[aria-live]");
   await expect(fact).not.toContainText("Cuando haya");
   // Seven facts, in a random order: "Otro dato" goes through every one, then starts over.
@@ -56,4 +67,11 @@ test("the crow tells facts about the group's games, one after another", async ({
     ].sort(),
   );
   expect(told).toContain((await fact.textContent())!);
+
+  if (!isMobile) {
+    // Esc puts the facts away.
+    await page.keyboard.press("Escape");
+    await expect(fact).toBeHidden();
+    await expect(crow(page).getByRole("button", { name: "¿Sabías que…?" })).toHaveAttribute("aria-expanded", "false");
+  }
 });
