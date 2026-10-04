@@ -241,7 +241,11 @@
     "anyTemple": "Either",
     "temples": {
       "bird": "Bird",
-      "snake": "Snake"
+      "snake": "Snake",
+      "waterfall": "Waterfall",
+      "tree": "Tree",
+      "monkey": "Monkey",
+      "lizard": "Lizard"
     },
     "who": "Who's in",
     "groups": {
@@ -261,7 +265,7 @@
       "mechanic": "the",
       "journalist": "the"
     },
-    "sentence": "{leader, select, all {With every leader} none {With no leader recorded} other {With {article} <b>{name}</b>}}{temple, select, bird { on the <b>Bird</b> temple} snake { on the <b>Snake</b> temple} none { on an unrecorded temple} other {}}{seat, select, 1 {, going <b>first</b>} 2 {, going <b>second</b>} 3 {, going <b>third</b>} 4 {, going <b>fourth</b>} other {}}",
+    "sentence": "{leader, select, all {With every leader} none {With no leader recorded} other {With {article} <b>{name}</b>}}{temple, select, bird { on the <b>Bird</b> temple} snake { on the <b>Snake</b> temple} waterfall { on the <b>Waterfall</b> temple} tree { on the <b>Tree</b> temple} monkey { on the <b>Monkey</b> temple} lizard { on the <b>Lizard</b> temple} none { on an unrecorded temple} other {}}{seat, select, 1 {, going <b>first</b>} 2 {, going <b>second</b>} 3 {, going <b>third</b>} 4 {, going <b>fourth</b>} other {}}",
     "summary": "{players, plural, one {# player} other {# players}} · {matches, plural, one {# game} other {# games}}",
     "sortBy": "Sort by",
     "sorts": {
@@ -287,7 +291,7 @@
       "rankings": "Rankings"
     },
     "card": {
-      "leaderTemple": "{leader}{temple, select, bird { · Bird temple} snake { · Snake temple} none { · temple unspecified} other {}}{seat, select, 1 { · went 1st} 2 { · went 2nd} 3 { · went 3rd} 4 { · went 4th} other {}}",
+      "leaderTemple": "{leader}{temple, select, bird { · Bird temple} snake { · Snake temple} waterfall { · Waterfall temple} tree { · Tree temple} monkey { · Monkey temple} lizard { · Lizard temple} none { · temple unspecified} other {}}{seat, select, 1 { · went 1st} 2 { · went 2nd} 3 { · went 3rd} 4 { · went 4th} other {}}",
       "everyone": "Friends and guests",
       "onlyYou": "Only you",
       "allTables": "every table",
@@ -298,7 +302,7 @@
     "apply": "See ranking",
     "unspecified": "Unspecified",
     "seat": "Turn",
-    "seatHint": "Where each player started at the table. Games without a recorded turn order don't count.",
+    "seatHint": "Where each player started, if turns were recorded.",
     "anySeat": "Any",
     "seats": {
       "1": "1st",

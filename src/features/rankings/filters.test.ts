@@ -14,7 +14,14 @@ describe("the Consulta in the URL", () => {
 
   it("means the defaults when they're missing or unknown: every leader, either side, everyone", () => {
     expect(parseRankingFilters({})).toEqual(DEFAULT_FILTERS);
-    expect(parseRankingFilters({ lider: "halconero", templo: "cascada", turno: "5" })).toEqual(DEFAULT_FILTERS);
+    expect(parseRankingFilters({ lider: "halconero", templo: "volcan", turno: "5" })).toEqual(DEFAULT_FILTERS);
+  });
+
+  it("offers every temple side, the expansions' too", () => {
+    expect(
+      (["waterfall", "tree", "monkey", "lizard"] as const).map((temple) => rankingSearchParams({ ...DEFAULT_FILTERS, temple }).templo),
+    ).toEqual(["cascada", "arbol", "mono", "lagarto"]);
+    expect(parseRankingFilters({ templo: "lagarto" }).temple).toBe("lizard");
   });
 
   it("reads games with no leader or no temple recorded", () => {

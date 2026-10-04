@@ -97,6 +97,14 @@ test("ranks everyone you play with, and the Consulta narrows it down", async ({ 
   await expect(page.getByText("1 jugador · 2 partidas")).toBeVisible();
   await expect(rows(page)).toHaveText([/^1.*Vos.*50\s% · 2 partidas/]);
 
+  // Every temple side, the expansions' too.
+  const temples = group(page, "Templo").getByRole("button");
+  await expect(temples).toHaveText(["Cualquiera", "Pájaro", "Serpiente", "Cascada", "Árbol", "Mono", "Lagarto", "Sin especificar"]);
+  await temples.filter({ hasText: "Cascada" }).click();
+  await expect(page).toHaveURL("/es/rankings?lider=profesor&templo=cascada");
+  await expect(page.getByText("Con el Profesor en el templo de la Cascada")).toBeVisible();
+  await expect(page.getByText("Nadie jugó esa combinación todavía.")).toBeVisible();
+
   // Other sorts: average points, highest first.
   await group(page, "Templo").getByRole("button", { name: "Cualquiera" }).click();
   await expect(page).toHaveURL("/es/rankings?lider=profesor");
@@ -104,9 +112,13 @@ test("ranks everyone you play with, and the Consulta narrows it down", async ({ 
   await page.getByLabel("Ordenar por").selectOption("avgPoints");
   await expect(rows(page)).toHaveText([/^1.*Manuela.*52 · 1 partida/, /^2.*Vos.*50 · 2 partidas/]);
 
-  // Only your guests: friends out (you stay).
-  await page.getByRole("button", { name: "Amigos", exact: true }).click();
+  // Only your guests: friends out (you stay). Several groups go at once, so they're checkboxes.
+  const who = group(page, "Quiénes entran");
+  await expect(who.getByRole("checkbox")).toHaveCount(3);
+  await who.getByRole("checkbox", { name: "Amigos" }).uncheck();
   await expect(page).toHaveURL("/es/rankings?lider=profesor&quienes=invitados%2Cotros");
+  await expect(who.getByRole("checkbox", { name: "Amigos" })).not.toBeChecked();
+  await expect(who.getByRole("checkbox", { name: "Tus invitados" })).toBeChecked();
   await expect(rows(page)).toHaveText([/Vos/]);
   // The sort stays through a new Consulta.
   await expect(page.getByLabel("Ordenar por")).toHaveValue("avgPoints");
