@@ -23,6 +23,7 @@ import { getPlayerStats } from "@/features/stats/queries";
 import { ARNAK_LEADER_STYLES } from "@/games/arnak";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile, isAdmin } from "@/lib/auth";
+import { isEnabled } from "@/lib/flags";
 
 export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   const [profile, locale, t] = await Promise.all([
@@ -181,7 +182,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       )}
 
       {/* Phones: the crow, with a fact about the group's games (on desktop it's on the insert). */}
-      <DidYouKnow placement="page" className="mt-11" />
+      {isEnabled("didYouKnow") && <DidYouKnow placement="page" className="mt-11" />}
 
       {/* The account's own links, quietly at the end of the page. */}
       <nav aria-label={t("account")} className="mt-11 flex flex-col items-center gap-3 text-sm">

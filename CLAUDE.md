@@ -52,7 +52,7 @@ v3, "cuaderno de campo": surfaces are paper inside a notebook, every accent is a
 
 - A feature that ships turned off sits behind `isEnabled("<flag>")` (`src/lib/flags.ts`, server-only): an environment variable, on only when it's exactly `"true"`, read on every request. Add each flag there and to `.env.example`. On Vercel, set it per environment (Settings → Environment Variables) and redeploy; locally, `.env.local`.
 - Both sides stay tested: the normal e2e projects run with every flag off; `e2e/flagged/` runs in the `flagged` project against a second server (port 3101, same build) with the flags on (`FLAGS_ON` in `playwright.config.ts`). Screenshots are taken with flags off.
-- Today: `FEATURE_COMPARE_HEAD_TO_HEAD` (Comparar's "Cara a cara" in place of "Puntos por categoría").
+- Today: `FEATURE_COMPARE_HEAD_TO_HEAD` (Comparar's "Cara a cara" in place of "Puntos por categoría") and `FEATURE_DID_YOU_KNOW` (the crow's "¿Sabías que…?" facts; off, the crow is the faint mark on the insert and `/api/facts` is a 404).
 
 ## Database
 

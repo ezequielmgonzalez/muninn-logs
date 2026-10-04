@@ -1,6 +1,7 @@
 import { findFacts } from "@/features/facts/facts";
 import { listMatches } from "@/features/matches/queries";
 import { getCurrentProfile } from "@/lib/auth";
+import { isEnabled } from "@/lib/flags";
 
 /**
  * The crow's facts (DidYouKnow), from the games the user can see (RLS decides
@@ -10,6 +11,7 @@ import { getCurrentProfile } from "@/lib/auth";
  * (1000 rows).
  */
 export async function GET() {
+  if (!isEnabled("didYouKnow")) return new Response(null, { status: 404 });
   if (!(await getCurrentProfile())) return Response.json([], { status: 401 });
   return Response.json(findFacts(await listMatches(250)), { headers: { "Cache-Control": "private, no-store" } });
 }

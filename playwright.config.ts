@@ -5,7 +5,7 @@ const baseURL = `http://localhost:${PORT}`;
 // Features behind a flag (src/lib/flags.ts) are tested against a second
 // server with them on: the same build, so it needs `pnpm build` first.
 const FLAGGED_PORT = 3101;
-const FLAGS_ON = { FEATURE_COMPARE_HEAD_TO_HEAD: "true" };
+const FLAGS_ON = { FEATURE_COMPARE_HEAD_TO_HEAD: "true", FEATURE_DID_YOU_KNOW: "true" };
 
 export default defineConfig({
   testDir: "./e2e",
