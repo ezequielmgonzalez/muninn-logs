@@ -36,10 +36,11 @@ export default async function RankingsPage({ searchParams }: PageProps<"/[locale
   const fresh = `${JSON.stringify(rankingSearchParams(filters))}|${playerCountsKey(players)}`;
 
   const sentence = t.rich("sentence", {
-    leader: filters.leader ? "one" : "all",
-    article: filters.leader ? t(`articles.${filters.leader}`) : "",
-    name: filters.leader ? tLeaders(filters.leader) : "",
+    leader: filters.leader === "none" ? "none" : filters.leader ? "one" : "all",
+    article: filters.leader && filters.leader !== "none" ? t(`articles.${filters.leader}`) : "",
+    name: filters.leader && filters.leader !== "none" ? tLeaders(filters.leader) : "",
     temple: filters.temple ?? "any",
+    seat: filters.seat ? String(filters.seat) : "any",
     b: (chunks) => <b className="font-semibold not-italic">{chunks}</b>,
   });
 
@@ -55,8 +56,10 @@ export default async function RankingsPage({ searchParams }: PageProps<"/[locale
     : t("card.allTables");
   const lines: [string, string] = [
     t("card.leaderTemple", {
-      leader: filters.leader ? tLeaders(filters.leader) : t("allLeaders"),
+      leader:
+        filters.leader === "none" ? t("unspecified") : filters.leader ? tLeaders(filters.leader) : t("allLeaders"),
       temple: filters.temple ?? "any",
+      seat: filters.seat ? String(filters.seat) : "any",
     }),
     `${who} · ${tables}`,
   ];
@@ -84,7 +87,7 @@ export default async function RankingsPage({ searchParams }: PageProps<"/[locale
         <div className="mt-8.5 text-center">
           <p className="type-caption m-0 text-ink-muted">{t("empty")}</p>
           <p className="m-0 mt-3">
-            <ClearRankingFilters />
+            <ClearRankingFilters filters={filters} />
           </p>
         </div>
       ) : (

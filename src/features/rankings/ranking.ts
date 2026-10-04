@@ -1,6 +1,6 @@
 // Sorting the ranking and sizing its bars. The rows come from get_rankings().
 
-export const RANKING_SORTS = ["winRate", "avgPoints", "avgPlace", "games"] as const;
+export const RANKING_SORTS = ["winRate", "avgPoints", "maxPoints", "minPoints", "avgPlace", "games"] as const;
 export type RankingSort = (typeof RANKING_SORTS)[number];
 
 export type RankingRow = {
@@ -13,6 +13,8 @@ export type RankingRow = {
   wins: number;
   avg_points: number;
   avg_place: number;
+  max_total: number;
+  min_total: number;
 };
 
 export function sortValue(row: RankingRow, sort: RankingSort): number {
@@ -21,6 +23,10 @@ export function sortValue(row: RankingRow, sort: RankingSort): number {
       return row.wins / row.games;
     case "avgPoints":
       return row.avg_points;
+    case "maxPoints":
+      return row.max_total;
+    case "minPoints":
+      return row.min_total;
     case "avgPlace":
       return row.avg_place;
     case "games":
@@ -29,7 +35,8 @@ export function sortValue(row: RankingRow, sort: RankingSort): number {
 }
 
 /**
- * Best first: the highest win rate, points and games, the lowest place. Ties:
+ * Best first: the highest win rate, points and games (the highest lowest
+ * total too: the best worst game), the lowest place. Ties:
  * more games first, then by name. Each row gets its bar, from 0 to 1 relative
  * to the best value in the list (for place: the best place over this one's).
  */

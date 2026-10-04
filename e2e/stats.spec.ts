@@ -189,7 +189,9 @@ test("while the player filter reloads, the screen says so instead of freezing", 
   });
   await tableSize(page, 2).setChecked(false);
   await tableSize(page, 4).setChecked(false);
-  await expect(page.getByRole("status").filter({ hasText: "Cargando…" }).filter({ visible: true })).toBeVisible();
+  // A pen loop turning by the checkboxes, which screen readers hear as "Cargando…".
+  const loading = page.getByRole("status").filter({ hasText: "Cargando…" }).filter({ visible: true });
+  await expect(loading.locator("svg")).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("data-refreshing");
 
   await expect(page.getByText("No hay partidas de 3 jugadores.")).toBeVisible({ timeout: 10_000 });
