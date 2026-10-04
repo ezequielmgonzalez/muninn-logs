@@ -75,3 +75,9 @@ test("the crow tells facts about the group's games, one after another", async ({
     await expect(crow(page).getByRole("button", { name: "¿Sabías que…?" })).toHaveAttribute("aria-expanded", "false");
   }
 });
+
+test("the facts are only for someone signed in", async ({ request }) => {
+  const response = await request.get("/api/facts");
+  expect(response.status()).toBe(401);
+  expect(await response.json()).toEqual([]);
+});

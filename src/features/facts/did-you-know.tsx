@@ -7,7 +7,6 @@ import { CrowMark } from "@/components/notebook/icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { loadFacts } from "./actions";
 import type { Fact, Person } from "./facts";
 
 // "¿Sabías que…?": Muninn, the crow, tells facts about the group's games in a
@@ -31,7 +30,8 @@ function useFacts(placement: "insert" | "page") {
     const ask = () => {
       if (asked || desktop.matches !== (placement === "insert")) return;
       asked = true;
-      loadFacts()
+      fetch("/api/facts")
+        .then((response) => (response.ok ? (response.json() as Promise<Fact[]>) : []))
         .then((list) => live && setFacts(shuffle(list)))
         .catch(() => live && setFacts([]));
     };
