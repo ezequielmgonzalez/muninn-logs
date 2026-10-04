@@ -102,9 +102,11 @@ export function BrushBar({ value, tone, index = 0, size = "default", order = ind
       {percent === 0 ? (
         <div data-paint-layer="hairline" className="absolute inset-x-0 top-1/2 h-px bg-hairline/18" />
       ) : (
-        <div className="absolute inset-y-0 left-0" style={{ width: `${percent}%` }}>
+        // A container, so its stroke can be cut to its width (globals.css); never under a dab's width.
+        <div className="@container/bar absolute inset-y-0 left-0 min-w-1.5" style={{ width: `${percent}%` }}>
           <div
             data-paint-layer="stroke"
+            data-bar-stroke
             className={cn(
               "ink paint-in inset-x-0",
               thin ? "-inset-y-[3px]" : "-inset-y-[5px] notebook:-inset-y-[6px]",

@@ -51,6 +51,13 @@ describe("BrushBar", () => {
     expect(stroke(container)!.style.background).toBe("var(--chart-6)");
   });
 
+  it("cuts its stroke to its width instead of squeezing it (a short bar keeps its brush ends)", () => {
+    const { container } = render(<BrushBar value={0.02} tone="chart-1" />);
+    // The stroke's two copies are sized against the bar (globals.css): the bar is a container, never under a dab's width.
+    expect(stroke(container)).toHaveAttribute("data-bar-stroke");
+    expect(container.querySelector("[data-brush-bar] > div")).toHaveClass("@container/bar", "min-w-1.5");
+  });
+
   it("alternates the four bar strokes by its position", () => {
     const masks = [0, 1, 2, 3, 4].map((index) => {
       const { container } = render(<BrushBar value={0.5} tone="chart-1" index={index} />);
