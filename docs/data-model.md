@@ -53,11 +53,11 @@ How Muninn Logs stores people, games and matches, and who can see or change what
 
 Catalog rows are inserted by migrations/seeds, never by users. They store slugs only; display names live in the translation files (`es.json`: `research` → "Investigación").
 
-**`games`**: `id`, `slug` (unique, e.g. `arnak`), `min_players`, `max_players`.
+**`games`**: `id`, `slug` (unique), `min_players`, `max_players`. Two games: `arnak` (Lost Ruins of Arnak, 2–4) and `lotr-duel` (The Lord of the Rings: Duel for Middle-earth, exactly 2).
 
-**`game_characters`**: `id`, `game_id`, `slug`. Unique (`game_id`, `slug`). For Arnak, the leaders (`falconeer`, …).
+**`game_characters`**: `id`, `game_id`, `slug`. Unique (`game_id`, `slug`). For Arnak, the leaders (`falconeer`, …); for LOTR Duel, the two sides (`sauron`, `fellowship`).
 
-**`score_categories`**: `id`, `game_id`, `slug`, `sort_order`. Unique (`game_id`, `slug`). For Arnak: `research`, `temple`, `idols`, `guardians`, `cards`, `fear`, to be checked against the official score sheet before seeding.
+**`score_categories`**: `id`, `game_id`, `slug`, `sort_order`. Unique (`game_id`, `slug`). For Arnak: `research`, `temple`, `idols`, `guardians`, `cards`, `fear`, to be checked against the official score sheet before seeding. LOTR Duel has none: a duel isn't decided by points (see [Winner](#winner)).
 
 ### Matches
 
@@ -70,7 +70,7 @@ Catalog rows are inserted by migrations/seeds, never by users. They store slugs 
 | `created_by`       | uuid        | → `profiles`. Doesn't have to be a participant        |
 | `played_on`        | date        | Required                                              |
 | `duration_minutes` | integer     | Optional, > 0                                         |
-| `setup`            | jsonb       | Game-specific setup, validated by the game's Zod schema. Arnak: `{"board_side": "bird" \| "snake" \| "waterfall" \| "tree" \| "monkey" \| "lizard"}` (optional; `ARNAK_BOARD_SIDES` in `src/games/arnak.ts`) |
+| `setup`            | jsonb       | Game-specific setup, validated by the game's Zod schema. Arnak: `{"board_side": "bird" \| "snake" \| "waterfall" \| "tree" \| "monkey" \| "lizard"}` (optional; `ARNAK_BOARD_SIDES` in `src/games/arnak.ts`). LOTR Duel: `{"result": "sauron" \| "fellowship" \| "draw", "victory": "middle_earth" \| "ring" \| "races" \| "influence"}` (required; a draw has no `victory`; checked by the database too, since it decides the winner) |
 | `created_at`       | timestamptz |                                                       |
 | `updated_at`       | timestamptz |                                                       |
 
@@ -114,6 +114,8 @@ winner = rank = 1
 - If a first-place tie is left unresolved, every tied player has rank 1: a shared win.
 - `won_tiebreak` only matters among players tied for first; on anyone else it has no effect on the ranking.
 
+**Duels (LOTR Duel) are decided by their result, not by points.** Each player takes a side (their character, required), and `setup.result` names the winning side or a draw; `setup.victory` says how it was won: one of the three victories (`middle_earth`, `ring`, `races`) or, when none happened, more influence over Middle-earth at the end (`influence`). The view reads it in place of the points: the winning side is rank 1 and the winner, the other rank 2; in a draw both are rank 1 and neither wins. Only duels may have a `result` (`save_match_players()` rejects it for any other game), so every other game stays decided by points.
+
 The view must be created with `security_invoker = true`, so it applies the RLS of the person querying it instead of bypassing it.
 
 ## Who can see what
@@ -130,7 +132,7 @@ A user's **visible matches** are the ones they logged or played in. **Shared a m
 | A guest and their stats  | Its owner and anyone who shared a match with that guest; stats count only those shared matches |
 | Friendships              | The two users involved                                                                        |
 
-**Friends' stats without exposing their matches.** Matches stay private even from friends, but comparing yourself with a friend needs their overall numbers. `get_player_stats(user_id, game_slug)` (`security definer`) first checks that the caller is that user or an accepted friend (otherwise 42501), then returns aggregates only: games, wins (a shared first place counts), average points and place, the average per score category, and per leader (with one more entry, `slug` null, for matches played without a leader) its games, wins and average place plus the average, lowest and highest total and per category. Match rows themselves stay behind RLS. To compare on the games they played together, `get_shared_stats(friend_ids, game_slug)` (`security invoker`, accepted friends only) returns the same numbers for the caller and each friend, counting only matches where all of them played: every such match includes the caller, so RLS already shows it. Both take an optional `player_counts` (any of 2, 3 and 4, e.g. `{3,4}`) to count only matches of those table sizes; null counts every match. `player_count(matches)` is the computed field behind it, which the app's match lists filter on too (`player_count=in.(3,4)`).
+**Friends' stats without exposing their matches.** Matches stay private even from friends, but comparing yourself with a friend needs their overall numbers. `get_player_stats(user_id, game_slug)` (`security definer`) first checks that the caller is that user or an accepted friend (otherwise 42501), then returns aggregates only: games, wins (a shared first place counts), average points and place, the average per score category, and per leader (with one more entry, `slug` null, for matches played without a leader) its games, wins and average place plus the average, lowest and highest total and per category. For duels, also draws (overall and per side) and `victories`: per way a game was won, the player's wins and losses (a draw is neither). Match rows themselves stay behind RLS. To compare on the games they played together, `get_shared_stats(friend_ids, game_slug)` (`security invoker`, accepted friends only) returns the same numbers for the caller and each friend, counting only matches where all of them played: every such match includes the caller, so RLS already shows it. Both take an optional `player_counts` (any of 2, 3 and 4, e.g. `{3,4}`) to count only matches of those table sizes; null counts every match. `player_count(matches)` is the computed field behind it, which the app's match lists filter on too (`player_count=in.(3,4)`).
 
 **Guests' stats.** A guest has no account, so no friendship decides: `get_guest_stats(guest_id, game_slug, player_counts)` (`security definer`) lets the guest's owner and anyone who shared a match with them ask (otherwise 42501, also for a user's player), and counts only the matches the caller can see (`private.can_see_match`). It returns the same numbers as `get_player_stats`: both call `private.player_stats(player_id, game_id, player_counts, only_visible)`, which no role can call directly.
 
