@@ -519,7 +519,8 @@ function PlayerPicker({
       <div className="relative">
         <Input
           id="player-search"
-          className="pr-8"
+          // Phones: scrolled into view clear of the save bar (with room for the suggestions above).
+          className="scroll-mb-40 pr-8 notebook:scroll-mb-0"
           autoComplete="off"
           placeholder={t("searchPlaceholder")}
           value={query}
@@ -528,37 +529,44 @@ function PlayerPicker({
           aria-describedby={hintId}
         />
         <SearchIcon className="pointer-events-none absolute top-1/2 right-1 -translate-y-1/2 text-ink-muted" />
-      </div>
-      {(groups.length > 0 || canCreate) && (
-        <div role="group" aria-label={t("suggestions")} className="relative z-3 mt-1 rounded-sm bg-surface-pop py-1.5 shadow-pop">
-          {groups.map((group) => (
-            <div key={group.label}>
-              <p className="type-overline m-0 px-4 pt-2 pb-1 text-[10px] tracking-[0.14em] text-ink-muted">{group.label}</p>
-              {group.players.map((p) => (
-                <SuggestionButton key={p.id} onClick={() => pick(() => onPick(p))}>
-                  <Monogram name={p.name} guest={p.is_guest} />
-                  {p.name}
-                  {p.is_guest && p.owner_name !== me?.name && p.owner_name && (
-                    <small className="type-caption text-ink-muted">· {t("guestOf", { owner: p.owner_name })}</small>
-                  )}
-                  {p.is_me && <small className="type-caption text-ink-muted">· {t("you")}</small>}
+        {/* Floats over the page, above the field, instead of pushing the page down: the
+            field sits at the bottom of the left page on desktop, and on phones what's
+            below it is the save bar and, while typing, the keyboard. */}
+        {(groups.length > 0 || canCreate) && (
+          <div
+            role="group"
+            aria-label={t("suggestions")}
+            className="absolute inset-x-0 bottom-full z-9 mb-1 rounded-sm bg-surface-pop py-1.5 shadow-pop"
+          >
+            {groups.map((group) => (
+              <div key={group.label}>
+                <p className="type-overline m-0 px-4 pt-2 pb-1 text-[10px] tracking-[0.14em] text-ink-muted">{group.label}</p>
+                {group.players.map((p) => (
+                  <SuggestionButton key={p.id} onClick={() => pick(() => onPick(p))}>
+                    <Monogram name={p.name} guest={p.is_guest} />
+                    {p.name}
+                    {p.is_guest && p.owner_name !== me?.name && p.owner_name && (
+                      <small className="type-caption text-ink-muted">· {t("guestOf", { owner: p.owner_name })}</small>
+                    )}
+                    {p.is_me && <small className="type-caption text-ink-muted">· {t("you")}</small>}
+                  </SuggestionButton>
+                ))}
+              </div>
+            ))}
+            {canCreate && (
+              <>
+                {groups.length > 0 && <div aria-hidden className="my-1.5 h-px bg-ink-body/14" />}
+                <SuggestionButton onClick={() => pick(() => onCreateGuest(name))}>
+                  <span aria-hidden className="flex w-[30px] justify-center">
+                    <PlusIcon />
+                  </span>
+                  {t("createGuest", { name })}
                 </SuggestionButton>
-              ))}
-            </div>
-          ))}
-          {canCreate && (
-            <>
-              {groups.length > 0 && <div aria-hidden className="my-1.5 h-px bg-ink-body/14" />}
-              <SuggestionButton onClick={() => pick(() => onCreateGuest(name))}>
-                <span aria-hidden className="flex w-[30px] justify-center">
-                  <PlusIcon />
-                </span>
-                {t("createGuest", { name })}
-              </SuggestionButton>
-            </>
-          )}
-        </div>
-      )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
       <p id={hintId} className="type-caption mt-1.5 text-ink-muted">
         {t("addPlayerHint")}
       </p>
