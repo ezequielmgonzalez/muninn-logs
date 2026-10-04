@@ -10,6 +10,7 @@ import { PaperSheet } from "@/components/notebook/paper-sheet";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { signOut } from "@/features/auth/actions";
+import { DidYouKnow } from "@/features/facts/did-you-know";
 import { countIncomingRequests } from "@/features/friends/queries";
 import { listReceivedClaims } from "@/features/guests/queries";
 import { ReceivedClaims } from "@/features/guests/received-claims";
@@ -178,6 +179,9 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
           </p>
         </section>
       )}
+
+      {/* Phones: the crow, with a fact about the group's games (on desktop it's on the insert). */}
+      <DidYouKnow placement="page" className="mt-11" />
 
       {/* The account's own links, quietly at the end of the page. */}
       <nav aria-label={t("account")} className="mt-11 flex flex-col items-center gap-3 text-sm">

@@ -311,6 +311,28 @@
       "4": "4.º"
     }
   },
+  "Facts": {
+    "title": "¿Sabías que…?",
+    "next": "Otro dato",
+    "empty": "Cuando haya unas partidas más, te cuento cosas.",
+    "highestScore": "{who, select, me {<b>Vos</b> tenés} other {<b>{name}</b> tiene}} el puntaje más alto en una partida: <b>{points}</b> puntos.",
+    "lowestScore": "El puntaje más bajo en una partida es {who, select, me {<b>tuyo</b>} other {de <b>{name}</b>}}: <b>{points}</b> puntos.",
+    "mostWins": "{who, select, me {<b>Vos</b> sos} other {<b>{name}</b> es}} quien más partidas ganó: <b>{wins}</b>.",
+    "bestAverage": "{who, select, me {<b>Vos</b> tenés} other {<b>{name}</b> tiene}} el mejor promedio: <b>{average, number}</b> puntos por partida.",
+    "winlessAtSize": "{who, select, me {Jugaste} other {<b>{name}</b> jugó}} <b>{games}</b> partidas de {size} jugadores y no {who, select, me {ganaste} other {ganó}} ninguna.",
+    "neverLeader": "{who, select, me {Nunca jugaste} other {<b>{name}</b> nunca jugó}} con {article} <b>{leader}</b>.",
+    "favoriteLeader": "{who, select, me {Elegiste} other {<b>{name}</b> eligió}} {article} <b>{leader}</b> en <b>{count}</b> de {who, select, me {tus} other {sus}} {games} partidas.",
+    "leaderBest": "{article} <b>{leader}</b> ganó <b>{wins}</b> de las {games} partidas en que se jugó: ningún líder gana tan seguido.",
+    "leaderWinless": "{article} <b>{leader}</b> se jugó <b>{games}</b> veces y nunca ganó.",
+    "winStreak": "{who, select, me {Ganaste} other {<b>{name}</b> ganó}} <b>{count}</b> partidas seguidas.",
+    "mostPlayedWith": "Con quien más jugaste es <b>{name}</b>: <b>{games}</b> partidas.",
+    "rivalry": "{winner, select, me {Le ganaste a <b>{loserName}</b>} other {<b>{winnerName}</b> {loser, select, me {te ganó} other {le ganó a <b>{loserName}</b>}}}} en las <b>{games}</b> partidas que jugaron juntos.",
+    "firstSeat": "Quien empieza primero ganó <b>{wins}</b> de {games} partidas.",
+    "topTemple": "El templo más jugado es el {temple, select, bird {del <b>Pájaro</b>} snake {de la <b>Serpiente</b>} waterfall {de la <b>Cascada</b>} tree {del <b>Árbol</b>} monkey {del <b>Mono</b>} other {del <b>Lagarto</b>}}: <b>{games}</b> partidas.",
+    "biggestWin": "La mayor paliza: {winner, select, me {le sacaste <b>{diff}</b> puntos a <b>{loserName}</b>} other {<b>{winnerName}</b> {loser, select, me {te sacó <b>{diff}</b> puntos} other {le sacó <b>{diff}</b> puntos a <b>{loserName}</b>}}}}.",
+    "closestGame": "La partida más pareja: {winner, select, me {le ganaste a <b>{loserName}</b>} other {<b>{winnerName}</b> {loser, select, me {te ganó} other {le ganó a <b>{loserName}</b>}}}} {diff, plural, =0 {en el desempate} one {por <b>#</b> punto} other {por <b>#</b> puntos}}.",
+    "longestGame": "La partida más larga duró <b>{minutes}</b> minutos."
+  },
   "FriendProfile": {
     "back": "Amigos",
     "compare": "Compararme",

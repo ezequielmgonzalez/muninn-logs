@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
+import { DidYouKnow } from "@/features/facts/did-you-know";
 import type { PlayerCounts } from "@/features/player-count/options";
 import { getPlayerCounts } from "@/features/player-count/server";
 import { getPlayerStats } from "@/features/stats/queries";
@@ -8,7 +9,6 @@ import { getCurrentProfile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 import { FramePlayerFilter } from "./frame-filter";
-import { CrowMark } from "./icons";
 import { LegalLinks } from "./legal-links";
 import { SideNav, TabBar } from "./navigation";
 import { NotebookPage } from "./notebook-page";
@@ -60,10 +60,8 @@ function Insert({ playerCount }: { playerCount: PlayerCounts }) {
         <FramePlayerFilter value={playerCount} placement="insert" />
         <div aria-hidden className="mt-[26px] mr-[60px] mb-5 ml-[38px] h-px bg-ink-body/22" />
         <SideNav />
-        <div className="mt-auto pl-[70px]">
-          {/* Muninn, in the same faint ink the compass had. */}
-          <CrowMark width={96} className="text-ink opacity-16" />
-        </div>
+        {/* Muninn, the crow, with a fact about the group's games. */}
+        <DidYouKnow placement="insert" className="mt-auto" />
         <LegalLinks className="pt-[22px] pl-[38px]" />
       </div>
     </div>
