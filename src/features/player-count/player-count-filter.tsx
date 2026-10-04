@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,6 @@ export function PlayerCountFilter({ value, className }: { value: PlayerCounts; c
   const t = useTranslations("PlayerCount");
   const tLoading = useTranslations("Loading");
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
   // The latest choice, ticked at once while the screen reloads with it. It
   // holds until the server sends a different value, so quick changes build on
   // each other instead of on a value still on its way.
@@ -40,11 +39,22 @@ export function PlayerCountFilter({ value, className }: { value: PlayerCounts; c
   }
   const [notice, setNotice] = useState("");
 
-  // While the screen reloads, its pages fade back (globals.css), so it never looks frozen.
+  // Reloading until the server's value is the one asked for. router.refresh()
+  // fetches after it returns, outside any transition, so a transition's
+  // pending state can't tell; the server's answer can.
+  const [awaiting, setAwaiting] = useState<string | null>(null);
+  const pending = awaiting !== null && awaiting !== playerCountsKey(value);
+
+  // While the screen reloads, its pages fade back (globals.css), so it never
+  // looks frozen; a reload that never answers stops counting after a while.
   useEffect(() => {
     if (!pending) return;
     document.documentElement.setAttribute("data-refreshing", "");
-    return () => document.documentElement.removeAttribute("data-refreshing");
+    const giveUp = setTimeout(() => setAwaiting(null), 20_000);
+    return () => {
+      clearTimeout(giveUp);
+      document.documentElement.removeAttribute("data-refreshing");
+    };
   }, [pending]);
 
   function toggle(size: PlayerCount) {
@@ -63,10 +73,9 @@ export function PlayerCountFilter({ value, className }: { value: PlayerCounts; c
     if (stored) params.set(PLAYER_COUNTS_PARAM, stored);
     else params.delete(PLAYER_COUNTS_PARAM);
     const query = params.toString();
-    startTransition(() => {
-      window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
-      router.refresh();
-    });
+    window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+    setAwaiting(playerCountsKey(next));
+    router.refresh();
   }
 
   const checked = checkedCounts(counts);
@@ -90,12 +99,34 @@ export function PlayerCountFilter({ value, className }: { value: PlayerCounts; c
       <span aria-live="polite" className="sr-only">
         {notice}
       </span>
-      {pending && (
-        <span role="status" className="type-caption ml-1 animate-pulse text-ink-muted motion-reduce:animate-none">
-          {tLoading("label")}
-        </span>
-      )}
+      {/* Its place is kept, so the checkboxes don't move when it turns up. */}
+      <span className="ml-1 inline-flex size-4 text-ink-muted">
+        {pending && (
+          <span role="status" className="inline-flex">
+            <PenSpinner />
+            <span className="sr-only">{tLoading("label")}</span>
+          </span>
+        )}
+      </span>
     </fieldset>
+  );
+}
+
+/** A loop drawn in pen, turning while the screen reloads (still, under reduced motion). */
+function PenSpinner() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 20 20"
+      className="size-4 animate-spin [animation-duration:900ms] motion-reduce:animate-none"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+    >
+      {/* Most of a circle, the pen lifting before it closes, with a slight wobble. */}
+      <path d="M10 2.2C14.6 2.1 17.9 5.6 17.8 10.1C17.7 14.6 14.2 17.9 9.8 17.8C5.6 17.7 2.3 14.5 2.2 10.3C2.15 7.6 3.4 5.3 5.4 3.9" />
+    </svg>
   );
 }
 
