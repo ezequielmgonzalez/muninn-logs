@@ -70,7 +70,7 @@ El MVP está completo cuando un usuario real puede registrar sus partidas de Arn
 
 **Queda afuera del MVP (a propósito)**
 
--   Otros juegos distintos de Arnak.
+-   Otros juegos distintos de Arnak. *(Después del MVP llegó el segundo: El Señor de los Anillos: Duelo por la Tierra Media, "LOTR Duel", a dos jugadores, Sauron contra la Comunidad del Anillo, sin puntos: se gana por Tierra Media, Carrera del Anillo, Razas o influencia, o se empata. El cuaderno elige el juego con "Juego" y todas las estadísticas pasan a ser de ese juego; Comparar, la importación y "¿Sabías que…?" siguen siendo solo de Arnak.)*
 -   Estadísticas por líder y comparativas cara a cara (fase 2).
 -   Reclamar un jugador sin cuenta al registrarse (fase 2).
 -   Fotos de partidas, comentarios o feed social.

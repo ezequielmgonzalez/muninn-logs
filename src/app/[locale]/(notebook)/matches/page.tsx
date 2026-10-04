@@ -8,6 +8,8 @@ import { PaintedBand } from "@/components/notebook/painted-band";
 import { Button } from "@/components/ui/button";
 import { groupByMonth, type MonthGroup, spreadOf } from "@/features/matches/group-by-month";
 import { MatchList } from "@/features/matches/match-list";
+import { hasTableSizes } from "@/features/game/options";
+import { getGame } from "@/features/game/server";
 import { listMatches } from "@/features/matches/queries";
 import { noGamesFor, PlayerCountsNote } from "@/features/player-count/copy";
 import { playerCountsKey } from "@/features/player-count/options";
@@ -15,7 +17,7 @@ import { getPlayerCounts } from "@/features/player-count/server";
 import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
-/** Every game the user logged or played, a month per notebook page, newest first. */
+/** Every game of the notebook's game the user logged or played, a month per notebook page, newest first. */
 export default async function MatchesPage({ searchParams }: PageProps<"/[locale]/matches">) {
   const [profile, locale, t, format, { page }] = await Promise.all([
     getCurrentProfile(),
@@ -28,8 +30,10 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
   // A group's whole history fits in one read; months are paged here.
-  const players = await getPlayerCounts();
-  const matches = await listMatches(1000, players);
+  // A duel is always two players: table sizes only filter Arnak.
+  const game = await getGame();
+  const players = hasTableSizes(game) ? await getPlayerCounts() : null;
+  const matches = await listMatches(1000, players, game);
   const title = <h1 className="sr-only">{t("title")}</h1>;
 
   if (matches.length === 0) {
@@ -101,7 +105,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
     <NotebookPages
       left={
         // A new player count paints the screen again.
-        <Fragment key={playerCountsKey(players)}>
+        <Fragment key={`${game}:${playerCountsKey(players)}`}>
           {title}
           {left && month(left, false)}
           {!right && pager}
@@ -109,7 +113,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/[locale]
       }
       right={
         right && (
-          <Fragment key={playerCountsKey(players)}>
+          <Fragment key={`${game}:${playerCountsKey(players)}`}>
             {month(right, true)}
             {pager}
           </Fragment>

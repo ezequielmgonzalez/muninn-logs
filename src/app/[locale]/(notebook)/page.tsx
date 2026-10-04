@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { signOut } from "@/features/auth/actions";
 import { DidYouKnow } from "@/features/facts/did-you-know";
+import { hasTableSizes } from "@/features/game/options";
+import { getGame } from "@/features/game/server";
 import { countIncomingRequests } from "@/features/friends/queries";
 import { listReceivedClaims } from "@/features/guests/queries";
 import { ReceivedClaims } from "@/features/guests/received-claims";
@@ -19,7 +21,8 @@ import { listMatches } from "@/features/matches/queries";
 import { noGamesFor, PlayerCountsNote } from "@/features/player-count/copy";
 import { playerCountsKey } from "@/features/player-count/options";
 import { getPlayerCounts } from "@/features/player-count/server";
-import { getPlayerStats } from "@/features/stats/queries";
+import { DuelSummary, SidesSection } from "@/features/stats/duel-view";
+import { getDuelStats, getPlayerStats } from "@/features/stats/queries";
 import { ARNAK_LEADER_STYLES } from "@/games/arnak";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentProfile, isAdmin } from "@/lib/auth";
@@ -34,7 +37,10 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   if (!profile) return <Landing searchParams={searchParams} />;
   if (!profile.username) return redirect({ href: "/onboarding", locale });
 
-  const players = await getPlayerCounts();
+  // The notebook's game: Arnak by default, or LOTR Duel (no table sizes: always two players).
+  const game = await getGame();
+  const duel = game === "lotr-duel";
+  const players = hasTableSizes(game) ? await getPlayerCounts() : null;
   const [tStats, tAuth, tEdit, tGuests, tAdmin, tImport, tLeaders, format, stats, recent, incomingRequests, claims, admin, params] =
     await Promise.all([
       getTranslations("Stats"),
@@ -46,7 +52,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       getTranslations("Games.arnak.leaders"),
       getFormatter(),
       getPlayerStats(profile.id, players),
-      listMatches(4, players),
+      listMatches(4, players, game),
       countIncomingRequests(profile.id),
       listReceivedClaims(),
       isAdmin(),
@@ -54,6 +60,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       searchParams,
     ]);
   const { profileSaved, linked } = params;
+  const duelStats = duel ? await getDuelStats(profile.id) : null;
   const percent = (value: number) => format.number(value, { style: "percent", maximumFractionDigits: 0 });
 
   // "Tus líderes": the three most played, bars scaled to the first.
@@ -64,7 +71,7 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
   const mostGames = topLeaders[0]?.games ?? 0;
 
   // A new player count paints the screen again: every block rises, every bar fills.
-  const fresh = playerCountsKey(players);
+  const fresh = `${game}:${playerCountsKey(players)}`;
   const left = (
     <Fragment key={fresh}>
       {/* On phones the diary's name opens the page; on desktop it's on the insert. */}
@@ -85,7 +92,22 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
       <section>
         <PaintedBand>{t("summary")}</PaintedBand>
         <PlayerCountsNote counts={players} />
-        {stats.games === 0 ? (
+        {duelStats ? (
+          duelStats.games === 0 ? (
+            <p className="type-caption mt-[26px] text-ink-muted">{t("noMatches")}</p>
+          ) : (
+            <>
+              <DuelSummary stats={duelStats} />
+              <p className="mt-5.5 flex justify-end">
+                <Button asChild variant="link">
+                  <TurnLink href="/profile" direction="forward" section="stats">
+                    {t("seeStats")} →
+                  </TurnLink>
+                </Button>
+              </p>
+            </>
+          )
+        ) : stats.games === 0 ? (
           <p className="type-caption mt-[26px] text-ink-muted">
             {players ? await noGamesFor(players) : t("noMatches")}
           </p>
@@ -114,7 +136,9 @@ export default async function Home({ searchParams }: PageProps<"/[locale]">) {
         )}
       </section>
 
-      {topLeaders.length > 0 && (
+      {duelStats && duelStats.games > 0 && <SidesSection stats={duelStats} title={tStats("sides")} className="mt-11" flip />}
+
+      {!duel && topLeaders.length > 0 && (
         <section className="mt-11">
           <PaintedBand variant={2} flip>
             {t("leaders")}

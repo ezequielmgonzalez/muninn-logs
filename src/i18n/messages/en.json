@@ -189,7 +189,13 @@
     "undatedTitle": "Undated game",
     "pages": "Pages {from}–{to} of {total}",
     "older": "Older",
-    "newer": "Newer"
+    "newer": "Newer",
+    "duelWon": "You won",
+    "duelLost": "You lost",
+    "duelDraw": "You drew",
+    "winnerBy": "{names} won · {victory}",
+    "victoryOf": "Victory: {victory}",
+    "sides": "Sides"
   },
   "Stats": {
     "expeditions": "{count, plural, one {# expedition logged} other {# expeditions logged}}",
@@ -229,7 +235,20 @@
       "min": "Low",
       "average": "Avg",
       "max": "High"
-    }
+    },
+    "duels": "{count, plural, one {# duel logged} other {# duels logged}}",
+    "draws": "Draws",
+    "losses": "Losses",
+    "gamesLabel": "Games",
+    "bySide": "By side",
+    "sides": "Your sides",
+    "sideWinRate": "you won {rate}",
+    "gamesWord": "{count, plural, one {game} other {games}}",
+    "howWon": "How you won",
+    "howLost": "How you lost",
+    "vsOpponents": "Against each opponent",
+    "record": "{wins} W · {draws} D · {losses} L",
+    "emptyDuels": "No duels of yours logged yet. Once you log one, this is where you will see how you play."
   },
   "Rankings": {
     "consulta": "Query",
@@ -309,7 +328,11 @@
       "2": "2nd",
       "3": "3rd",
       "4": "4th"
-    }
+    },
+    "side": "Side",
+    "sideHint": "The one each player played.",
+    "bothSides": "Both sides",
+    "duelSentence": "{side, select, sauron {As <b>Sauron</b>} fellowship {As <b>the Fellowship of the Ring</b>} other {With both sides}}"
   },
   "Facts": {
     "title": "Did you know…?",
@@ -336,13 +359,15 @@
   "FriendProfile": {
     "back": "Friends",
     "compare": "Compare with me",
-    "empty": "{name} has no logged games yet."
+    "empty": "{name} has no logged games yet.",
+    "emptyDuels": "{name} has no duels logged yet."
   },
   "GuestProfile": {
     "guest": "Guest",
     "backToGuests": "Your guests",
     "backToMatches": "Matches",
-    "empty": "No games with {name} that you can see yet."
+    "empty": "No games with {name} that you can see yet.",
+    "emptyDuels": "No duels of {name} you can see yet."
   },
   "Compare": {
     "title": "You vs. {names}",
@@ -588,6 +613,7 @@
   },
   "Games": {
     "arnak": {
+      "short": "Arnak",
       "name": "Lost Ruins of Arnak",
       "leaders": {
         "captain": "Captain",
@@ -607,12 +633,34 @@
         "cards": "Cards",
         "fear": "Fear"
       }
+    },
+    "lotr-duel": {
+      "short": "LOTR Duel",
+      "name": "The Lord of the Rings: Duel for Middle-earth",
+      "sides": {
+        "sauron": "Sauron",
+        "fellowship": "The Fellowship of the Ring"
+      },
+      "sidesShort": {
+        "sauron": "Sauron",
+        "fellowship": "Fellowship"
+      },
+      "victories": {
+        "middle_earth": "Middle-earth",
+        "ring": "Race for the Ring",
+        "races": "Races",
+        "influence": "Influence"
+      },
+      "draw": "Draw"
     }
   },
   "NotFound": {
     "title": "Page not found",
     "description": "This page doesn't exist, or you don't have access to it.",
     "home": "Back to the start"
+  },
+  "Game": {
+    "label": "Game"
   },
   "PlayerCount": {
     "label": "Players",
@@ -623,5 +671,24 @@
   },
   "Loading": {
     "label": "Loading…"
+  },
+  "LogDuel": {
+    "title": "New duel",
+    "editTitle": "Edit duel",
+    "whoIsSauron": "Who played Sauron?",
+    "whoIsSauronHint": "The other played the Fellowship of the Ring.",
+    "fellowshipIs": "{name} played the Fellowship of the Ring.",
+    "resultSection": "Result",
+    "winner": "Who won?",
+    "victory": "How?",
+    "influenceHint": "Influence: no one reached a victory, and whoever had more influence over Middle-earth won.",
+    "drawHint": "No one reached a victory, and influence was even.",
+    "needOpponent": "Add your opponent to save.",
+    "needSides": "Choose who played Sauron.",
+    "needResult": "Choose who won.",
+    "needVictory": "Choose how they won.",
+    "summaryWin": "{name} wins ({side}) · {victory}",
+    "summaryDraw": "Draw between {a} and {b}",
+    "save": "Save duel"
   }
 }

@@ -134,7 +134,8 @@ test("a picked option is circled in pen, drawn around it, and only that one", as
   const circle = serpent.locator("[data-pen-circle]");
   expect(await circle.evaluate((el) => getComputedStyle(el).animationName)).toBe("pen-draw");
   // The option before it isn't circled any more.
-  await expect(page.locator("[aria-pressed] [data-pen-circle]")).toHaveCount(2); // the board side, and the turn order
+  // In the form: the board side, and the turn order (the frame's game switch has its own).
+  await expect(page.locator("form [aria-pressed] [data-pen-circle]")).toHaveCount(2);
   await expect(page.getByRole("button", { name: "Sin registrar" }).first().locator("[data-pen-circle]")).toHaveCount(0);
 
   await page.emulateMedia({ reducedMotion: "reduce" });

@@ -189,7 +189,13 @@
     "undatedTitle": "Partida sin fecha",
     "pages": "Páginas {from}–{to} de {total}",
     "older": "Anteriores",
-    "newer": "Más recientes"
+    "newer": "Más recientes",
+    "duelWon": "Ganaste",
+    "duelLost": "Perdiste",
+    "duelDraw": "Empataste",
+    "winnerBy": "Ganó {names} · {victory}",
+    "victoryOf": "Victoria: {victory}",
+    "sides": "Bandos"
   },
   "Stats": {
     "expeditions": "{count, plural, one {# expedición registrada} other {# expediciones registradas}}",
@@ -229,7 +235,20 @@
       "min": "Mín.",
       "average": "Prom.",
       "max": "Máx."
-    }
+    },
+    "duels": "{count, plural, one {# duelo registrado} other {# duelos registrados}}",
+    "draws": "Empates",
+    "losses": "Derrotas",
+    "gamesLabel": "Partidas",
+    "bySide": "Por bando",
+    "sides": "Tus bandos",
+    "sideWinRate": "ganaste {rate}",
+    "gamesWord": "{count, plural, one {partida} other {partidas}}",
+    "howWon": "Cómo ganaste",
+    "howLost": "Cómo perdiste",
+    "vsOpponents": "Contra cada rival",
+    "record": "{wins} G · {draws} E · {losses} P",
+    "emptyDuels": "Todavía no hay duelos tuyos registrados. Cuando cargues uno, acá vas a ver cómo jugás."
   },
   "Rankings": {
     "consulta": "Consulta",
@@ -309,7 +328,11 @@
       "2": "2.º",
       "3": "3.º",
       "4": "4.º"
-    }
+    },
+    "side": "Bando",
+    "sideHint": "Con el que jugó cada uno.",
+    "bothSides": "Los dos bandos",
+    "duelSentence": "{side, select, sauron {Con <b>Sauron</b>} fellowship {Con <b>la Comunidad del Anillo</b>} other {Con los dos bandos}}"
   },
   "Facts": {
     "title": "¿Sabías que…?",
@@ -336,13 +359,15 @@
   "FriendProfile": {
     "back": "Amigos",
     "compare": "Compararme",
-    "empty": "{name} todavía no tiene partidas registradas."
+    "empty": "{name} todavía no tiene partidas registradas.",
+    "emptyDuels": "{name} todavía no tiene duelos registrados."
   },
   "GuestProfile": {
     "guest": "Invitado",
     "backToGuests": "Tus invitados",
     "backToMatches": "Partidas",
-    "empty": "Todavía no hay partidas de {name} que puedas ver."
+    "empty": "Todavía no hay partidas de {name} que puedas ver.",
+    "emptyDuels": "Todavía no hay duelos de {name} que puedas ver."
   },
   "Compare": {
     "title": "Vos vs. {names}",
@@ -588,6 +613,7 @@
   },
   "Games": {
     "arnak": {
+      "short": "Arnak",
       "name": "Las Ruinas Perdidas de Arnak",
       "leaders": {
         "captain": "Capitán",
@@ -607,12 +633,34 @@
         "cards": "Cartas",
         "fear": "Miedo"
       }
+    },
+    "lotr-duel": {
+      "short": "LOTR Duel",
+      "name": "El Señor de los Anillos: Duelo por la Tierra Media",
+      "sides": {
+        "sauron": "Sauron",
+        "fellowship": "La Comunidad del Anillo"
+      },
+      "sidesShort": {
+        "sauron": "Sauron",
+        "fellowship": "Comunidad"
+      },
+      "victories": {
+        "middle_earth": "Tierra Media",
+        "ring": "Carrera del Anillo",
+        "races": "Razas",
+        "influence": "Influencia"
+      },
+      "draw": "Empate"
     }
   },
   "NotFound": {
     "title": "Página no encontrada",
     "description": "Esta página no existe, o no tenés acceso a ella.",
     "home": "Volver al inicio"
+  },
+  "Game": {
+    "label": "Juego"
   },
   "PlayerCount": {
     "label": "Jugadores",
@@ -623,5 +671,24 @@
   },
   "Loading": {
     "label": "Cargando…"
+  },
+  "LogDuel": {
+    "title": "Nuevo duelo",
+    "editTitle": "Editar duelo",
+    "whoIsSauron": "¿Quién jugó con Sauron?",
+    "whoIsSauronHint": "El otro jugó con la Comunidad del Anillo.",
+    "fellowshipIs": "{name} jugó con la Comunidad del Anillo.",
+    "resultSection": "Resultado",
+    "winner": "¿Quién ganó?",
+    "victory": "¿Cómo ganó?",
+    "influenceHint": "Influencia: nadie llegó a una victoria y ganó quien tenía más influencia en la Tierra Media.",
+    "drawHint": "Nadie llegó a una victoria y la influencia quedó igualada.",
+    "needOpponent": "Agregá a tu rival para guardar.",
+    "needSides": "Elegí quién jugó con Sauron.",
+    "needResult": "Elegí quién ganó.",
+    "needVictory": "Elegí cómo ganó.",
+    "summaryWin": "Gana {name} ({side}) · {victory}",
+    "summaryDraw": "Empate entre {a} y {b}",
+    "save": "Guardar duelo"
   }
 }

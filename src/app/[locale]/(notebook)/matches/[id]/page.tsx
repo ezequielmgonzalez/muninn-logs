@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { getFriendships } from "@/features/friends/queries";
 import { DeleteMatch } from "@/features/matches/delete-match";
+import { DuelDetail } from "@/features/matches/duel-detail";
 import { playedOnDate } from "@/features/matches/format";
 import { getMatch } from "@/features/matches/queries";
 import { ARNAK_CATEGORY_TONES, ARNAK_LEADER_STYLES, ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
@@ -49,6 +50,7 @@ export default async function MatchPage({ params, searchParams }: PageProps<"/[l
         : p.isGuest
           ? ({ href: `/guests/${p.playerId}`, section: "friends" } as const)
           : null;
+  if (match.duel) return <DuelDetail match={match} saved={saved === "1"} statsOf={statsOf} />;
   const results = match.players.map((p) => ({ ...p, stats: statsOf(p) }));
 
   const best = Math.max(...match.players.map((p) => p.total), 0);

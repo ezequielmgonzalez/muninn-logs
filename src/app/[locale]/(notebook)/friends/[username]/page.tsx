@@ -4,9 +4,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { TurnLink } from "@/components/notebook/page-turn";
 import { getFriendByUsername } from "@/features/friends/queries";
+import { getGame } from "@/features/game/server";
 import { getPlayerCounts } from "@/features/player-count/server";
-import { getPlayerStats } from "@/features/stats/queries";
-import { SomeoneElsesStats } from "@/features/stats/someone-elses-stats";
+import { getDuelStats, getPlayerStats } from "@/features/stats/queries";
+import { SomeoneElsesDuels, SomeoneElsesStats } from "@/features/stats/someone-elses-stats";
 import { redirect } from "@/i18n/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 
@@ -26,17 +27,7 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
   // Not a friend (or not a user at all): to the viewer, there's nothing here.
   if (!friend) notFound();
 
-  const players = await getPlayerCounts();
-  const stats = await getPlayerStats(friend.id, players);
-
-  return (
-    <SomeoneElsesStats
-      name={friend.display_name}
-      caption={tStats("expeditions", { count: stats.games })}
-      stats={stats}
-      players={players}
-      empty={t("empty", { name: friend.display_name })}
-      links={
+  const links = (
         <>
           <Button asChild variant="link">
             <TurnLink href="/friends" direction="backward" section="friends">
@@ -49,7 +40,31 @@ export default async function FriendProfilePage({ params }: PageProps<"/[locale]
             </TurnLink>
           </Button>
         </>
-      }
+  );
+
+  if ((await getGame()) === "lotr-duel") {
+    const stats = await getDuelStats(friend.id);
+    return (
+      <SomeoneElsesDuels
+        name={friend.display_name}
+        caption={tStats("duels", { count: stats.games })}
+        stats={stats}
+        empty={t("emptyDuels", { name: friend.display_name })}
+        links={links}
+      />
+    );
+  }
+
+  const players = await getPlayerCounts();
+  const stats = await getPlayerStats(friend.id, players);
+  return (
+    <SomeoneElsesStats
+      name={friend.display_name}
+      caption={tStats("expeditions", { count: stats.games })}
+      stats={stats}
+      players={players}
+      empty={t("empty", { name: friend.display_name })}
+      links={links}
     />
   );
 }
