@@ -8,6 +8,8 @@ import "server-only";
 const FLAGS = {
   /** Comparar's "Cara a cara" in place of "Puntos por categoría" (design/updates/2026-10-rankings-comparar). */
   compareHeadToHead: "FEATURE_COMPARE_HEAD_TO_HEAD",
+  /** "¿Sabías que…?": the crow tells facts about the group's games (src/features/facts). */
+  didYouKnow: "FEATURE_DID_YOU_KNOW",
 } as const;
 
 export type Flag = keyof typeof FLAGS;

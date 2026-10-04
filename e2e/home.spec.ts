@@ -29,3 +29,11 @@ test("home is a dashboard: a summary and the latest games", async ({ page, reque
   await page.getByRole("link", { name: /Ganó Ana/ }).click();
   await expect(page).toHaveURL(/\/es\/matches\/[0-9a-f-]{36}$/);
 });
+
+test("without FEATURE_DID_YOU_KNOW, the crow is a faint mark and tells nothing", async ({ page, request }) => {
+  await signUp(page, request, "Ana");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Diario de Ana");
+  await expect(page.getByRole("region", { name: "¿Sabías que…?" })).toHaveCount(0);
+  // Signed in, and still nothing: the facts are off (on: e2e/flagged/did-you-know.spec.ts).
+  expect((await page.request.get("/api/facts")).status()).toBe(404);
+});

@@ -311,6 +311,28 @@
       "4": "4th"
     }
   },
+  "Facts": {
+    "title": "Did you know…?",
+    "next": "Another one",
+    "empty": "Log a few more games and I’ll tell you things.",
+    "highestScore": "{who, select, me {<b>You</b> hold} other {<b>{name}</b> holds}} the highest score in a game: <b>{points}</b> points.",
+    "lowestScore": "The lowest score in a game is {who, select, me {<b>yours</b>} other {<b>{name}</b>’s}}: <b>{points}</b> points.",
+    "mostWins": "{who, select, me {<b>You</b> have} other {<b>{name}</b> has}} won the most games: <b>{wins}</b>.",
+    "bestAverage": "{who, select, me {<b>You</b> have} other {<b>{name}</b> has}} the best average: <b>{average, number}</b> points a game.",
+    "winlessAtSize": "{who, select, me {You} other {<b>{name}</b>}} played <b>{games}</b> {size}-player games and won none.",
+    "neverLeader": "{who, select, me {You have} other {<b>{name}</b> has}} never played the <b>{leader}</b>.",
+    "favoriteLeader": "{who, select, me {You} other {<b>{name}</b>}} picked the <b>{leader}</b> in <b>{count}</b> of {who, select, me {your} other {their}} {games} games.",
+    "leaderBest": "The <b>{leader}</b> won <b>{wins}</b> of the {games} games it was played in: no leader wins as often.",
+    "leaderWinless": "The <b>{leader}</b> was played <b>{games}</b> times and never won.",
+    "winStreak": "{who, select, me {You} other {<b>{name}</b>}} won <b>{count}</b> games in a row.",
+    "mostPlayedWith": "The one you play with most is <b>{name}</b>: <b>{games}</b> games.",
+    "rivalry": "{winner, select, me {You beat <b>{loserName}</b>} other {<b>{winnerName}</b> beat {loser, select, me {you} other {<b>{loserName}</b>}}}} in all <b>{games}</b> games played together.",
+    "firstSeat": "Whoever goes first won <b>{wins}</b> of {games} games.",
+    "topTemple": "The most played temple is the <b>{temple, select, bird {Bird} snake {Snake} waterfall {Waterfall} tree {Tree} monkey {Monkey} other {Lizard}}</b>: <b>{games}</b> games.",
+    "biggestWin": "The biggest beating: {winner, select, me {you beat <b>{loserName}</b>} other {<b>{winnerName}</b> beat {loser, select, me {you} other {<b>{loserName}</b>}}}} by <b>{diff}</b> points.",
+    "closestGame": "The closest game: {winner, select, me {you beat <b>{loserName}</b>} other {<b>{winnerName}</b> beat {loser, select, me {you} other {<b>{loserName}</b>}}}} {diff, plural, =0 {on the tiebreak} one {by <b>#</b> point} other {by <b>#</b> points}}.",
+    "longestGame": "The longest game lasted <b>{minutes}</b> minutes."
+  },
   "FriendProfile": {
     "back": "Friends",
     "compare": "Compare with me",
