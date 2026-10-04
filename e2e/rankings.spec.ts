@@ -60,6 +60,9 @@ async function seed(page: Page, request: Parameters<typeof signUp>[1], browser: 
   ]);
 }
 
+/** One of the Consulta's groups of picks (Líder, Templo, Turno, Quiénes entran). */
+const group = (page: Page, name: string) => page.getByRole("group", { name, exact: true }).filter({ visible: true });
+
 const rows = (page: Page) => page.getByRole("listitem").filter({ has: page.locator("[data-brush-bar]") });
 
 test("ranks everyone you play with, and the Consulta narrows it down", async ({ page, request, browser, isMobile }) => {
@@ -88,14 +91,14 @@ test("ranks everyone you play with, and the Consulta narrows it down", async ({ 
   // The Profesor in the Serpent's temple: Ezequiel's two games with it.
   await page.getByRole("button", { name: "Profesor" }).click();
   await expect(page.getByRole("button", { name: "Profesor" })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "Serpiente" }).click();
+  await group(page, "Templo").getByRole("button", { name: "Serpiente" }).click();
   await expect(page).toHaveURL("/es/rankings?lider=profesor&templo=serpiente");
   await expect(page.getByText("Con el Profesor en el templo de la Serpiente")).toBeVisible();
   await expect(page.getByText("1 jugador · 2 partidas")).toBeVisible();
   await expect(rows(page)).toHaveText([/^1.*Vos.*50\s% · 2 partidas/]);
 
   // Other sorts: average points, highest first.
-  await page.getByRole("button", { name: "Cualquiera" }).click();
+  await group(page, "Templo").getByRole("button", { name: "Cualquiera" }).click();
   await expect(page).toHaveURL("/es/rankings?lider=profesor");
   await expect(page.getByText("2 jugadores · 3 partidas")).toBeVisible();
   await page.getByLabel("Ordenar por").selectOption("avgPoints");
@@ -154,4 +157,53 @@ test("on phones, Rankings is a switch away from your numbers, with its Consulta 
   await expect(page).toHaveURL("/es/rankings?lider=profesor&templo=serpiente");
   await expect(page.getByText("Profesor · templo de la Serpiente")).toBeVisible();
   await expect(rows(page)).toHaveText([/Vos.*50\s% · 2 partidas/]);
+});
+
+test("by seat, for games with no leader or temple recorded, and by highest and lowest points", async ({
+  page,
+  request,
+  browser,
+  isMobile,
+}) => {
+  test.skip(isMobile, "the Consulta is the desktop's left page");
+  test.setTimeout(120_000);
+  await seed(page, request, browser);
+  // One more: no temple side and no leaders recorded. Jessi beats Ezequiel, who listed himself first.
+  await page.goto("/es/matches/new");
+  await page.getByLabel("Agregar jugador").fill("Jessi");
+  await page.getByRole("button", { name: /^Jessi/ }).first().click();
+  await fillScores(page, "Ezequiel", [30, 0, 0, 0, 0, 0]);
+  await fillScores(page, "Jessi", [35, 0, 0, 0, 0, 0]);
+  await page.getByRole("button", { name: "Guardar partida" }).click();
+  await expect(page).toHaveURL(/saved=1/);
+
+  // Who started first: Ezequiel in his three games (won 1), Iñaki in his.
+  await page.goto("/es/rankings");
+  await group(page, "Turno").getByRole("button", { name: "1.º" }).click();
+  await expect(page).toHaveURL("/es/rankings?turno=1");
+  await expect(page.getByText("Con todos los líderes, empezando primero")).toBeVisible();
+  await expect(rows(page)).toHaveText([/^1.*Iñaki.*100\s% · 1 partida/, /^2.*Vos.*33\s% · 3 partidas/]);
+
+  // Games with no leader recorded, then with no temple: only the last one.
+  await group(page, "Turno").getByRole("button", { name: "Cualquiera" }).click();
+  await group(page, "Líder").getByRole("button", { name: "Sin especificar" }).click();
+  await expect(page).toHaveURL("/es/rankings?lider=sin-especificar");
+  await expect(page.getByText("Sin líder registrado")).toBeVisible();
+  await expect(rows(page)).toHaveText([/^1.*Jessi.*100\s% · 1 partida/, /^2.*Vos.*0\s% · 1 partida/]);
+  await page.goto("/es/rankings?templo=sin-especificar");
+  await expect(page.getByText("Con todos los líderes en un templo sin registrar")).toBeVisible();
+  await expect(rows(page)).toHaveCount(2);
+
+  // Highest and lowest totals; a tie goes to more games.
+  await page.goto("/es/rankings");
+  await page.getByLabel("Ordenar por").selectOption("maxPoints");
+  await expect(rows(page)).toHaveText([/Vos.*60 · 4 partidas/, /Iñaki.*55/, /Manuela.*52/, /Jessi.*40/, /Jero.*30/]);
+  await page.getByLabel("Ordenar por").selectOption("minPoints");
+  await expect(rows(page)).toHaveText([/Iñaki.*55/, /Manuela.*50/, /Jessi.*35/, /Vos.*30 · 4 partidas/, /Jero.*30 · 1 partida/]);
+
+  // The pen circle hugs the picked leader instead of filling its grid cell.
+  await page.getByRole("button", { name: "Profesor" }).click();
+  const picked = (await page.getByRole("button", { name: "Profesor" }).boundingBox())!;
+  const grid = (await page.getByRole("button", { name: "Profesor" }).locator("..").boundingBox())!;
+  expect(picked.width).toBeLessThan(grid.width / 2 - 20);
 });

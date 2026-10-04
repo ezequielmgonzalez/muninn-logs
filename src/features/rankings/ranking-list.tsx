@@ -22,7 +22,8 @@ export function RankingList({
   paintKey,
 }: {
   rows: RankingRow[];
-  leader: ArnakLeader | null;
+  /** Its color for the bars: bronze for every leader, grey for none recorded. */
+  leader: ArnakLeader | "none" | null;
   /** Changes with the Consulta and the player filter: the bars paint again, the sort stays. */
   paintKey: string;
 }) {
@@ -34,7 +35,7 @@ export function RankingList({
 
   const display = (value: number) => {
     if (sort === "winRate") return format.number(value, { style: "percent", maximumFractionDigits: 0 });
-    if (sort === "games") return format.number(value);
+    if (sort === "games" || sort === "maxPoints" || sort === "minPoints") return format.number(value);
     return format.number(value, { maximumFractionDigits: sort === "avgPlace" ? 2 : 1 });
   };
   const who = (row: RankingRow) => {
@@ -87,7 +88,7 @@ export function RankingList({
                   </span>
                 </p>
                 {/* Zero (no wins, say) draws a hairline, not a stroke. */}
-                <BrushBar value={bar} tone={leader ? ARNAK_LEADER_STYLES[leader].tone : "player-you"} index={i} />
+                <BrushBar value={bar} tone={leader === "none" ? "ink-muted" : leader ? ARNAK_LEADER_STYLES[leader].tone : "player-you"} index={i} />
               </div>
             </li>
           );
