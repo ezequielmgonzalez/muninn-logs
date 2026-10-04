@@ -1,9 +1,11 @@
 import type { ArnakBoardSide, ArnakLeader } from "@/games/arnak";
 
-// The Rankings "Consulta": which leader, which temple side, and who's in.
-// It lives in the URL, in Spanish like the rest of the group's links:
-// ?lider=profesor&templo=serpiente&quienes=amigos,invitados,otros.
-// Each one is left out when it's the default (Todos, Cualquiera, everyone).
+// The Rankings "Consulta": which leader, which temple side, which seat, and
+// who's in. It lives in the URL, in Spanish like the rest of the group's links:
+// ?lider=profesor&templo=serpiente&turno=1&quienes=amigos,invitados,otros.
+// Each one is left out when it's the default (Todos, Cualquiera, any seat,
+// everyone). Leader and temple can also be "sin-especificar": the games
+// where none was recorded.
 
 /** The leader's name in the URL (the app's Spanish names, without accents). */
 export const LEADER_PARAMS: Record<ArnakLeader, string> = {
@@ -22,20 +24,30 @@ export const RANKING_TEMPLES = ["bird", "snake"] as const satisfies readonly Arn
 export type RankingTemple = (typeof RANKING_TEMPLES)[number];
 const TEMPLE_PARAMS: Record<RankingTemple, string> = { bird: "pajaro", snake: "serpiente" };
 
+/** No leader or no temple recorded: a choice of its own. */
+export const UNSPECIFIED = "none";
+const UNSPECIFIED_PARAM = "sin-especificar";
+
+/** Where a player started in the turn order. */
+export const RANKING_SEATS = [1, 2, 3, 4] as const;
+export type RankingSeat = (typeof RANKING_SEATS)[number];
+
 export const RANKING_GROUPS = ["friends", "ownGuests", "otherGuests"] as const;
 export type RankingGroup = (typeof RANKING_GROUPS)[number];
 const GROUP_PARAMS: Record<RankingGroup, string> = { friends: "amigos", ownGuests: "invitados", otherGuests: "otros" };
 
 export type RankingFilters = {
-  /** null: every leader ("Todos"). */
-  leader: ArnakLeader | null;
-  /** null: either side ("Cualquiera"). */
-  temple: RankingTemple | null;
+  /** null: every leader ("Todos"); "none": the games with no leader recorded. */
+  leader: ArnakLeader | typeof UNSPECIFIED | null;
+  /** null: either side ("Cualquiera"); "none": no side recorded. */
+  temple: RankingTemple | typeof UNSPECIFIED | null;
+  /** null: any seat. */
+  seat: RankingSeat | null;
   /** Who's in besides you (always in). */
   groups: readonly RankingGroup[];
 };
 
-export const DEFAULT_FILTERS: RankingFilters = { leader: null, temple: null, groups: RANKING_GROUPS };
+export const DEFAULT_FILTERS: RankingFilters = { leader: null, temple: null, seat: null, groups: RANKING_GROUPS };
 
 const keyOf = <K extends string>(map: Record<K, string>, value: string | undefined) =>
   (Object.keys(map) as K[]).find((key) => map[key] === value) ?? null;
@@ -46,9 +58,12 @@ const first = (value: string | string[] | undefined) => (Array.isArray(value) ? 
 /** The Consulta from the page's search params; anything unknown means its default. */
 export function parseRankingFilters(params: Params): RankingFilters {
   const who = first(params.quienes);
+  const [leader, temple] = [first(params.lider), first(params.templo)];
+  const seat = Number(first(params.turno));
   return {
-    leader: keyOf(LEADER_PARAMS, first(params.lider)),
-    temple: keyOf(TEMPLE_PARAMS, first(params.templo)),
+    leader: leader === UNSPECIFIED_PARAM ? UNSPECIFIED : keyOf(LEADER_PARAMS, leader),
+    temple: temple === UNSPECIFIED_PARAM ? UNSPECIFIED : keyOf(TEMPLE_PARAMS, temple),
+    seat: (RANKING_SEATS as readonly number[]).includes(seat) ? (seat as RankingSeat) : null,
     groups:
       who === undefined
         ? RANKING_GROUPS
@@ -59,8 +74,9 @@ export function parseRankingFilters(params: Params): RankingFilters {
 /** The search params for a Consulta, leaving out the defaults ("quienes=" when nobody else is in). */
 export function rankingSearchParams(filters: RankingFilters): Record<string, string> {
   const params: Record<string, string> = {};
-  if (filters.leader) params.lider = LEADER_PARAMS[filters.leader];
-  if (filters.temple) params.templo = TEMPLE_PARAMS[filters.temple];
+  if (filters.leader) params.lider = filters.leader === UNSPECIFIED ? UNSPECIFIED_PARAM : LEADER_PARAMS[filters.leader];
+  if (filters.temple) params.templo = filters.temple === UNSPECIFIED ? UNSPECIFIED_PARAM : TEMPLE_PARAMS[filters.temple];
+  if (filters.seat) params.turno = String(filters.seat);
   if (filters.groups.length !== RANKING_GROUPS.length) {
     params.quienes = RANKING_GROUPS.filter((g) => filters.groups.includes(g))
       .map((g) => GROUP_PARAMS[g])
