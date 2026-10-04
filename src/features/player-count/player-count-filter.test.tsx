@@ -59,6 +59,27 @@ describe("PlayerCountFilter", () => {
     expect(group.getByRole("checkbox", { name: "3 jugadores" })).not.toBeChecked();
   });
 
+  it("shows a spinner from the change until the server's value arrives", async () => {
+    const view = render(
+      <NextIntlClientProvider locale="es" messages={es}>
+        <PlayerCountFilter value={null} />
+      </NextIntlClientProvider>,
+    );
+    await act(async () => fireEvent.click(screen.getByRole("checkbox", { name: "2 jugadores" })));
+    const loading = screen.getByRole("status");
+    expect(loading).toHaveTextContent("Cargando…");
+    expect(loading.querySelector("svg")).not.toBeNull();
+    expect(document.documentElement).toHaveAttribute("data-refreshing");
+
+    view.rerender(
+      <NextIntlClientProvider locale="es" messages={es}>
+        <PlayerCountFilter value={[3, 4]} />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(document.documentElement).not.toHaveAttribute("data-refreshing");
+  });
+
   it("keeps the last size ticked, and says why", async () => {
     const group = renderFilter([4]);
     await act(async () => fireEvent.click(group.getByRole("checkbox", { name: "4 jugadores" })));
