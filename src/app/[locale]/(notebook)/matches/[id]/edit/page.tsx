@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 
+import { LogDuelForm } from "@/features/matches/log-duel-form";
 import { type FormPlayer, LogMatchForm } from "@/features/matches/log-match-form";
 import { getMatch } from "@/features/matches/queries";
 import { ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
@@ -10,10 +11,11 @@ import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function EditMatchPage({ params }: PageProps<"/[locale]/matches/[id]/edit">) {
-  const [profile, locale, t] = await Promise.all([
+  const [profile, locale, t, tDuel] = await Promise.all([
     getCurrentProfile(),
     getLocale(),
     getTranslations("LogMatch"),
+    getTranslations("LogDuel"),
   ]);
   if (!profile) return redirect({ href: "/login", locale });
   if (!profile.username) return redirect({ href: "/onboarding", locale });
@@ -27,6 +29,32 @@ export default async function EditMatchPage({ params }: PageProps<"/[locale]/mat
   const supabase = await createClient();
   const { data: addable, error } = await supabase.rpc("list_addable_players");
   if (error) throw error;
+
+  // A duel: its two players, who played Sauron, and the result.
+  if (match.game === "lotr-duel") {
+    return (
+      <LogDuelForm
+        title={tDuel("editTitle")}
+        addable={addable}
+        initial={{
+          matchId: match.id,
+          playedOn: match.playedOn ?? "",
+          durationMinutes: match.durationMinutes,
+          players: match.players.map((p) => ({
+            key: p.playerId,
+            name: p.name,
+            playerId: p.playerId,
+            isGuest: p.isGuest,
+            isMe: p.isMe,
+            ownerName: null,
+          })),
+          sauronKey: match.players.find((p) => p.side === "sauron")?.playerId ?? null,
+          result: match.duel?.result ?? null,
+          victory: match.duel?.victory ?? null,
+        }}
+      />
+    );
+  }
 
   const players: FormPlayer[] = [...match.players]
     // In turn order when it's known; otherwise as ranked.

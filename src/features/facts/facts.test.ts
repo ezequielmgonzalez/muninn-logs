@@ -17,6 +17,7 @@ function game(seats: Seat[], options: { side?: ArnakBoardSide; minutes?: number;
     isMe: name === "Vos",
     isGuest: false,
     leader: leader ?? null,
+    side: null,
     turnOrder: options.seated ? i + 1 : null,
     total,
     rank: 1 + seats.filter(([, other]) => other > total).length,
@@ -26,6 +27,8 @@ function game(seats: Seat[], options: { side?: ArnakBoardSide; minutes?: number;
   players.sort((a, b) => a.rank - b.rank);
   return {
     id: String(next++),
+    game: "arnak",
+    duel: null,
     playedOn: null,
     durationMinutes: options.minutes ?? null,
     boardSide: options.side ?? null,

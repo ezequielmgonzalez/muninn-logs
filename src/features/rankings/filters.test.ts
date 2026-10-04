@@ -8,6 +8,7 @@ describe("the Consulta in the URL", () => {
       leader: "professor",
       temple: "snake",
       seat: 1,
+      side: null,
       groups: ["friends", "otherGuests"],
     });
   });
@@ -22,6 +23,12 @@ describe("the Consulta in the URL", () => {
       (["waterfall", "tree", "monkey", "lizard"] as const).map((temple) => rankingSearchParams({ ...DEFAULT_FILTERS, temple }).templo),
     ).toEqual(["cascada", "arbol", "mono", "lagarto"]);
     expect(parseRankingFilters({ templo: "lagarto" }).temple).toBe("lizard");
+  });
+
+  it("reads a duel's side, in Spanish", () => {
+    expect(parseRankingFilters({ bando: "comunidad" }).side).toBe("fellowship");
+    expect(rankingSearchParams({ ...DEFAULT_FILTERS, side: "sauron" })).toEqual({ bando: "sauron" });
+    expect(parseRankingFilters({ bando: "orcos" })).toEqual(DEFAULT_FILTERS);
   });
 
   it("reads games with no leader or no temple recorded", () => {
@@ -40,7 +47,7 @@ describe("the Consulta in the URL", () => {
   it("writes only what isn't a default, in a stable order", () => {
     expect(rankingSearchParams(DEFAULT_FILTERS)).toEqual({});
     expect(isDefaultFilters(DEFAULT_FILTERS)).toBe(true);
-    expect(rankingSearchParams({ leader: "falconer", temple: "bird", seat: null, groups: ["otherGuests", "friends"] })).toEqual({
+    expect(rankingSearchParams({ leader: "falconer", temple: "bird", seat: null, side: null, groups: ["otherGuests", "friends"] })).toEqual({
       lider: "cetrera",
       templo: "pajaro",
       quienes: "amigos,otros",
@@ -49,7 +56,7 @@ describe("the Consulta in the URL", () => {
   });
 
   it("reads back what it writes", () => {
-    const filters = { leader: "journalist", temple: "snake", seat: 4, groups: ["ownGuests"] } as const;
+    const filters = { leader: "journalist", temple: "snake", seat: 4, side: null, groups: ["ownGuests"] } as const;
     expect(parseRankingFilters(rankingSearchParams(filters))).toEqual(filters);
   });
 });

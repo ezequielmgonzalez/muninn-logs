@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import { NativeSelect } from "@/components/notebook/native-select";
 import { BrushBar } from "@/components/notebook/painted-band";
-import { ARNAK_LEADER_STYLES, type ArnakLeader } from "@/games/arnak";
 import { cn } from "@/lib/utils";
 
 import { RANKING_SORTS, type RankingRow, type RankingSort, rankRows } from "./ranking";
@@ -13,17 +12,20 @@ import { RANKING_SORTS, type RankingRow, type RankingSort, rankRows } from "./ra
 /**
  * The ranking: "Ordenar por", then one row per player, best first: the
  * position, the name and who they are to you, the sorted value with their
- * games, and a bar in the leader's color (bronze for every leader). Your own
- * row is bold, with the bronze dot.
+ * games, and a bar in the leader's (or side's) color. Your own row is bold,
+ * with the bronze dot.
  */
 export function RankingList({
   rows,
-  leader,
+  tone,
+  sorts = RANKING_SORTS,
   paintKey,
 }: {
   rows: RankingRow[];
-  /** Its color for the bars: bronze for every leader, grey for none recorded. */
-  leader: ArnakLeader | "none" | null;
+  /** The bars' color: the leader's or side's, bronze for all of them, grey for none recorded. */
+  tone: Parameters<typeof BrushBar>[0]["tone"];
+  /** What it can be sorted by: a duel has no points or places. */
+  sorts?: readonly RankingSort[];
   /** Changes with the Consulta and the player filter: the bars paint again, the sort stays. */
   paintKey: string;
 }) {
@@ -57,7 +59,7 @@ export function RankingList({
           value={sort}
           onChange={(e) => setSort(e.target.value as RankingSort)}
         >
-          {RANKING_SORTS.map((s) => (
+          {sorts.map((s) => (
             <option key={s} value={s}>
               {t(`sorts.${s}`)}
             </option>
@@ -88,7 +90,7 @@ export function RankingList({
                   </span>
                 </p>
                 {/* Zero (no wins, say) draws a hairline, not a stroke. */}
-                <BrushBar value={bar} tone={leader === "none" ? "ink-muted" : leader ? ARNAK_LEADER_STYLES[leader].tone : "player-you"} index={i} />
+                <BrushBar value={bar} tone={tone} index={i} />
               </div>
             </li>
           );

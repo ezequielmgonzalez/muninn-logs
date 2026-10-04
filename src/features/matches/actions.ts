@@ -8,6 +8,7 @@ import { redirect } from "@/i18n/navigation";
 import { logUnexpected } from "@/lib/log";
 import { createClient } from "@/lib/supabase/server";
 
+import { logDuelSchema, toLogDuelArgs } from "./duel-schema";
 import { logMatchSchema, toLogMatchArgs } from "./schema";
 
 // Codes map to LogMatch.errors.* in the messages. The form's fields are
@@ -16,8 +17,26 @@ export type SaveMatchState =
   | { status: "idle" }
   | { status: "error"; error: "invalid" | "notAllowed" | "duplicate" | "generic" };
 
-/** Logs a new match, or replaces one when the form carries its matchId. */
-export async function saveMatch(_state: SaveMatchState, formData: FormData): Promise<SaveMatchState> {
+/** Logs a new Arnak match, or replaces one when the form carries its matchId. */
+export async function saveMatch(state: SaveMatchState, formData: FormData): Promise<SaveMatchState> {
+  return save(formData, (payload) => {
+    const input = logMatchSchema.safeParse(payload);
+    return input.success ? toLogMatchArgs(input.data) : null;
+  });
+}
+
+/** The same for a LOTR duel. */
+export async function saveDuel(state: SaveMatchState, formData: FormData): Promise<SaveMatchState> {
+  return save(formData, (payload) => {
+    const input = logDuelSchema.safeParse(payload);
+    return input.success ? toLogDuelArgs(input.data) : null;
+  });
+}
+
+type LogMatchArgs = ReturnType<typeof toLogMatchArgs> | ReturnType<typeof toLogDuelArgs>;
+
+/** Validates the form's payload into log_match()'s arguments, then logs or updates the match. */
+async function save(formData: FormData, toArgs: (payload: unknown) => LogMatchArgs | null): Promise<SaveMatchState> {
   const locale = localeSchema.parse(formData.get("locale"));
   const existingId = formData.get("matchId") ? z.uuid().safeParse(formData.get("matchId")) : null;
   if (existingId && !existingId.success) return { status: "error", error: "invalid" };
@@ -28,11 +47,11 @@ export async function saveMatch(_state: SaveMatchState, formData: FormData): Pro
   } catch {
     return { status: "error", error: "invalid" };
   }
-  const input = logMatchSchema.safeParse(payload);
-  if (!input.success) return { status: "error", error: "invalid" };
+  const input = toArgs(payload);
+  if (!input) return { status: "error", error: "invalid" };
 
   const supabase = await createClient();
-  const { played_on, ...rest } = toLogMatchArgs(input.data);
+  const { played_on, ...rest } = input;
   // played_on may be null (undated game), which the functions accept; the
   // generated types mark every argument without a default as non-null.
   const args = { ...rest, played_on: played_on as string };

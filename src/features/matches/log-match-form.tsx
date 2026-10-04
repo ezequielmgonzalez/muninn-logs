@@ -87,7 +87,7 @@ function numericScores(scores: FormPlayer["scores"]) {
 }
 
 /** Today in the player's own time zone: games often end after midnight UTC. */
-function localToday() {
+export function localToday() {
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60_000;
   return new Date(now.getTime() - offset).toISOString().slice(0, 10);
@@ -347,7 +347,7 @@ export function LogMatchForm({
 }
 
 /** A choice among a few, circled in pen when pressed (design/components/FormFields.md). */
-function PenToggle({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
+export function PenToggle({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <button
       type="button"
@@ -477,14 +477,15 @@ function PlayerCard({
 }
 
 /** Who can be added: grouped as in the design, shown while typing. */
-function PlayerPicker({
+export function PlayerPicker({
   addable,
   chosen,
   onPick,
   onCreateGuest,
 }: {
   addable: AddablePlayer[];
-  chosen: FormPlayer[];
+  /** Who's already in the match: not offered again. */
+  chosen: Pick<FormPlayer, "playerId" | "name">[];
   onPick: (player: AddablePlayer) => void;
   onCreateGuest: (name: string) => void;
 }) {

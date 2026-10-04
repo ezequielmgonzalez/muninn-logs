@@ -4,7 +4,9 @@ import { cache } from "react";
 import { z } from "zod";
 
 import { type PlayerCounts, parsePlayerCounts, serializePlayerCounts } from "@/features/player-count/options";
-import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES } from "@/games/arnak";
+import type { Game } from "@/features/game/options";
+import { ARNAK_LEADERS, ARNAK_SCORE_CATEGORIES, ARNAK_SLUG } from "@/games/arnak";
+import { LOTR_DUEL_SLUG, LOTR_SIDES, LOTR_VICTORIES } from "@/games/lotr-duel";
 import { createClient } from "@/lib/supabase/server";
 
 import type { Finish } from "./head-to-head";
@@ -52,11 +54,49 @@ const playerStatsFor = cache(async (userId: string, players: string | null): Pro
   const counts = parsePlayerCounts(players);
   const { data, error } = await supabase.rpc("get_player_stats", {
     target_user_id: userId,
+    game_slug: ARNAK_SLUG,
     ...(counts ? { player_counts: [...counts] } : {}),
   });
   if (error) throw error;
   return statsSchema.parse(data);
 });
+
+// The same functions for LOTR Duel: no points or places, but draws, and how
+// games were won and lost.
+const duelStatsSchema = z.object({
+  games: z.number(),
+  wins: z.number(),
+  draws: z.number(),
+  /** Per side, most played first. */
+  leaders: z.array(
+    z.object({ slug: z.enum(LOTR_SIDES).nullable(), games: z.number(), wins: z.number(), draws: z.number() }),
+  ),
+  /** Per victory: the player's wins and losses by it (a draw is neither). */
+  victories: z.array(z.object({ slug: z.enum(LOTR_VICTORIES), wins: z.number(), losses: z.number() })),
+});
+
+export type DuelStats = z.infer<typeof duelStatsSchema>;
+
+/** LOTR Duel stats for the user or one of their friends (the database enforces who). Cached per request. */
+export const getDuelStats = cache(async (userId: string): Promise<DuelStats> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_player_stats", { target_user_id: userId, game_slug: LOTR_DUEL_SLUG });
+  if (error) throw error;
+  return duelStatsSchema.parse(data);
+});
+
+/** A guest's LOTR Duel stats, from the duels of theirs the user can see. */
+export async function getGuestDuelStats(guestId: string): Promise<DuelStats> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_guest_stats", { guest_id: guestId, game_slug: LOTR_DUEL_SLUG });
+  if (error) throw error;
+  return duelStatsSchema.parse(data);
+}
+
+/** How many games of this game the user played: the diary's "N expediciones". */
+export async function countGames(userId: string, game: Game): Promise<number> {
+  return game === LOTR_DUEL_SLUG ? (await getDuelStats(userId)).games : (await getPlayerStats(userId)).games;
+}
 
 /**
  * A guest's Arnak stats, from the games of theirs the user can see (the
@@ -66,6 +106,7 @@ export async function getGuestStats(guestId: string, players: PlayerCounts = nul
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_guest_stats", {
     guest_id: guestId,
+    game_slug: ARNAK_SLUG,
     ...(players ? { player_counts: [...players] } : {}),
   });
   if (error) throw error;

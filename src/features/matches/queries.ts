@@ -1,7 +1,16 @@
 import "server-only";
 
+import { DEFAULT_GAME, type Game, GAMES } from "@/features/game/options";
 import type { PlayerCounts } from "@/features/player-count/options";
-import { ARNAK_BOARD_SIDES, type ArnakBoardSide, type ArnakLeader, type ArnakScoreCategory } from "@/games/arnak";
+import { ARNAK_BOARD_SIDES, ARNAK_LEADERS, type ArnakBoardSide, type ArnakLeader, type ArnakScoreCategory } from "@/games/arnak";
+import {
+  LOTR_RESULTS,
+  LOTR_SIDES,
+  LOTR_VICTORIES,
+  type LotrResult,
+  type LotrSide,
+  type LotrVictory,
+} from "@/games/lotr-duel";
 import { createClient } from "@/lib/supabase/server";
 
 // Reading matches. RLS already limits them to ones the user logged or played.
@@ -13,7 +22,10 @@ export type MatchPlayer = {
   username: string | null;
   isMe: boolean;
   isGuest: boolean;
+  /** Arnak: the player's leader. */
   leader: ArnakLeader | null;
+  /** LOTR Duel: the player's side. */
+  side: LotrSide | null;
   /** Null when the match's turn order is unknown (e.g. copied from an old score pad). */
   turnOrder: number | null;
   total: number;
@@ -24,6 +36,9 @@ export type MatchPlayer = {
 
 export type MatchSummary = {
   id: string;
+  game: Game;
+  /** LOTR Duel: who won, and how (null in a draw); null for games decided by points. */
+  duel: { result: LotrResult; victory: LotrVictory | null } | null;
   /** Null for undated games. */
   playedOn: string | null;
   durationMinutes: number | null;
@@ -41,6 +56,7 @@ export type MatchDetail = MatchSummary & {
 
 const MATCH_COLUMNS = `
   id, played_on, created_by, duration_minutes, setup,
+  game:games!inner ( slug ),
   match_players (
     player_id, turn_order, won_tiebreak,
     player:players ( name, user_id, profile:profiles!players_user_id_fkey ( display_name, username ) ),
@@ -53,6 +69,7 @@ type MatchRow = {
   created_by: string;
   duration_minutes: number | null;
   setup: unknown;
+  game: { slug: string };
   match_players: {
     player_id: string;
     turn_order: number | null;
@@ -88,7 +105,8 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
         username: mp.player?.profile?.username ?? null,
         isMe: mp.player?.user_id != null && mp.player.user_id === me,
         isGuest: mp.player?.user_id == null,
-        leader: (mp.character?.slug as ArnakLeader | undefined) ?? null,
+        leader: ARNAK_LEADERS.find((slug) => slug === mp.character?.slug) ?? null,
+        side: LOTR_SIDES.find((slug) => slug === mp.character?.slug) ?? null,
         turnOrder: mp.turn_order,
         total: result?.total ?? 0,
         rank: result?.rank ?? 0,
@@ -98,9 +116,12 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
     });
     players.sort((a, b) => a.rank - b.rank || (a.turnOrder ?? 0) - (b.turnOrder ?? 0));
 
-    const setup = (row.setup ?? {}) as { board_side?: string };
+    const setup = (row.setup ?? {}) as { board_side?: string; result?: string; victory?: string };
+    const result = LOTR_RESULTS.find((r) => r === setup.result);
     return {
       id: row.id,
+      game: GAMES.find((g) => g === row.game.slug) ?? DEFAULT_GAME,
+      duel: result ? { result, victory: LOTR_VICTORIES.find((v) => v === setup.victory) ?? null } : null,
       playedOn: row.played_on,
       durationMinutes: row.duration_minutes,
       boardSide: ARNAK_BOARD_SIDES.find((side) => side === setup.board_side) ?? null,
@@ -111,11 +132,10 @@ async function toSummaries(rows: MatchRow[]): Promise<MatchSummary[]> {
   });
 }
 
-/** The user's most recent matches, newest first. */
-/** The newest matches, optionally only those of these table sizes (player_count, a computed field). */
-export async function listMatches(limit = 50, players: PlayerCounts = null): Promise<MatchSummary[]> {
+/** The newest matches of a game, optionally only those of these table sizes (player_count, a computed field). */
+export async function listMatches(limit = 50, players: PlayerCounts = null, game: Game = DEFAULT_GAME): Promise<MatchSummary[]> {
   const supabase = await createClient();
-  let query = supabase.from("matches").select(MATCH_COLUMNS);
+  let query = supabase.from("matches").select(MATCH_COLUMNS).eq("game.slug", game);
   if (players) query = query.in("player_count", [...players]);
   const { data, error } = await query
     .order("played_on", { ascending: false, nullsFirst: false })

@@ -2,14 +2,16 @@ import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { DidYouKnow } from "@/features/facts/did-you-know";
+import type { Game } from "@/features/game/options";
+import { getGame } from "@/features/game/server";
 import type { PlayerCounts } from "@/features/player-count/options";
 import { getPlayerCounts } from "@/features/player-count/server";
-import { getPlayerStats } from "@/features/stats/queries";
+import { countGames } from "@/features/stats/queries";
 import { getCurrentProfile } from "@/lib/auth";
 import { isEnabled } from "@/lib/flags";
 import { cn } from "@/lib/utils";
 
-import { FramePlayerFilter } from "./frame-filter";
+import { FrameControls } from "./frame-filter";
 import { CrowMark } from "./icons";
 import { LegalLinks } from "./legal-links";
 import { SideNav, TabBar } from "./navigation";
@@ -34,32 +36,33 @@ import { SpineRings, TopSpirals } from "./rings";
 
 const SHEET = "pointer-events-none absolute bg-size-[100%_100%] bg-no-repeat";
 
-/** "Diario de / Ezequiel / 28 expediciones registradas". */
+/** "Diario de / Ezequiel / 28 expediciones registradas" (or "duelos", for LOTR Duel). */
 export async function DiaryIdentity({ className }: { className?: string }) {
   const profile = await getCurrentProfile();
   if (!profile) return null;
-  const [t, tStats, stats] = await Promise.all([
+  const game = await getGame();
+  const [t, tStats, games] = await Promise.all([
     getTranslations("Nav"),
     getTranslations("Stats"),
-    getPlayerStats(profile.id),
+    countGames(profile.id, game),
   ]);
   return (
     <div className={className}>
       <p className="type-caption m-0 text-sm text-ink-muted">{t("diaryOf")}</p>
       <p className="type-diary-name m-0 leading-[1.15] text-ink">{profile.display_name}</p>
-      <p className="type-caption m-0 mt-1 text-ink-muted">{tStats("expeditions", { count: stats.games })}</p>
+      <p className="type-caption m-0 mt-1 text-ink-muted">{game === "lotr-duel" ? tStats("duels", { count: games }) : tStats("expeditions", { count: games })}</p>
     </div>
   );
 }
 
 /** Desktop only: the loose sheet tucked under the left page, with the navigation. */
-function Insert({ playerCount }: { playerCount: PlayerCounts }) {
+function Insert({ game, playerCount }: { game: Game; playerCount: PlayerCounts }) {
   return (
     <div className="absolute top-[104px] left-6 z-2 hidden h-[790px] w-[300px] origin-[80%_50%] -rotate-[1.2deg] notebook:block">
       <div aria-hidden className={cn(SHEET, "inset-0 bg-[url(/paper/page-insert.webp)] drop-shadow-[0_10px_16px_rgba(48,30,12,0.45)]")} />
       <div className="relative z-2 flex h-full flex-col pt-[60px] pb-[26px]">
         <DiaryIdentity className="pl-[38px]" />
-        <FramePlayerFilter value={playerCount} placement="insert" />
+        <FrameControls game={game} playerCounts={playerCount} placement="insert" />
         <div aria-hidden className="mt-[26px] mr-[60px] mb-5 ml-[38px] h-px bg-ink-body/22" />
         <SideNav />
         {isEnabled("didYouKnow") ? (
@@ -79,7 +82,7 @@ function Insert({ playerCount }: { playerCount: PlayerCounts }) {
 
 /** The notebook around every signed-in screen: the (notebook) layout. */
 export async function NotebookFrame({ children }: { children: ReactNode }) {
-  const playerCount = await getPlayerCounts();
+  const [game, playerCount] = await Promise.all([getGame(), getPlayerCounts()]);
   return (
     <div
       data-notebook
@@ -98,7 +101,7 @@ export async function NotebookFrame({ children }: { children: ReactNode }) {
           )}
         />
 
-        <Insert playerCount={playerCount} />
+        <Insert game={game} playerCount={playerCount} />
 
         {/* Desktop pages, with their thickness: two darker copies offset 3px and 6px. */}
         <div aria-hidden className="hidden notebook:block">
@@ -130,8 +133,8 @@ export async function NotebookFrame({ children }: { children: ReactNode }) {
               "notebook:absolute notebook:top-[46px] notebook:left-[290px] notebook:h-[908px] notebook:w-[948px] notebook:flex-row notebook:gap-6 notebook:p-0",
             )}
           >
-            {/* Phones: the player filter opens the page. */}
-            <FramePlayerFilter value={playerCount} placement="phone" />
+            {/* Phones: the game switch and the player filter open the page. */}
+            <FrameControls game={game} playerCounts={playerCount} placement="phone" />
             {children}
             <LegalLinks className="order-3 justify-center notebook:hidden" />
           </main>

@@ -22,6 +22,15 @@ export function hasPlayerFilter(path: string): boolean {
   return ["/", "/matches", "/profile", "/rankings", "/compare"].includes(path) || /^\/(friends|guests)\/[^/]+$/.test(path);
 }
 
+/**
+ * Screens about one game, which the game switch changes: its stats and lists,
+ * and the form for a new match. Comparar is Arnak's only; an existing match
+ * keeps its own game.
+ */
+export function hasGameSwitch(path: string): boolean {
+  return (hasPlayerFilter(path) && path !== "/compare") || path === "/matches/new";
+}
+
 /** The match form brings its own save bar on phones, in place of the tab bar. */
 export function hasSaveBar(path: string): boolean {
   return MATCH_FORM.test(path);

@@ -9,7 +9,9 @@ import { PaintedBand } from "@/components/notebook/painted-band";
 import { PenCheck } from "@/components/notebook/pen-checkbox";
 import { PenCircle } from "@/components/notebook/pen-circle";
 import { Button } from "@/components/ui/button";
+import type { Game } from "@/features/game/options";
 import { ARNAK_LEADER_STYLES, ARNAK_LEADERS, type ArnakLeader } from "@/games/arnak";
+import { LOTR_SIDE_STYLES, LOTR_SIDES, type LotrSide } from "@/games/lotr-duel";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +56,7 @@ function useApplyFilters(current: RankingFilters) {
 
   function apply(filters: RankingFilters) {
     const params = new URLSearchParams(window.location.search);
-    for (const key of ["lider", "templo", "turno", "quienes"]) params.delete(key);
+    for (const key of ["lider", "templo", "turno", "bando", "quienes"]) params.delete(key);
     for (const [key, value] of Object.entries(rankingSearchParams(filters))) params.set(key, value);
     const query = params.toString();
     window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
@@ -92,8 +94,8 @@ function Pick({
   );
 }
 
-/** The leader's emoji in its bronze frame, as everywhere leaders appear (a dash without one). */
-export function LeaderFrame({ leader, className }: { leader: ArnakLeader | typeof UNSPECIFIED; className?: string }) {
+/** The leader's (or a duel side's) emoji in its bronze frame, as everywhere leaders appear (a dash without one). */
+export function LeaderFrame({ leader, className }: { leader: ArnakLeader | LotrSide | typeof UNSPECIFIED; className?: string }) {
   return (
     <span
       aria-hidden
@@ -102,14 +104,27 @@ export function LeaderFrame({ leader, className }: { leader: ArnakLeader | typeo
         className,
       )}
     >
-      {leader === UNSPECIFIED ? "–" : ARNAK_LEADER_STYLES[leader].emoji}
+      {leader === UNSPECIFIED
+        ? "–"
+        : leader === "sauron" || leader === "fellowship"
+          ? LOTR_SIDE_STYLES[leader].emoji
+          : ARNAK_LEADER_STYLES[leader].emoji}
     </span>
   );
 }
 
-/** The three groups of picks, for the page and for the phone's sheet alike. */
-function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (filters: RankingFilters) => void }) {
+/** The groups of picks, for the page and for the phone's sheet alike: a duel's are its side and who's in. */
+function Controls({
+  game,
+  filters,
+  onChange,
+}: {
+  game: Game;
+  filters: RankingFilters;
+  onChange: (filters: RankingFilters) => void;
+}) {
   const t = useTranslations("Rankings");
+  const tDuel = useTranslations("Games.lotr-duel");
   const tLeaders = useTranslations("Games.arnak.leaders");
   const locale = useLocale();
   // On the page and in the phone's sheet at once: ids of their own.
@@ -123,6 +138,48 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
         ? filters.groups.filter((g) => g !== group)
         : RANKING_GROUPS.filter((g) => g === group || filters.groups.includes(g)),
     });
+
+  const whoGroup = (
+    <div role="group" aria-labelledby={`${id}-who`}>
+      <h3 id={`${id}-who`} className="type-label m-0">
+        {t("who")}
+      </h3>
+      {/* Several at once: ticked, not circled. */}
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+        {RANKING_GROUPS.map((group) => (
+          <PenCheck key={group} checked={filters.groups.includes(group)} onChange={() => toggleGroup(group)}>
+            {t(`groups.${group}`)}
+          </PenCheck>
+        ))}
+      </div>
+      <p className="type-caption m-0 mt-2 text-ink-muted">{t("whoHint")}</p>
+    </div>
+  );
+
+  if (game === "lotr-duel") {
+    return (
+      <div className="flex flex-col gap-5.5">
+        <div role="group" aria-labelledby={`${id}-side`}>
+          <h3 id={`${id}-side`} className="type-label m-0">
+            {t("side")}
+          </h3>
+          <p className="type-caption m-0 mt-1 text-ink-muted">{t("sideHint")}</p>
+          <div className="mt-3 flex flex-col gap-1.5">
+            <Pick pressed={filters.side === null} onClick={() => onChange({ ...filters, side: null })}>
+              {t("bothSides")}
+            </Pick>
+            {LOTR_SIDES.map((side) => (
+              <Pick key={side} pressed={filters.side === side} onClick={() => onChange({ ...filters, side })}>
+                <LeaderFrame leader={side} />
+                {tDuel(`sides.${side}`)}
+              </Pick>
+            ))}
+          </div>
+        </div>
+        {whoGroup}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5.5">
@@ -185,26 +242,13 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
         </div>
       </div>
 
-      <div role="group" aria-labelledby={`${id}-who`}>
-        <h3 id={`${id}-who`} className="type-label m-0">
-          {t("who")}
-        </h3>
-        {/* Several at once: ticked, not circled. */}
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-          {RANKING_GROUPS.map((group) => (
-            <PenCheck key={group} checked={filters.groups.includes(group)} onChange={() => toggleGroup(group)}>
-              {t(`groups.${group}`)}
-            </PenCheck>
-          ))}
-        </div>
-        <p className="type-caption m-0 mt-2 text-ink-muted">{t("whoHint")}</p>
-      </div>
+      {whoGroup}
     </div>
   );
 }
 
 /** Desktop: the left page. Every pick applies at once. */
-export function RankingQuery({ filters }: { filters: RankingFilters }) {
+export function RankingQuery({ game, filters }: { game: Game; filters: RankingFilters }) {
   const t = useTranslations("Rankings");
   const apply = useApplyFilters(filters);
   // Circled at once, while the ranking reloads; the server's next value wins.
@@ -224,7 +268,7 @@ export function RankingQuery({ filters }: { filters: RankingFilters }) {
     <section>
       <PaintedBand>{t("consulta")}</PaintedBand>
       <div className="mt-5.5">
-        <Controls filters={picked} onChange={change} />
+        <Controls game={game} filters={picked} onChange={change} />
       </div>
       {!isDefaultFilters(picked) && (
         <p className="mt-5.5 flex justify-end">
@@ -255,7 +299,7 @@ export function ClearRankingFilters({ filters }: { filters: RankingFilters }) {
  * focus stays in it, Esc or a tap on the scrim closes it, and nothing applies
  * until "Ver ranking".
  */
-export function RankingFiltersCard({ filters, lines }: { filters: RankingFilters; lines: [string, string] }) {
+export function RankingFiltersCard({ game, filters, lines }: { game: Game; filters: RankingFilters; lines: [string, string] }) {
   const t = useTranslations("Rankings");
   const apply = useApplyFilters(filters);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -270,7 +314,9 @@ export function RankingFiltersCard({ filters, lines }: { filters: RankingFilters
   return (
     <div className="relative px-4 py-3.5 before:ink before:ink--pen-box before:-inset-1 before:bg-ink">
       <div className="flex items-start gap-3">
-        {filters.leader && <LeaderFrame leader={filters.leader} className="size-10 text-xl" />}
+        {game === "lotr-duel"
+          ? filters.side && <LeaderFrame leader={filters.side} className="size-10 text-xl" />
+          : filters.leader && <LeaderFrame leader={filters.leader} className="size-10 text-xl" />}
         <div className="min-w-0 flex-1">
           <p className="m-0 text-[15px] text-ink-body">{lines[0]}</p>
           <p className="type-caption m-0 mt-0.5 text-ink-muted">{lines[1]}</p>
@@ -314,7 +360,7 @@ export function RankingFiltersCard({ filters, lines }: { filters: RankingFilters
                 </div>
               </div>
               <div className="mt-5">
-                <Controls filters={draft} onChange={setDraft} />
+                <Controls game={game} filters={draft} onChange={setDraft} />
               </div>
               <InkButton
                 type="button"

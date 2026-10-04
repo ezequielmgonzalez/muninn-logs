@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 
+import { GAME_COOKIE, GAME_PARAM, gameParam, parseGame } from "@/features/game/options";
 import {
   PLAYER_COUNTS_COOKIE,
   PLAYER_COUNTS_PARAM,
@@ -39,14 +40,25 @@ function playerCountsFromUrl(request: NextRequest): string | null | undefined {
   return value;
 }
 
+/** ?juego=lotr becomes the game's cookie, the same way: the value to store, or undefined. */
+function gameFromUrl(request: NextRequest): string | undefined {
+  const param = request.nextUrl.searchParams.get(GAME_PARAM);
+  if (param === null) return undefined;
+  const value = gameParam(parseGame(param));
+  request.cookies.set(GAME_COOKIE, value);
+  return value;
+}
+
 export async function proxy(request: NextRequest) {
   const playerCounts = playerCountsFromUrl(request);
+  const game = gameFromUrl(request);
   const response = await updateSession(request, (req) => handleI18nRouting(withoutBrowserLanguage(req)));
   if (playerCounts) {
     response.cookies.set(PLAYER_COUNTS_COOKIE, playerCounts, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   } else if (playerCounts === null) {
     response.cookies.delete(PLAYER_COUNTS_COOKIE);
   }
+  if (game) response.cookies.set(GAME_COOKIE, game, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   return response;
 }
 

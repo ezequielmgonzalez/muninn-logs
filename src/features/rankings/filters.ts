@@ -1,11 +1,13 @@
 import { ARNAK_BOARD_SIDES, type ArnakBoardSide, type ArnakLeader } from "@/games/arnak";
+import type { LotrSide } from "@/games/lotr-duel";
 
 // The Rankings "Consulta": which leader, which temple side, which seat, and
 // who's in. It lives in the URL, in Spanish like the rest of the group's links:
 // ?lider=profesor&templo=serpiente&turno=1&quienes=amigos,invitados,otros.
 // Each one is left out when it's the default (Todos, Cualquiera, any seat,
 // everyone). Leader and temple can also be "sin-especificar": the games
-// where none was recorded.
+// where none was recorded. For LOTR Duel the Consulta is the side instead
+// (?bando=sauron|comunidad), plus who's in.
 
 /** The leader's name in the URL (the app's Spanish names, without accents). */
 export const LEADER_PARAMS: Record<ArnakLeader, string> = {
@@ -31,6 +33,9 @@ const TEMPLE_PARAMS: Record<RankingTemple, string> = {
   lizard: "lagarto",
 };
 
+/** LOTR Duel: the side the players played, in the URL. */
+const SIDE_PARAMS: Record<LotrSide, string> = { sauron: "sauron", fellowship: "comunidad" };
+
 /** No leader or no temple recorded: a choice of its own. */
 export const UNSPECIFIED = "none";
 const UNSPECIFIED_PARAM = "sin-especificar";
@@ -50,11 +55,13 @@ export type RankingFilters = {
   temple: RankingTemple | typeof UNSPECIFIED | null;
   /** null: any seat. */
   seat: RankingSeat | null;
+  /** LOTR Duel: null for both sides. */
+  side: LotrSide | null;
   /** Who's in besides you (always in). */
   groups: readonly RankingGroup[];
 };
 
-export const DEFAULT_FILTERS: RankingFilters = { leader: null, temple: null, seat: null, groups: RANKING_GROUPS };
+export const DEFAULT_FILTERS: RankingFilters = { leader: null, temple: null, seat: null, side: null, groups: RANKING_GROUPS };
 
 const keyOf = <K extends string>(map: Record<K, string>, value: string | undefined) =>
   (Object.keys(map) as K[]).find((key) => map[key] === value) ?? null;
@@ -71,6 +78,7 @@ export function parseRankingFilters(params: Params): RankingFilters {
     leader: leader === UNSPECIFIED_PARAM ? UNSPECIFIED : keyOf(LEADER_PARAMS, leader),
     temple: temple === UNSPECIFIED_PARAM ? UNSPECIFIED : keyOf(TEMPLE_PARAMS, temple),
     seat: (RANKING_SEATS as readonly number[]).includes(seat) ? (seat as RankingSeat) : null,
+    side: keyOf(SIDE_PARAMS, first(params.bando)),
     groups:
       who === undefined
         ? RANKING_GROUPS
@@ -84,6 +92,7 @@ export function rankingSearchParams(filters: RankingFilters): Record<string, str
   if (filters.leader) params.lider = filters.leader === UNSPECIFIED ? UNSPECIFIED_PARAM : LEADER_PARAMS[filters.leader];
   if (filters.temple) params.templo = filters.temple === UNSPECIFIED ? UNSPECIFIED_PARAM : TEMPLE_PARAMS[filters.temple];
   if (filters.seat) params.turno = String(filters.seat);
+  if (filters.side) params.bando = SIDE_PARAMS[filters.side];
   if (filters.groups.length !== RANKING_GROUPS.length) {
     params.quienes = RANKING_GROUPS.filter((g) => filters.groups.includes(g))
       .map((g) => GROUP_PARAMS[g])
