@@ -7,10 +7,12 @@
 --   m3  Bob's, snake, 2 players:  Bob 60 (professor), Jero 20 (captain)    -- Ana isn't in it
 --   m4  Ana's, snake, 2 players:  Carla 50 (captain), Ana 35 (professor)
 --   m5  Bob's, bird,  2 players:  Bob 40 (captain), Kiki 10 (mystic)       -- nor in this one
+--   m6  Ana's, no temple, no leaders, turn order unknown: Ana 44, Jessi 20
+-- Turn order is the order listed (Ana went first in m1, second in m2 and m4).
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(12);
+select plan(18);
 
 insert into auth.users (id, email) values
   ('c1111111-1111-1111-1111-111111111111', 'ana-rankings@example.com'),
@@ -38,7 +40,8 @@ from public.games g,
           ('ce000000-0000-0000-0000-000000000002'::uuid, 'c1111111-1111-1111-1111-111111111111'::uuid, 'bird'),
           ('ce000000-0000-0000-0000-000000000003'::uuid, 'c2222222-2222-2222-2222-222222222222'::uuid, 'snake'),
           ('ce000000-0000-0000-0000-000000000004'::uuid, 'c1111111-1111-1111-1111-111111111111'::uuid, 'snake'),
-          ('ce000000-0000-0000-0000-000000000005'::uuid, 'c2222222-2222-2222-2222-222222222222'::uuid, 'bird')) as m(id, created_by, side)
+          ('ce000000-0000-0000-0000-000000000005'::uuid, 'c2222222-2222-2222-2222-222222222222'::uuid, 'bird'),
+          ('ce000000-0000-0000-0000-000000000006'::uuid, 'c1111111-1111-1111-1111-111111111111'::uuid, null)) as m(id, created_by, side)
 where g.slug = 'arnak';
 
 insert into public.match_players (match_id, player_id, turn_order, character_id)
@@ -54,7 +57,9 @@ from (values
   ('ce000000-0000-0000-0000-000000000004'::uuid, 'c0000000-0000-0000-0000-000000000003'::uuid, 1, 'captain'),
   ('ce000000-0000-0000-0000-000000000004'::uuid, 'c0000000-0000-0000-0000-000000000001'::uuid, 2, 'professor'),
   ('ce000000-0000-0000-0000-000000000005'::uuid, 'c0000000-0000-0000-0000-000000000002'::uuid, 1, 'captain'),
-  ('ce000000-0000-0000-0000-000000000005'::uuid, 'c0000000-0000-0000-0000-00000000000c'::uuid, 2, 'mystic')
+  ('ce000000-0000-0000-0000-000000000005'::uuid, 'c0000000-0000-0000-0000-00000000000c'::uuid, 2, 'mystic'),
+  ('ce000000-0000-0000-0000-000000000006'::uuid, 'c0000000-0000-0000-0000-000000000001'::uuid, null, null),
+  ('ce000000-0000-0000-0000-000000000006'::uuid, 'c0000000-0000-0000-0000-00000000000a'::uuid, null, null)
 ) as v(match_id, player_id, turn_order, leader);
 
 -- The whole total in cards, 0 elsewhere.
@@ -71,13 +76,15 @@ from (values
   ('ce000000-0000-0000-0000-000000000004'::uuid, 'c0000000-0000-0000-0000-000000000003'::uuid, 50),
   ('ce000000-0000-0000-0000-000000000004'::uuid, 'c0000000-0000-0000-0000-000000000001'::uuid, 35),
   ('ce000000-0000-0000-0000-000000000005'::uuid, 'c0000000-0000-0000-0000-000000000002'::uuid, 40),
-  ('ce000000-0000-0000-0000-000000000005'::uuid, 'c0000000-0000-0000-0000-00000000000c'::uuid, 10)
+  ('ce000000-0000-0000-0000-000000000005'::uuid, 'c0000000-0000-0000-0000-00000000000c'::uuid, 10),
+  ('ce000000-0000-0000-0000-000000000006'::uuid, 'c0000000-0000-0000-0000-000000000001'::uuid, 44),
+  ('ce000000-0000-0000-0000-000000000006'::uuid, 'c0000000-0000-0000-0000-00000000000a'::uuid, 20)
 ) as v(match_id, player_id, total)
 cross join public.score_categories c
 where c.game_id = (select id from public.games where slug = 'arnak');
 
 select ok(
-  not has_function_privilege('anon', 'public.get_rankings(text, text, boolean, boolean, boolean, integer[], text)', 'execute'),
+  not has_function_privilege('anon', 'public.get_rankings(text, text, boolean, boolean, boolean, integer[], text, boolean, boolean, integer)', 'execute'),
   'visitors can''t see rankings'
 );
 
@@ -89,13 +96,13 @@ create temporary table everyone on commit drop as select public.get_rankings() a
 select results_eq(
   $$ select p ->> 'name', p ->> 'kind', p ->> 'owner_name', (p ->> 'games')::int, (p ->> 'wins')::int
      from everyone, jsonb_array_elements(r -> 'players') p order by 1 $$,
-  $$ values ('Ana', 'me', null, 3, 1),
+  $$ values ('Ana', 'me', null, 4, 2),
             ('Bob', 'friend', null, 1, 1),
             ('Jero', 'other_guest', 'Bob', 1, 0),
-            ('Jessi', 'own_guest', null, 1, 0) $$,
+            ('Jessi', 'own_guest', null, 2, 0) $$,
   'everyone Ana may see, over the matches she can see: not Bob''s games without her, not Carla (no friend), not Kiki (never met)'
 );
-select is((select (r ->> 'matches')::int from everyone), 3, 'and the distinct matches it uses: m1, m2, m4');
+select is((select (r ->> 'matches')::int from everyone), 4, 'and the distinct matches it uses: m1, m2, m4, m6');
 
 create temporary table professor on commit drop as select public.get_rankings('professor') as r;
 select results_eq(
@@ -134,6 +141,47 @@ select results_eq(
      from jsonb_array_elements(public.get_rankings(include_own_guests => false, include_other_guests => false) -> 'players') p $$,
   $$ values (array['Ana', 'Bob']) $$,
   'without guests: you always stay'
+);
+
+select results_eq(
+  $$ select p ->> 'name', (p ->> 'max_total')::int, (p ->> 'min_total')::int
+     from everyone, jsonb_array_elements(r -> 'players') p where p ->> 'kind' = 'me' $$,
+  $$ values ('Ana', 50, 30) $$,
+  'each player''s highest and lowest total under the filters'
+);
+
+-- Games with nothing recorded: no leader, no temple.
+select results_eq(
+  $$ select p ->> 'name', (p ->> 'games')::int, (p ->> 'wins')::int
+     from jsonb_array_elements(public.get_rankings(no_leader => true) -> 'players') p order by 1 $$,
+  $$ values ('Ana', 1, 1), ('Jessi', 1, 0) $$,
+  'without a leader: each player''s games where they had none recorded (m6)'
+);
+select results_eq(
+  $$ select array_agg(p ->> 'name' order by p ->> 'name')
+     from jsonb_array_elements(public.get_rankings(no_board_side => true) -> 'players') p $$,
+  $$ values (array['Ana', 'Jessi']) $$,
+  'without a temple: the matches with no side recorded (m6)'
+);
+
+-- Seats: where each player started; unknown turn orders never count.
+select results_eq(
+  $$ select p ->> 'name', (p ->> 'games')::int, (p ->> 'wins')::int
+     from jsonb_array_elements(public.get_rankings(seat => 1) -> 'players') p order by 1 $$,
+  $$ values ('Ana', 1, 1), ('Bob', 1, 1) $$,
+  'starting first: Ana''s m1, Bob''s m2 (m6 has no turn order)'
+);
+select results_eq(
+  $$ select p ->> 'name', (p ->> 'games')::int
+     from jsonb_array_elements(public.get_rankings(seat => 2) -> 'players') p order by 1 $$,
+  $$ values ('Ana', 2), ('Jessi', 1) $$,
+  'starting second: Ana''s m2 and m4, Jessi''s m1'
+);
+select throws_ok(
+  $$ select public.get_rankings(seat => 5) $$,
+  '22023',
+  null,
+  'a seat is 1 to 4'
 );
 
 select results_eq(

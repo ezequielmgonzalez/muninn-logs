@@ -261,12 +261,14 @@
       "mechanic": "la",
       "journalist": "la"
     },
-    "sentence": "Con {leader, select, all {todos los líderes} other {{article} <b>{name}</b>}}{temple, select, bird { en el templo del <b>Pájaro</b>} snake { en el templo de la <b>Serpiente</b>} other {}}",
+    "sentence": "{leader, select, all {Con todos los líderes} none {Sin líder registrado} other {Con {article} <b>{name}</b>}}{temple, select, bird { en el templo del <b>Pájaro</b>} snake { en el templo de la <b>Serpiente</b>} none { en un templo sin registrar} other {}}{seat, select, 1 {, empezando <b>primero</b>} 2 {, empezando <b>segundo</b>} 3 {, empezando <b>tercero</b>} 4 {, empezando <b>cuarto</b>} other {}}",
     "summary": "{players, plural, one {# jugador} other {# jugadores}} · {matches, plural, one {# partida} other {# partidas}}",
     "sortBy": "Ordenar por",
     "sorts": {
       "winRate": "Win Rate",
       "avgPoints": "Puntos promedio",
+      "maxPoints": "Puntos máximos",
+      "minPoints": "Puntos mínimos",
       "avgPlace": "Lugar promedio",
       "games": "Partidas"
     },
@@ -285,7 +287,7 @@
       "rankings": "Rankings"
     },
     "card": {
-      "leaderTemple": "{leader}{temple, select, bird { · templo del Pájaro} snake { · templo de la Serpiente} other {}}",
+      "leaderTemple": "{leader}{temple, select, bird { · templo del Pájaro} snake { · templo de la Serpiente} none { · templo sin especificar} other {}}{seat, select, 1 { · 1.º en la mesa} 2 { · 2.º en la mesa} 3 { · 3.º en la mesa} 4 { · 4.º en la mesa} other {}}",
       "everyone": "Amigos e invitados",
       "onlyYou": "Solo vos",
       "allTables": "todas las mesas",
@@ -293,7 +295,17 @@
     },
     "change": "Cambiar filtros",
     "close": "Cerrar",
-    "apply": "Ver ranking"
+    "apply": "Ver ranking",
+    "unspecified": "Sin especificar",
+    "seat": "Turno",
+    "seatHint": "En qué lugar de la mesa empezó cada uno. Las partidas sin turnos registrados no cuentan.",
+    "anySeat": "Cualquiera",
+    "seats": {
+      "1": "1.º",
+      "2": "2.º",
+      "3": "3.º",
+      "4": "4.º"
+    }
   },
   "FriendProfile": {
     "back": "Amigos",

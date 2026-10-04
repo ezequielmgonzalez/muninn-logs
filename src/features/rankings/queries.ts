@@ -20,6 +20,8 @@ const rankingSchema = z.object({
       wins: z.number(),
       avg_points: z.number(),
       avg_place: z.number(),
+      max_total: z.number(),
+      min_total: z.number(),
     }),
   ),
 });
@@ -30,8 +32,9 @@ export type Ranking = z.infer<typeof rankingSchema>;
 export async function getRanking(filters: RankingFilters, players: PlayerCounts): Promise<Ranking> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_rankings", {
-    ...(filters.leader ? { leader_slug: filters.leader } : {}),
-    ...(filters.temple ? { board_side: filters.temple } : {}),
+    ...(filters.leader === "none" ? { no_leader: true } : filters.leader ? { leader_slug: filters.leader } : {}),
+    ...(filters.temple === "none" ? { no_board_side: true } : filters.temple ? { board_side: filters.temple } : {}),
+    ...(filters.seat ? { seat: filters.seat } : {}),
     include_friends: filters.groups.includes("friends"),
     include_own_guests: filters.groups.includes("ownGuests"),
     include_other_guests: filters.groups.includes("otherGuests"),

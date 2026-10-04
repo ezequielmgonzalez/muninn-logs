@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { type ReactNode, useEffect, useId, useRef, useState, useTransition } from "react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
 import { CloseIcon } from "@/components/notebook/icons";
 import { InkButton } from "@/components/notebook/ink-button";
@@ -16,44 +16,53 @@ import {
   DEFAULT_FILTERS,
   isDefaultFilters,
   RANKING_GROUPS,
+  RANKING_SEATS,
   RANKING_TEMPLES,
   type RankingFilters,
   type RankingGroup,
   rankingSearchParams,
+  UNSPECIFIED,
 } from "./filters";
 
 // The Rankings "Consulta": which leader, which temple, who's in. On desktop
 // it's the left page and every pick applies at once; on phones it folds into
 // a card whose sheet applies with "Ver ranking". Picks are circled in pen.
 
+const filtersKey = (filters: RankingFilters) => JSON.stringify(rankingSearchParams(filters));
+
 /**
  * Applies a Consulta: the URL changes in place (keeping the Jugadores filter)
  * and the screen reloads, fading back meanwhile, so it never flashes the
- * loading sketch.
+ * loading sketch. It's reloading until the server's Consulta is the one asked
+ * for: router.refresh() fetches after it returns, outside any transition.
  */
-function useApplyFilters() {
+function useApplyFilters(current: RankingFilters) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const [awaiting, setAwaiting] = useState<string | null>(null);
+  const pending = awaiting !== null && awaiting !== filtersKey(current);
   useEffect(() => {
     if (!pending) return;
     document.documentElement.setAttribute("data-refreshing", "");
-    return () => document.documentElement.removeAttribute("data-refreshing");
+    const giveUp = setTimeout(() => setAwaiting(null), 20_000);
+    return () => {
+      clearTimeout(giveUp);
+      document.documentElement.removeAttribute("data-refreshing");
+    };
   }, [pending]);
 
   function apply(filters: RankingFilters) {
     const params = new URLSearchParams(window.location.search);
-    for (const key of ["lider", "templo", "quienes"]) params.delete(key);
+    for (const key of ["lider", "templo", "turno", "quienes"]) params.delete(key);
     for (const [key, value] of Object.entries(rankingSearchParams(filters))) params.set(key, value);
     const query = params.toString();
-    startTransition(() => {
-      window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
-      router.refresh();
-    });
+    window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+    setAwaiting(filtersKey(filters));
+    router.refresh();
   }
   return apply;
 }
 
-/** One pick among a few, circled in pen when it's the one (or one of them). */
+/** One pick among a few, circled in pen when it's the one (or one of them): the circle hugs its label, not its cell. */
 function Pick({
   pressed,
   onClick,
@@ -71,7 +80,7 @@ function Pick({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        "relative flex min-h-11 cursor-pointer items-center gap-3 px-3 text-left text-[15px] text-ink-body outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze aria-pressed:font-semibold aria-pressed:text-ink",
+        "relative flex min-h-11 w-fit cursor-pointer items-center gap-3 px-3 text-left text-[15px] text-ink-body outline-none focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bronze aria-pressed:font-semibold aria-pressed:text-ink",
         className,
       )}
     >
@@ -81,8 +90,8 @@ function Pick({
   );
 }
 
-/** The leader's emoji in its bronze frame, as everywhere leaders appear. */
-export function LeaderFrame({ leader, className }: { leader: ArnakLeader; className?: string }) {
+/** The leader's emoji in its bronze frame, as everywhere leaders appear (a dash without one). */
+export function LeaderFrame({ leader, className }: { leader: ArnakLeader | typeof UNSPECIFIED; className?: string }) {
   return (
     <span
       aria-hidden
@@ -91,7 +100,7 @@ export function LeaderFrame({ leader, className }: { leader: ArnakLeader; classN
         className,
       )}
     >
-      {ARNAK_LEADER_STYLES[leader].emoji}
+      {leader === UNSPECIFIED ? "–" : ARNAK_LEADER_STYLES[leader].emoji}
     </span>
   );
 }
@@ -130,6 +139,10 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
               {tLeaders(leader)}
             </Pick>
           ))}
+          <Pick pressed={filters.leader === UNSPECIFIED} onClick={() => onChange({ ...filters, leader: UNSPECIFIED })}>
+            <LeaderFrame leader={UNSPECIFIED} />
+            {t("unspecified")}
+          </Pick>
         </div>
       </div>
 
@@ -144,6 +157,26 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
           {RANKING_TEMPLES.map((temple) => (
             <Pick key={temple} pressed={filters.temple === temple} onClick={() => onChange({ ...filters, temple })}>
               {t(`temples.${temple}`)}
+            </Pick>
+          ))}
+          <Pick pressed={filters.temple === UNSPECIFIED} onClick={() => onChange({ ...filters, temple: UNSPECIFIED })}>
+            {t("unspecified")}
+          </Pick>
+        </div>
+      </div>
+
+      <div role="group" aria-labelledby={`${id}-seat`}>
+        <h3 id={`${id}-seat`} className="type-label m-0">
+          {t("seat")}
+        </h3>
+        <p className="type-caption m-0 mt-1 text-ink-muted">{t("seatHint")}</p>
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+          <Pick pressed={filters.seat === null} onClick={() => onChange({ ...filters, seat: null })}>
+            {t("anySeat")}
+          </Pick>
+          {RANKING_SEATS.map((seat) => (
+            <Pick key={seat} pressed={filters.seat === seat} onClick={() => onChange({ ...filters, seat })}>
+              {t(`seats.${seat}`)}
             </Pick>
           ))}
         </div>
@@ -169,10 +202,10 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
 /** Desktop: the left page. Every pick applies at once. */
 export function RankingQuery({ filters }: { filters: RankingFilters }) {
   const t = useTranslations("Rankings");
-  const apply = useApplyFilters();
+  const apply = useApplyFilters(filters);
   // Circled at once, while the ranking reloads; the server's next value wins.
   const [picked, setPicked] = useState(filters);
-  const serverKey = JSON.stringify(rankingSearchParams(filters));
+  const serverKey = filtersKey(filters);
   const [fromServer, setFromServer] = useState(serverKey);
   if (fromServer !== serverKey) {
     setFromServer(serverKey);
@@ -201,9 +234,9 @@ export function RankingQuery({ filters }: { filters: RankingFilters }) {
 }
 
 /** "Limpiar filtros", where the ranking is empty. */
-export function ClearRankingFilters() {
+export function ClearRankingFilters({ filters }: { filters: RankingFilters }) {
   const t = useTranslations("Rankings");
-  const apply = useApplyFilters();
+  const apply = useApplyFilters(filters);
   return (
     <Button variant="link" onClick={() => apply(DEFAULT_FILTERS)}>
       {t("clear")}
@@ -220,7 +253,7 @@ export function ClearRankingFilters() {
  */
 export function RankingFiltersCard({ filters, lines }: { filters: RankingFilters; lines: [string, string] }) {
   const t = useTranslations("Rankings");
-  const apply = useApplyFilters();
+  const apply = useApplyFilters(filters);
   const dialog = useRef<HTMLDialogElement>(null);
   const [draft, setDraft] = useState(filters);
 
