@@ -1,4 +1,4 @@
-import type { ArnakBoardSide, ArnakLeader } from "@/games/arnak";
+import { ARNAK_BOARD_SIDES, type ArnakBoardSide, type ArnakLeader } from "@/games/arnak";
 
 // The Rankings "Consulta": which leader, which temple side, which seat, and
 // who's in. It lives in the URL, in Spanish like the rest of the group's links:
@@ -19,10 +19,17 @@ export const LEADER_PARAMS: Record<ArnakLeader, string> = {
   journalist: "periodista",
 };
 
-/** The two temple sides the Consulta offers (the base game's). */
-export const RANKING_TEMPLES = ["bird", "snake"] as const satisfies readonly ArnakBoardSide[];
-export type RankingTemple = (typeof RANKING_TEMPLES)[number];
-const TEMPLE_PARAMS: Record<RankingTemple, string> = { bird: "pajaro", snake: "serpiente" };
+/** Every temple side a game can be set up with: the base game's two and the expansions'. */
+export const RANKING_TEMPLES = ARNAK_BOARD_SIDES;
+export type RankingTemple = ArnakBoardSide;
+const TEMPLE_PARAMS: Record<RankingTemple, string> = {
+  bird: "pajaro",
+  snake: "serpiente",
+  waterfall: "cascada",
+  tree: "arbol",
+  monkey: "mono",
+  lizard: "lagarto",
+};
 
 /** No leader or no temple recorded: a choice of its own. */
 export const UNSPECIFIED = "none";

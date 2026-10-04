@@ -241,7 +241,11 @@
     "anyTemple": "Cualquiera",
     "temples": {
       "bird": "Pájaro",
-      "snake": "Serpiente"
+      "snake": "Serpiente",
+      "waterfall": "Cascada",
+      "tree": "Árbol",
+      "monkey": "Mono",
+      "lizard": "Lagarto"
     },
     "who": "Quiénes entran",
     "groups": {
@@ -261,7 +265,7 @@
       "mechanic": "la",
       "journalist": "la"
     },
-    "sentence": "{leader, select, all {Con todos los líderes} none {Sin líder registrado} other {Con {article} <b>{name}</b>}}{temple, select, bird { en el templo del <b>Pájaro</b>} snake { en el templo de la <b>Serpiente</b>} none { en un templo sin registrar} other {}}{seat, select, 1 {, empezando <b>primero</b>} 2 {, empezando <b>segundo</b>} 3 {, empezando <b>tercero</b>} 4 {, empezando <b>cuarto</b>} other {}}",
+    "sentence": "{leader, select, all {Con todos los líderes} none {Sin líder registrado} other {Con {article} <b>{name}</b>}}{temple, select, bird { en el templo del <b>Pájaro</b>} snake { en el templo de la <b>Serpiente</b>} waterfall { en el templo de la <b>Cascada</b>} tree { en el templo del <b>Árbol</b>} monkey { en el templo del <b>Mono</b>} lizard { en el templo del <b>Lagarto</b>} none { en un templo sin registrar} other {}}{seat, select, 1 {, empezando <b>primero</b>} 2 {, empezando <b>segundo</b>} 3 {, empezando <b>tercero</b>} 4 {, empezando <b>cuarto</b>} other {}}",
     "summary": "{players, plural, one {# jugador} other {# jugadores}} · {matches, plural, one {# partida} other {# partidas}}",
     "sortBy": "Ordenar por",
     "sorts": {
@@ -287,7 +291,7 @@
       "rankings": "Rankings"
     },
     "card": {
-      "leaderTemple": "{leader}{temple, select, bird { · templo del Pájaro} snake { · templo de la Serpiente} none { · templo sin especificar} other {}}{seat, select, 1 { · 1.º en la mesa} 2 { · 2.º en la mesa} 3 { · 3.º en la mesa} 4 { · 4.º en la mesa} other {}}",
+      "leaderTemple": "{leader}{temple, select, bird { · templo del Pájaro} snake { · templo de la Serpiente} waterfall { · templo de la Cascada} tree { · templo del Árbol} monkey { · templo del Mono} lizard { · templo del Lagarto} none { · templo sin especificar} other {}}{seat, select, 1 { · 1.º en la mesa} 2 { · 2.º en la mesa} 3 { · 3.º en la mesa} 4 { · 4.º en la mesa} other {}}",
       "everyone": "Amigos e invitados",
       "onlyYou": "Solo vos",
       "allTables": "todas las mesas",

@@ -6,6 +6,7 @@ import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { CloseIcon } from "@/components/notebook/icons";
 import { InkButton } from "@/components/notebook/ink-button";
 import { PaintedBand } from "@/components/notebook/painted-band";
+import { PenCheck } from "@/components/notebook/pen-checkbox";
 import { PenCircle } from "@/components/notebook/pen-circle";
 import { Button } from "@/components/ui/button";
 import { ARNAK_LEADER_STYLES, ARNAK_LEADERS, type ArnakLeader } from "@/games/arnak";
@@ -26,7 +27,8 @@ import {
 
 // The Rankings "Consulta": which leader, which temple, who's in. On desktop
 // it's the left page and every pick applies at once; on phones it folds into
-// a card whose sheet applies with "Ver ranking". Picks are circled in pen.
+// a card whose sheet applies with "Ver ranking". Picks are circled in pen;
+// who's in, where several go at once, is ticked.
 
 const filtersKey = (filters: RankingFilters) => JSON.stringify(rankingSearchParams(filters));
 
@@ -186,11 +188,12 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
         <h3 id={`${id}-who`} className="type-label m-0">
           {t("who")}
         </h3>
-        <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1">
+        {/* Several at once: ticked, not circled. */}
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
           {RANKING_GROUPS.map((group) => (
-            <Pick key={group} pressed={filters.groups.includes(group)} onClick={() => toggleGroup(group)}>
+            <PenCheck key={group} checked={filters.groups.includes(group)} onChange={() => toggleGroup(group)}>
               {t(`groups.${group}`)}
-            </Pick>
+            </PenCheck>
           ))}
         </div>
         <p className="type-caption m-0 mt-2 text-ink-muted">{t("whoHint")}</p>
