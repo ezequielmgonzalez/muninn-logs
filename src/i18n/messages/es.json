@@ -302,7 +302,7 @@
     "apply": "Ver ranking",
     "unspecified": "Sin especificar",
     "seat": "Turno",
-    "seatHint": "En qué lugar de la mesa empezó cada uno. Las partidas sin turnos registrados no cuentan.",
+    "seatHint": "Dónde empezó cada uno, si se registraron los turnos.",
     "anySeat": "Cualquiera",
     "seats": {
       "1": "1.º",

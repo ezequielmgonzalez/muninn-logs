@@ -131,7 +131,7 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
           {t("leader")}
         </h3>
         <p className="type-caption m-0 mt-1 text-ink-muted">{t("leaderHint")}</p>
-        <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1.5">
+        <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-0.5">
           <Pick pressed={filters.leader === null} onClick={() => onChange({ ...filters, leader: null })}>
             {t("allLeaders")}
           </Pick>
@@ -152,7 +152,8 @@ function Controls({ filters, onChange }: { filters: RankingFilters; onChange: (f
         <h3 id={`${id}-temple`} className="type-label m-0">
           {t("temple")}
         </h3>
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+        {/* Tight, so the eight fit in two rows on the desktop page. */}
+        <div className="mt-2 flex flex-wrap gap-x-1">
           <Pick pressed={filters.temple === null} onClick={() => onChange({ ...filters, temple: null })}>
             {t("anyTemple")}
           </Pick>

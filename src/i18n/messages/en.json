@@ -302,7 +302,7 @@
     "apply": "See ranking",
     "unspecified": "Unspecified",
     "seat": "Turn",
-    "seatHint": "Where each player started at the table. Games without a recorded turn order don't count.",
+    "seatHint": "Where each player started, if turns were recorded.",
     "anySeat": "Any",
     "seats": {
       "1": "1st",
