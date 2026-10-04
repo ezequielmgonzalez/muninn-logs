@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { formError, signUp } from "./helpers/auth";
+import { befriend } from "./helpers/friends";
 import { addGuest, fillScores, saveMatch, setDate } from "./helpers/matches";
 
 test("logs a match with guests, leaders and a tiebreak", async ({ page, request }) => {
@@ -136,4 +137,28 @@ test("the board can be any of Arnak's temples", async ({ page, request }) => {
   await expect(page.getByRole("button", { name: "Cascada" })).toHaveAttribute("aria-pressed", "true");
   await saveMatch(page);
   await expect(page.getByText("Cascada")).toBeVisible();
+});
+
+test("suggesting players floats over the form instead of moving it", async ({ page, request, browser }) => {
+  await signUp(page, request, "Ana");
+  const beto = await browser.newPage();
+  const { username } = await signUp(beto, request, "Beto");
+  await befriend(page, "Ana", beto, username);
+  await beto.close();
+
+  await page.goto("/es/matches/new");
+  const search = page.getByLabel("Agregar jugador");
+  await search.scrollIntoViewIfNeeded();
+  const hint = page.getByText("Buscá entre tus amigos e invitados");
+  const before = await hint.boundingBox();
+
+  await search.fill("Be");
+  const suggestions = page.getByRole("group", { name: "Sugerencias" });
+  await expect(suggestions.getByRole("button", { name: /^Beto/ })).toBeVisible();
+  // Nothing under the field moved.
+  expect(await hint.boundingBox()).toEqual(before);
+
+  await suggestions.getByRole("button", { name: /^Beto/ }).click();
+  await expect(suggestions).toHaveCount(0);
+  await expect(page.getByLabel("Líder de Beto")).toBeVisible();
 });
